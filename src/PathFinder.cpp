@@ -7,7 +7,7 @@
 
 PathFinder::PathFinder() {
   
-  const double STEER_LIMIT     = 5; // * pi() / 180; 
+  //const double STEER_LIMIT     = 50; // * pi() / 180; 
   
   
 }

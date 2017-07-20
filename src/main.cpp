@@ -293,9 +293,11 @@ int main() {
           cout << "end_path_d = " << end_path_d << endl; 
           cout << "sensor_fusion = " << sensor_fusion << endl;
           cout << "car x,y,s,d,yaw,speed = " << car_x << " " << car_y << " " << car_s << " " << car_d << " " << car_yaw << " " << car_speed << endl;
-         
+          
           cout << endl;
-          cout << pf.STEER_LIMIT << endl;
+          cout << "pf.* = " << pf.N_SAMPLES << " " << pf.SPEED_LIMIT << " " << pf.VEHICLE_RADIUS << " " << pf.MAX_JERK << " " << pf.MAX_ACCEL << " " << pf.EXPECTED_JERK_IN_ONE_SEC << " " << pf.EXPECTED_ACC_IN_ONE_SEC << endl;
+                    // pf.* = 10 50 1.5 10 10 2 1
+          
           cout << endl;
           
           /*
