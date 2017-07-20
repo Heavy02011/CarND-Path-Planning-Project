@@ -38,7 +38,11 @@ class PathFinder
     const double EXPECTED_JERK_IN_ONE_SEC = 2.0; // m/s/s
     const double EXPECTED_ACC_IN_ONE_SEC = 1.0; // m/s
     
+    // sample function
     double myfunc(double deg);
+    
+    //===== helper functions =====
+    double logistic(double x);
       
   private:
       

@@ -298,6 +298,7 @@ int main() {
           cout << "pf.* = " << pf.N_SAMPLES << " " << pf.SPEED_LIMIT << " " << pf.VEHICLE_RADIUS << " " << pf.MAX_JERK << " " << pf.MAX_ACCEL << " " << pf.EXPECTED_JERK_IN_ONE_SEC << " " << pf.EXPECTED_ACC_IN_ONE_SEC << endl;
                     // pf.* = 10 50 1.5 10 10 2 1
           cout << "pf.myfunc = " << pf.myfunc(180.) << endl;
+          cout << "pf.logistic(0.5) = " << pf.logistic(0.5) << endl;
           
           cout << endl;
           
