@@ -8,8 +8,11 @@
 #include "Eigen-3.3/Eigen/Core"
 #include "Eigen-3.3/Eigen/QR"
 #include "json.hpp"
+#include "spline.h" // rbx
+#include "PathFinder.h"
 
 using namespace std;
+using namespace tk; //rbx
 
 // for convenience
 using json = nlohmann::json;
@@ -195,8 +198,48 @@ int main() {
   	map_waypoints_dx.push_back(d_x);
   	map_waypoints_dy.push_back(d_y);
   }
+  
+//rbx
+  
+  // output waypoints & size 
+  cout << "waypoints.size: " << map_waypoints_x.size() << std::endl;
+  for (int i=0; i<map_waypoints_x.size(); i++) {
+    cout << i <<  " map_waypoints_x,y,s,dx,dy = " << map_waypoints_x[i] << " ";  
+    cout << map_waypoints_y[i] << " ";     
+    cout << map_waypoints_s[i] << " ";  
+    cout << map_waypoints_dx[i] << " "; 
+    cout << map_waypoints_dy[i] << endl;
+  }
+  
+  // setup spline objects
+  spline waypointspline_x;
+  spline waypointspline_y;
+  spline waypointspline_dx;
+  spline waypointspline_dy;
+      
+  // generate splines
+  waypointspline_x.set_points( map_waypoints_s, map_waypoints_x );
+  waypointspline_y.set_points( map_waypoints_s, map_waypoints_y );
+  waypointspline_dx.set_points(map_waypoints_s, map_waypoints_dx);
+  waypointspline_dy.set_points(map_waypoints_s, map_waypoints_dy);
+  
+  // get new point at my_s with --> double y = waypointspline_x(my_s);
+  //double x_smooth = waypointspline_x(100.0);
+  //cout <<  x_smooth << endl;
+            
 
-  h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
+  // generate PathFinder class
+  PathFinder pf;
+  
+  /*
+    h.onMessage([&count,&pp, &map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy,&WP_spline_x,&WP_spline_y,&WP_spline_dx,&WP_spline_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
+    uWS::OpCode opCode) {
+  */
+  
+//rbx
+  //ur h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
+      
+  h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy, &waypointspline_x, &waypointspline_y, &waypointspline_dx, &waypointspline_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                      uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -231,6 +274,8 @@ int main() {
           	double end_path_d = j[1]["end_path_d"];
 
           	// Sensor Fusion Data, a list of all other cars on the same side of the road.
+            // ["sensor_fusion"] A 2d vector of cars and then that car's 
+            // [car's unique ID, car's x position in map coordinates, car's y position in map coordinates, car's x velocity in m/s, car's y velocity in m/s, car's s position in frenet coordinates, car's d position in frenet coordinates.
           	auto sensor_fusion = j[1]["sensor_fusion"];
 
           	json msgJson;
@@ -240,6 +285,114 @@ int main() {
 
 
           	// TODO: define a path made up of (x,y) points that the car will visit sequentially every .02 seconds
+            
+//rbx            
+          cout << "previous_path_x = " << previous_path_x << endl;  
+          cout << "previous_path_y = " << previous_path_y << endl;     
+          cout << "end_path_s = " << end_path_s << endl;  
+          cout << "end_path_d = " << end_path_d << endl; 
+          cout << "sensor_fusion = " << sensor_fusion << endl;
+          cout << "car x,y,s,d,yaw,speed = " << car_x << " " << car_y << " " << car_s << " " << car_d << " " << car_yaw << " " << car_speed << endl;
+         
+          cout << endl;
+          //cout << pf.STEER_LIMIT << endl;
+          cout << endl;
+          
+          /*
+          previous_path_x = []
+          previous_path_y = []
+          end_path_s = 0
+          end_path_d = 0
+          sensor_fusion = [ [0 ,1022.598,1147.169,14.19477 ,10.3549   ,237.563  , 8.870655],
+                            [1 ,1044.688,1155.066,15.69208 ,6.39629   ,261.0865 , 9.971673],
+                            [2 ,1133.548,1187.77 ,14.78464 ,1.11656   ,357.6642 , 1.827328],
+                            [3 ,904.5436,1124.697, 2.529505,2.679815  ,119.9534 ,10.10191 ],
+                            [4 ,949.4061,1134.024,15.38097 ,1.409398  ,164.616  , 2.596563],
+                            [5 ,1156.399,1189.374,15.09513 ,1.014567  ,380.5711 , 1.956437],
+                            [6 ,1166.188,1181.94 ,16.5754  ,0.8770281 ,390.0564 , 9.954964],
+                            [7 ,901.1926,1124.588, 2.646314,0.4060514 ,124.8682 ,10.17496 ],
+                            [8 ,892.0728,1130.129,18.83123 ,1.271136  ,107.481  , 4.67399 ],
+                            [9 ,1096.84 ,1174.888,17.36887 ,4.232598  ,332.6492 ,10.20708 ],
+                            [10,1071.899,1174.909,16.43713 ,6.889896  ,293.7626 , 2.037921],
+                            [11,836.1995,1132.793,20.70742 ,0.03320942, 51.60747, 2.123863] ]        
+          */                  
+                         
+/*                            
+          // store x,y of other cars                  
+          vector<double> maps_x; 
+          vector<double> maps_y;          
+          for (int i = 0; i < sensor_fusion.size(); i++) {
+            maps_x.push_back(sensor_fusion[i][1]);
+            maps_y.push_back(sensor_fusion[i][2]);
+          }
+          
+          // determine closest waypoint
+          int cpoint = ClosestWaypoint(car_x, car_y, maps_x, maps_y);
+          cout << "closest point = " << cpoint << endl;     
+         
+          // Transform from Cartesian x,y coordinates to Frenet s,d coordinates          
+          double theta = 0;
+          vector<double> cars_sd = getFrenet(car_x, car_y,theta, map_waypoints_x, map_waypoints_y);
+          cout << "car_sd = " << cars_sd[0] << " " << cars_sd[1] << endl;   
+          // car x,y,s,d,yaw,speed = 909.48 1128.67 124.834 6.16483 0 0
+          // car_sd = 124.834 6.16497  
+*/                      
+          
+          // calculate new car path without smoothing and store in next_x_vals0, next_y_vals0   
+          // http://hyperphysics.phy-astr.gsu.edu/hbase/avari.html          
+          // ds = v * dt --> v = ds / dt with 
+          
+          double max_car_speed = 0.8 * 50.0 * 0.44704; // apply safety factor of 90%
+          
+          // position
+          double b = 0.8*10.0; //10.0; // m/s2
+          double c = 0.8*50.0; //50.0; // m/s3
+          double dt = 0.02;        // s          
+          double x0 = 0; //car_s;
+          double v0 = max_car_speed; // change to variable speed according to traffic conditions later
+          double xt = x0 + v0 * dt + b * dt*dt/2 + c * dt*dt*dt/6;
+          cout << "==========================================================================" << endl;
+          cout << "car_s, car_d, xt, v0 = " << car_s << " " << car_d << " " << xt << " " << v0 << endl;
+          cout << endl;
+          double x_smooth = waypointspline_x(car_s);
+          cout <<  "smooth x = " << x_smooth << endl;
+          cout << endl;
+          cout << endl;
+          cout << "==========================================================================" << endl;
+          
+          double ds = xt; //0.4; // increment along s for time interval dt  
+          double dd = 6.0; //car_s - 6.0; //0.0; // increment for changing lane  
+          
+          // placeholder for unsmoothed waypoints
+          vector<double> next_x_vals0;
+          vector<double> next_y_vals0; 
+          
+          // set number of path points 
+          int n_points = 50;
+          for (int i=0; i<n_points; i++) {
+            
+            // new increments along s,d
+            double delta_s = car_s + i * ds;
+            double delta_d = car_d + i * dd;
+            
+            // use spline to get smooth new path points of road center
+            double new_x0 = waypointspline_x(delta_s);
+            double new_y0 = waypointspline_y(delta_s);
+            double new_dx0 = waypointspline_dx(delta_s);
+            double new_dy0 = waypointspline_dy(delta_s);
+                       
+            // adjust for lane
+            double new_x = new_x0 + new_dx0 * dd;
+            double new_y = new_y0 + new_dy0 * dd;
+            
+            // store the calculated path
+            next_x_vals.push_back(new_x); 
+            next_y_vals.push_back(new_y);   
+            
+          }
+         
+  
+//rbx
           	msgJson["next_x"] = next_x_vals;
           	msgJson["next_y"] = next_y_vals;
 
@@ -292,9 +445,56 @@ int main() {
 }
 
 
+//########
+/*
+int NextWaypoint(double x, double y, double theta, 
+                 vector<double> &maps_x, vector<double> &maps_y,
+                 vector<double> &maps_dx, vector<double> &maps_dy)
+{
 
+	int closestWaypoint = ClosestWaypoint(x,y,maps_x,maps_y);
 
+	double map_x = maps_x[closestWaypoint];
+	double map_y = maps_y[closestWaypoint];
 
+//	double heading = atan2( (map_y-y),(map_x-x) );
+	
+    //heading vector
+    double hx = map_x-x;
+    double hy = map_y-y;
+    
+    //Normal vector:
+    double nx = maps_dx[closestWaypoint];
+    double ny = maps_dy[closestWaypoint];
+    
+    //Vector into the direction of the road (perpendicular to the normal vector)
+    double vx = -ny;
+    double vy = nx;
+    
+    //Here we assume that the vehicle goes in the right directions
+    //(If this is not the case, we have to examine theta and we might need to decrease closestWaypoint!)
+    
+    //If the inner product of v and h is positive then we are behind the waypoint so we do not need to
+    //increment closestWaypoint, otherwise we are beyond the waypoint and we need to increment closestWaypoint.
+
+    double inner = hx*vx+hy*vy;
+    if (inner<0.0) {
+        closestWaypoint++;
+    }
+    
+//    double heading = atan2( vy,vx );
+
+//	double angle = abs(theta-heading);
+
+//	if(angle > pi()/4)
+//	{
+//		closestWaypoint++;
+//	}
+    
+
+    return closestWaypoint;
+}
+*/
 
 
 
