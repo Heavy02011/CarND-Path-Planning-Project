@@ -13,3 +13,8 @@ PathFinder::PathFinder() {
 }
 
 PathFinder::~PathFinder() {}
+
+
+double PathFinder::myfunc(double deg) {
+    return deg * M_PI / 180.0;
+  }

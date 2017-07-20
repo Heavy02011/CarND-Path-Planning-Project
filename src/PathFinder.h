@@ -14,9 +14,7 @@
 
 class PathFinder 
 {
-  private:
-    
-  
+
   public:
         
     PathFinder();
@@ -39,8 +37,12 @@ class PathFinder
     // max jerk and acceleration in one second
     const double EXPECTED_JERK_IN_ONE_SEC = 2.0; // m/s/s
     const double EXPECTED_ACC_IN_ONE_SEC = 1.0; // m/s
-      
     
+    double myfunc(double deg);
+      
+  private:
+      
+      
 };
 
 #endif /* PATHFINDER_H */
