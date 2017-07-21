@@ -217,7 +217,6 @@ vector<states> PathFinder::successor_states(states input)
         succ_states.push_back(KL);   // 0
         return succ_states;
   }
-  //return succ_states;
 }
 
 

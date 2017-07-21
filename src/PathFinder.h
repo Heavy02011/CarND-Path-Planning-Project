@@ -26,12 +26,13 @@ struct test_case {
 		double T;
 };
 
+// data structure for FSM following the ideas of https://stackoverflow.com/questions/133214/is-there-a-typical-state-machine-implementation-pattern
+
 typedef enum { KL,           // 0 keep lane
                PLCL,         // 1 prepare lane change left
                PLCR,         // 2 prepare lane change right
                LCL,          // 3 lane change left
-               LCR } states; // 4 lane change right 
-              
+               LCR } states; // 4 lane change right             
                
 class PathFinder 
 {
@@ -96,39 +97,3 @@ class PathFinder
 };
 
 #endif /* PATHFINDER_H */
-
-/*
-
-// https://stackoverflow.com/questions/133214/is-there-a-typical-state-machine-implementation-pattern
-
-typedef enum
-{
-    STATE_1 = 0,
-    STATE_2,
-    STATE_3
-} my_state_t;
-
-my_state_t state = STATE_1;
-
-void foo(char input)
-{
-    ...
-    switch(state)
-    {
-        case STATE_1:
-            if(input)
-                state = STATE_2;
-            break;
-        case STATE_2:
-            if(input)
-                state = STATE_3;
-            else
-                state = STATE_1;
-            break;
-        case STATE_3:
-            ...
-            break;
-    }
-    ...
-    }
-*/
