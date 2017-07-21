@@ -26,6 +26,11 @@ PathFinder::PathFinder() {
 
 PathFinder::~PathFinder() {}
 
+// For converting back and forth between radians and degrees.
+constexpr double pi() { return M_PI; }
+double deg2rad2(double x) { return x * pi() / 180; }
+double rad2deg2(double x) { return x * 180 / pi(); }
+
 
 double PathFinder::myfunc(double deg) {
     return deg * M_PI / 180.0;
@@ -101,6 +106,47 @@ vector<double> PathFinder::JMT(vector< double> start, vector <double> end, doubl
     double a5 = x[2];
     
     return {a0,a1,a2,a3,a4,a5};
+    
+}
+
+void PathFinder::generate_path_straight(double car_x, double car_y, double car_yaw, vector<double> *next_x, vector<double> *next_y) {//, vector<double> *prev_x, vector<double> *prev_y) {
+  
+  // https://stackoverflow.com/questions/13295011/altering-the-values-of-array-elements-from-within-a-function
+  
+  //vector<double> next_x_vals;
+  //vector<double> next_y_vals;
+  double my_x;
+  double my_y;
+  
+  double dist_inc = 0.5;
+  for(int i = 0; i < 50; i++)
+  {
+        //next_x_vals.push_back(car_x+(dist_inc*i)*cos(deg2rad2(car_yaw)));
+        //next_y_vals.push_back(car_y+(dist_inc*i)*sin(deg2rad2(car_yaw)));
+    my_x = car_x+(dist_inc*i)*cos(deg2rad2(car_yaw));
+    my_y = car_y+(dist_inc*i)*sin(deg2rad2(car_yaw));
+    (*next_x)[i] = my_x;
+    (*next_y)[i] = my_y; 
+    
+  }
+  //cout << "next_x/y_vals.size() = " << next_x_vals.size() << " " << next_y_vals.size() << endl;
+  cout << "next_x/y.size() = " << next_x->size() << " " << next_y->size() << endl;
+  
+/*  
+  // store result
+  for(int i=0;i<next_x_vals.size();i++) {
+    next_x[i] = next_x_vals[i];
+    next_y[i] = next_y_vals[i];    
+  }
+  
+      *x = new int[n];
+    (*x)[0] = 2;
+    (*x)[1] = 1;
+    (*x)[2] = 0;
+  
+  
+  
+*/
     
 }
 

@@ -448,6 +448,8 @@ int main() {
             
           }
          
+          // overwrite with straight line
+          pf.generate_path_straight(car_x,car_y, car_yaw, &next_x_vals, &next_y_vals); //, &previous_path_x, &previous_path_y);
   
 //rbx
           	msgJson["next_x"] = next_x_vals;
@@ -552,78 +554,3 @@ int NextWaypoint(double x, double y, double theta,
     return closestWaypoint;
 }
 */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

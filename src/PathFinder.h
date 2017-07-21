@@ -57,8 +57,6 @@ class PathFinder
     //const vector<double> SIGMA_D = {1.0, 1.0, 1.0};
     VectorXd SIGMA_S = VectorXd(3);
     VectorXd SIGMA_D = VectorXd(3);
-    
-    //const double SIGMA_S[3] = {10.0, 4.0, 2.0}; // s, s_dot, s_double_dot
     const double SIGMA_T = 2.0;
   
     // sample function
@@ -66,6 +64,9 @@ class PathFinder
     
     // Calculate the Jerk Minimizing Trajectory that connects the initial state to the final state in time T.
     vector<double> JMT(vector< double> start, vector <double> end, double T);
+    
+    // generate straight path
+    void generate_path_straight(double car_x, double car_y, double car_yaw, vector<double> *next_x, vector<double> *next_y); //, vector<double> *prev_x, vector<double> *prev_y);
     
     //===== helper functions =====
     double logistic(double x);
