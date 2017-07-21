@@ -234,8 +234,9 @@ int main() {
   //cout <<  x_smooth << endl;
             
 
-  // generate PathFinder class
+  // generate PathFinder class & initial states
   PathFinder pf;
+  pf.state = KL;
   
   /*
     h.onMessage([&count,&pp, &map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy,&WP_spline_x,&WP_spline_y,&WP_spline_dx,&WP_spline_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
@@ -505,7 +506,30 @@ int main() {
               next_y_vals.push_back(pos_y+(dist_inc)*sin(angle+(i+1)*(pi()/100)));
               pos_x += (dist_inc)*cos(angle+(i+1)*(pi()/100));
               pos_y += (dist_inc)*sin(angle+(i+1)*(pi()/100));
-            }
+            
+          }
+          
+          cout << "test Finite State Machine" << endl;  
+          
+          // loop over all states
+          for (int istate=0; istate<pf.all_states.size(); istate++) {
+            cout << istate << " " << pf.all_states[istate] << endl;
+            
+            // set a new state
+            pf.state = pf.all_states[istate];
+            
+            // check for possible succesor states
+            vector<states> my_possible_states = pf.successor_states(pf.state); 
+            
+            // print results
+            for (int kk=0; kk<my_possible_states.size(); kk++) {
+              cout << my_possible_states[kk] << endl;
+            } 
+            
+            // test check for state
+            if (pf.state == LCL) cout << "LCR detected" << endl;
+            
+          }         
           
           
 //rbx
