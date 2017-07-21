@@ -471,18 +471,22 @@ int main() {
           }
           */
           
-
+          // variables for actual vehicle data
           double pos_x;
           double pos_y;
           double angle;
+          
+          // current size of path
           int path_size = previous_path_x.size();
 
+          // store previous path in new one for smooth transition 
           for(int i = 0; i < path_size; i++)
           {
               next_x_vals.push_back(previous_path_x[i]);
               next_y_vals.push_back(previous_path_y[i]);
           }
 
+          // treat case of initial path of length zero, one and two
           if(path_size == 0)
           {
               pos_x = car_x;
@@ -499,6 +503,7 @@ int main() {
               angle = atan2(pos_y-pos_y2,pos_x-pos_x2);
           }
 
+          // generate circle
           double dist_inc = 0.5;
           for(int i = 0; i < 50-path_size; i++)
           {    
@@ -509,6 +514,7 @@ int main() {
             
           }
           
+          // test Finite State Machine
           cout << "test Finite State Machine" << endl;  
           
           // loop over all states
