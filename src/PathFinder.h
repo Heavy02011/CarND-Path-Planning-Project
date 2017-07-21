@@ -19,6 +19,13 @@ using namespace std;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
+struct test_case {
+	
+		vector<double> start;
+		vector<double> end;
+		double T;
+};
+
 class PathFinder 
 {
 
@@ -45,6 +52,13 @@ class PathFinder
     const double EXPECTED_JERK_IN_ONE_SEC = 2.0; // m/s/s
     const double EXPECTED_ACC_IN_ONE_SEC = 1.0; // m/s
     
+    // sigmas for generating perturbed goal points according to lesson 5.30
+    //const vector<double> SIGMA_S = {10.0, 4.0, 2.0}; // s, s_dot, s_double_dot
+    //const vector<double> SIGMA_D = {1.0, 1.0, 1.0};
+    const double SIGMA_S[3] = {10.0, 4.0, 2.0}; // s, s_dot, s_double_dot
+    const double SIGMA_D[3] = {1.0, 1.0, 1.0};
+    const double SIGMA_T = 2.0;
+  
     // sample function
     double myfunc(double deg);
     
@@ -60,9 +74,3 @@ class PathFinder
 };
 
 #endif /* PATHFINDER_H */
-
-/*
-SIGMA_S = [10.0, 4.0, 2.0] # s, s_dot, s_double_dot
-SIGMA_D = [1.0, 1.0, 1.0]
-SIGMA_T = 2.0
-*/

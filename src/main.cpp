@@ -301,21 +301,15 @@ int main() {
           cout << "car x,y,s,d,yaw,speed = " << car_x << " " << car_y << " " << car_s << " " << car_d << " " << car_yaw << " " << car_speed << endl;
           
           cout << endl;
-          cout << "pf.* = " << pf.N_SAMPLES << " " << pf.SPEED_LIMIT << " " << pf.VEHICLE_RADIUS << " " << pf.MAX_JERK << " " << pf.MAX_ACCEL << " " << pf.EXPECTED_JERK_IN_ONE_SEC << " " << pf.EXPECTED_ACC_IN_ONE_SEC << endl;
+          //cout << "pf.* = " << pf.N_SAMPLES << " " << pf.SPEED_LIMIT << " " << pf.VEHICLE_RADIUS << " " << pf.MAX_JERK << " " << pf.MAX_ACCEL << " " << pf.EXPECTED_JERK_IN_ONE_SEC << " " << pf.EXPECTED_ACC_IN_ONE_SEC << endl;
                     // pf.* = 10 50 1.5 10 10 2 1
-          cout << "pf.myfunc = " << pf.myfunc(180.) << endl;
-          cout << "pf.logistic(0.5) = " << pf.logistic(0.5) << endl;
+          //cout << "pf.myfunc = " << pf.myfunc(180.) << endl;
+          //cout << "pf.logistic(0.5) = " << pf.logistic(0.5) << endl;
+          //cout << endl;
           
-          cout << endl;
+          //############## test code for pf.JMT
           
-          //##############
-struct test_case {
-	
-		vector<double> start;
-		vector<double> end;
-		double T;
-  };
-  
+/*  
 	vector<test_case> tc;
 
 	test_case tc1;
@@ -350,7 +344,7 @@ struct test_case {
     }
   
 	}
-  
+*/  
           
           //##############
           
@@ -413,6 +407,9 @@ struct test_case {
           cout << endl;
           double x_smooth = waypointspline_x(car_s);
           cout <<  "smooth x = " << x_smooth << endl;
+          
+          cout << pf.SIGMA_S[0] << " " << pf.SIGMA_S[1] << " " << pf.SIGMA_S[2] << " " <<endl;
+          cout << pf.SIGMA_D[0] << " " << pf.SIGMA_D[1] << " " << pf.SIGMA_D[2] << " " <<endl;
           cout << endl;
           cout << endl;
           cout << "==========================================================================" << endl;
