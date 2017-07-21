@@ -121,8 +121,8 @@ void PathFinder::generate_path_straight(double car_x, double car_y, double car_y
   double dist_inc = 0.5;
   for(int i = 0; i < 50; i++)
   {
-        //next_x_vals.push_back(car_x+(dist_inc*i)*cos(deg2rad2(car_yaw)));
-        //next_y_vals.push_back(car_y+(dist_inc*i)*sin(deg2rad2(car_yaw)));
+    //next_x_vals.push_back(car_x+(dist_inc*i)*cos(deg2rad2(car_yaw)));
+    //next_y_vals.push_back(car_y+(dist_inc*i)*sin(deg2rad2(car_yaw)));
     my_x = car_x+(dist_inc*i)*cos(deg2rad2(car_yaw));
     my_y = car_y+(dist_inc*i)*sin(deg2rad2(car_yaw));
     (*next_x)[i] = my_x;
@@ -131,23 +131,58 @@ void PathFinder::generate_path_straight(double car_x, double car_y, double car_y
   }
   //cout << "next_x/y_vals.size() = " << next_x_vals.size() << " " << next_y_vals.size() << endl;
   cout << "next_x/y.size() = " << next_x->size() << " " << next_y->size() << endl;
-  
-/*  
-  // store result
-  for(int i=0;i<next_x_vals.size();i++) {
-    next_x[i] = next_x_vals[i];
-    next_y[i] = next_y_vals[i];    
-  }
-  
-      *x = new int[n];
-    (*x)[0] = 2;
-    (*x)[1] = 1;
-    (*x)[2] = 0;
-  
-  
-  
-*/
     
+}
+
+void PathFinder::generate_path_circle(double car_x, double car_y, double car_yaw, vector<double> *next_x, vector<double> *next_y, vector<double> *prev_x, vector<double> *prev_y) {
+  // https://stackoverflow.com/questions/13295011/altering-the-values-of-array-elements-from-within-a-function
+  
+  vector<double> next_x_vals;
+  vector<double> next_y_vals;
+  
+  double pos_x;
+  double pos_y;
+  double angle;
+  int path_size = prev_x->size();
+  cout << "circle: path_size = " << path_size << endl;
+
+  for(int i = 0; i < path_size; i++)
+  {
+      next_x_vals.push_back((*prev_x)[i]);
+      next_y_vals.push_back((*prev_y)[i]);
+  }
+
+  if(path_size == 0)
+  {
+      pos_x = car_x;
+      pos_y = car_y;
+      angle = deg2rad2(car_yaw);
+  }
+  else
+  {
+      pos_x = (*prev_x)[path_size-1];
+      pos_y = (*prev_y)[path_size-1];
+
+      double pos_x2 = (*prev_x)[path_size-2];
+      double pos_y2 = (*prev_y)[path_size-2];
+      angle = atan2(pos_y-pos_y2,pos_x-pos_x2);
+  }
+
+  double dist_inc = 0.5;
+  for(int i = 0; i < 50-path_size; i++)
+  {    
+      next_x_vals.push_back(pos_x+(dist_inc)*cos(angle+(i+1)*(pi()/100)));
+      next_y_vals.push_back(pos_y+(dist_inc)*sin(angle+(i+1)*(pi()/100)));
+      pos_x += (dist_inc)*cos(angle+(i+1)*(pi()/100));
+      pos_y += (dist_inc)*sin(angle+(i+1)*(pi()/100));
+  }
+ 
+  // store final result
+ for(int i=0; i< path_size; i++) {
+   (*next_x)[i] = next_x_vals[i];
+   (*next_y)[i] = next_y_vals[i];
+ } 
+  
 }
 
 //###########helpers########################

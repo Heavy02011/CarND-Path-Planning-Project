@@ -67,6 +67,9 @@ class PathFinder
     
     // generate straight path
     void generate_path_straight(double car_x, double car_y, double car_yaw, vector<double> *next_x, vector<double> *next_y); //, vector<double> *prev_x, vector<double> *prev_y);
+ 
+    // generate straight path
+    void generate_path_circle(double car_x, double car_y, double car_yaw, vector<double> *next_x, vector<double> *next_y, vector<double> *prev_x, vector<double> *prev_y);
     
     //===== helper functions =====
     double logistic(double x);
