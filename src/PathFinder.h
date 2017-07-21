@@ -55,8 +55,10 @@ class PathFinder
     // sigmas for generating perturbed goal points according to lesson 5.30
     //const vector<double> SIGMA_S = {10.0, 4.0, 2.0}; // s, s_dot, s_double_dot
     //const vector<double> SIGMA_D = {1.0, 1.0, 1.0};
-    const double SIGMA_S[3] = {10.0, 4.0, 2.0}; // s, s_dot, s_double_dot
-    const double SIGMA_D[3] = {1.0, 1.0, 1.0};
+    VectorXd SIGMA_S = VectorXd(3);
+    VectorXd SIGMA_D = VectorXd(3);
+    
+    //const double SIGMA_S[3] = {10.0, 4.0, 2.0}; // s, s_dot, s_double_dot
     const double SIGMA_T = 2.0;
   
     // sample function

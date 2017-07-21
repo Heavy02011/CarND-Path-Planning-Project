@@ -408,6 +408,9 @@ int main() {
           double x_smooth = waypointspline_x(car_s);
           cout <<  "smooth x = " << x_smooth << endl;
           
+          cout << pf.SIGMA_S << endl;
+          cout << pf.SIGMA_D << endl;
+                    
           cout << pf.SIGMA_S[0] << " " << pf.SIGMA_S[1] << " " << pf.SIGMA_S[2] << " " <<endl;
           cout << pf.SIGMA_D[0] << " " << pf.SIGMA_D[1] << " " << pf.SIGMA_D[2] << " " <<endl;
           cout << endl;

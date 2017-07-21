@@ -17,8 +17,10 @@ using Eigen::VectorXd;
 
 PathFinder::PathFinder() {
   
-  //const double STEER_LIMIT     = 50; // * pi() / 180; 
-  
+  // sigmas for generating perturbed goal points according to lesson 5.30
+  SIGMA_S << 10.0, 4.0, 2.0 ;
+  SIGMA_D << 1.0, 1.0, 1.0 ;
+      
   
 }
 
