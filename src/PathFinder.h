@@ -12,6 +12,13 @@
 #include "Eigen-3.3/Eigen/QR"
 #include "spline.h" // rbx
 
+#include <cmath>
+//#include "Dense"
+
+using namespace std;
+using Eigen::MatrixXd;
+using Eigen::VectorXd;
+
 class PathFinder 
 {
 
@@ -40,6 +47,9 @@ class PathFinder
     
     // sample function
     double myfunc(double deg);
+    
+    // Calculate the Jerk Minimizing Trajectory that connects the initial state to the final state in time T.
+    vector<double> JMT(vector< double> start, vector <double> end, double T);
     
     //===== helper functions =====
     double logistic(double x);

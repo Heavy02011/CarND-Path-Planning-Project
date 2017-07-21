@@ -11,6 +11,12 @@
 #include "spline.h" // rbx
 #include "PathFinder.h"
 
+#include <cmath>
+#include <vector>
+
+using Eigen::MatrixXd;
+using Eigen::VectorXd;
+
 using namespace std;
 using namespace tk; //rbx
 
@@ -302,6 +308,52 @@ int main() {
           
           cout << endl;
           
+          //##############
+struct test_case {
+	
+		vector<double> start;
+		vector<double> end;
+		double T;
+  };
+  
+	vector<test_case> tc;
+
+	test_case tc1;
+	tc1.start = {0,10,0};
+	tc1.end = {10,10,0};
+	tc1.T = 1;
+	tc.push_back(tc1);
+
+	test_case tc2;
+	tc2.start = {0,10,0};
+	tc2.end = {20,15,20};
+	tc2.T = 2;
+	tc.push_back(tc2);
+
+	test_case tc3;
+	tc3.start = {5,10,2};
+	tc3.end = {-30,-20,-4};
+	tc3.T = 5;
+	tc.push_back(tc3);
+
+	bool total_correct = true;
+	for(int i = 0; i < tc.size(); i++)
+	{
+		vector< double > jmt = pf.JMT(tc[i].start, tc[i].end, tc[i].T);
+    
+		//cout << jmt2 << endl;
+    cout << "test pf.JMT" << endl;
+    for (int j=0; j<jmt.size(); j++) {
+
+        cout << jmt[j] << endl;
+       
+    }
+  
+	}
+  
+          
+          //##############
+          
           /*
           previous_path_x = []
           previous_path_y = []
@@ -346,7 +398,8 @@ int main() {
           // http://hyperphysics.phy-astr.gsu.edu/hbase/avari.html          
           // ds = v * dt --> v = ds / dt with 
           
-          double max_car_speed = 0.8 * 50.0 * 0.44704; // apply safety factor of 90%
+          //double max_car_speed = 0.8 * 50.0 * 0.44704; // apply safety factor of 90%
+          double max_car_speed = 0.8 * pf.SPEED_LIMIT * 0.44704; // apply safety factor of 90%
           
           // position
           double b = 0.8*10.0; //10.0; // m/s2
