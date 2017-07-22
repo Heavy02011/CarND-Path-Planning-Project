@@ -284,7 +284,7 @@ vector<double> PathFinder::differentiate(vector<double> coefficients) {
 // calculate distance of othercar to my car
 double PathFinder::distance2car(Vehicle othercar) {
   double dist = 0.0;
-  dist = sqrt(2);
+  dist = sqrt( pow(this->x - othercar.x,2) + pow(this->y - othercar.y,2) );
   return dist;
 }
 
