@@ -14,6 +14,8 @@
 #include <cmath>
 #include <vector>
 
+#include "vehicle.h"
+
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
@@ -312,9 +314,7 @@ int main() {
                             car's y velocity in m/s, 
                             car's s position in frenet coordinates, 
                             car's d position in frenet coordinates.
-                            
-          car x,y,s,d,yaw,speed = 909.48 1128.67 124.834 6.16483 0 0
-          
+                                                  
           sensor_fusion = [ [0 ,1022.598,1147.169,14.19477 ,10.3549   ,237.563  , 8.870655],
                             [1 ,1044.688,1155.066,15.69208 ,6.39629   ,261.0865 , 9.971673],
                             [2 ,1133.548,1187.77 ,14.78464 ,1.11656   ,357.6642 , 1.827328],
@@ -326,7 +326,10 @@ int main() {
                             [8 ,892.0728,1130.129,18.83123 ,1.271136  ,107.481  , 4.67399 ],
                             [9 ,1096.84 ,1174.888,17.36887 ,4.232598  ,332.6492 ,10.20708 ],
                             [10,1071.899,1174.909,16.43713 ,6.889896  ,293.7626 , 2.037921],
-                            [11,836.1995,1132.793,20.70742 ,0.03320942, 51.60747, 2.123863] ]        
+                            [11,836.1995,1132.793,20.70742 ,0.03320942, 51.60747, 2.123863] ]  
+                      
+          car x,y,s,d,yaw,speed = 909.48 1128.67 124.834 6.16483 0 0
+                    
           */    
             
           // output of path data  
@@ -443,6 +446,14 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
                         4 0.0013479
             
             */
+                        
+            // test vehicle creation 
+            Vehicle mycar(23,0,0,50,10,100,4,0); // int id, double x, double y, double vx, double vy, double s, double d
+            mycar.display(mycar);
+            
+            // test prediction state in 5s
+            vector<double> mystate = mycar.state_at(5);
+            pf.output_vector(mystate);
             
           }
           

@@ -24,14 +24,6 @@ PathFinder::PathFinder(double lane, double s, double v, double a) {
   this->a = a;
   state = KL;
   max_acceleration = -1;
- 
-  
-      // sigmas for generating perturbed goal points according to lesson 5.30
-    //SIGMA_S << 10.0, 4.0, 2.0 ;
-    //SIGMA_D << 1.0, 1.0, 1.0 ;
-      
-    // populate vector with all states
-  //all_states = { KL, PLCL, PLCR, LCL, LCR }; 
   
 }
 
@@ -246,6 +238,7 @@ void PathFinder::output_vector(vector<double> x) {
   for (int i=0; i<x.size(); i++) {
     cout << i << " " << x[i] << endl;  
   } 
+  cout << endl;
 }
 
 // evaluate a polynomal 5th order determined by coefficients at value x

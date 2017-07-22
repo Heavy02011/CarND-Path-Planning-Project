@@ -15,6 +15,8 @@
 #include <cmath>
 //#include "Dense"
 
+#include "vehicle.h"
+
 using namespace std;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
@@ -44,7 +46,7 @@ class PathFinder
     virtual ~PathFinder();
         
     // number of sample points on track
-    const int N_SAMPLES = 10;
+    const int N_SAMPLES = 50;
       
     // convert from MPH to m/s
     const double MPH2MPS = 0.44704;
