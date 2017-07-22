@@ -80,11 +80,18 @@ public:
             
     };
     
-    // Predicts state of vehicle in t seconds (assuming constant acceleration)
+    // Predicts state of vehicle in t seconds (assuming constant acceleration along s & d)
     vector<double> state_at(double t) {
-      double s = this->s + this->v * t + this->a * t * t / 2;
-      double v = this->v + this->a * t;
-      return {s, v, this->a, this->d, 0, 0};
+      
+      // s movement
+      double s     = this->s + this->v * t + this->a * t * t / 2;
+      double v     = this->v + this->a * t;
+      
+      // d movement
+      double d     = this->d + this->d_dot * t + this->d_double_dot * t * t / 2;
+      double d_dot = this->d_dot + this->d_double_dot * t;
+      
+      return {s, v, this->a, d, d_dot, this->d_double_dot};
     } 
     
 };
