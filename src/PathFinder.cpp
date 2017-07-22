@@ -304,19 +304,7 @@ lane PathFinder::in_lane(double d) {
 }
 
 
-/* //######
 
-def differentiate(coefficients):
-    """
-    Calculates the derivative of a polynomial and returns
-    the corresponding coefficients.
-    """
-    new_cos = []
-    for deg, prev_co in enumerate(coefficients[1:]):
-        new_cos.append((deg+1) * prev_co)
-        return new_cos
-
-*/ //######
 
 /*
 

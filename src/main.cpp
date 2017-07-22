@@ -298,10 +298,14 @@ int main() {
 
           	// TODO: define a path made up of (x,y) points that the car will visit sequentially every .02 seconds
             
-// ==== rbx =======================================================================
+// =====================================================================================          
+// ==== rbx ============================================================================
+// =====================================================================================
             
-    
-          // update my cars data in PathFinder object
+          // ***************************************************************************
+          // 1 update my cars data in PathFinder object
+          // ***************************************************************************
+            
           pf.s = car_s;
           pf.d = car_d;
           pf.x = car_x;
@@ -309,17 +313,47 @@ int main() {
           pf.v = car_speed;
           
           // test lane detection
+          /*
           for (int k=0; k<sensor_fusion.size(); k++) {
             double my_d = sensor_fusion[k][6];
             lane my_lane = pf.in_lane(my_d);
             cout << k << " d = " << my_d << " lane = " << my_lane << endl;
           }
+          */
+
+          // ***************************************************************************
+          // 2 limit investigation of traffic to a smaller range out of sensor_fusion
+          // ***************************************************************************
           
-          // limit investigation of traffic to a smaller range out of sensor_fusion       
-          //TODO: ...store subset in a Vehicle class
+          // keep vehicles in range in this vector      
+          vector<Vehicle> vehicles_inrange;
           
-  
+          // loop over all vehicles
+          for (int k=0; k<sensor_fusion.size(); k++) {
             
+            // generate a test vehicle 
+            Vehicle othercar(sensor_fusion[k][0], sensor_fusion[k][1], sensor_fusion[k][2], sensor_fusion[k][3], sensor_fusion[k][4], sensor_fusion[k][5], sensor_fusion[k][6], 0, 0, 0);
+            
+            // determine distance to my car
+            double distance = pf.distance2car(othercar);
+            cout << "distance = " << distance << endl;
+            
+            // store vehicles in range
+            if (distance < 50) {
+              vehicles_inrange.push_back(othercar);
+            }
+            
+          }
+          cout << "*** " << vehicles_inrange.size() << " vehicles in range 50m detected ***" << endl;
+
+          // ***************************************************************************
+          // 3 select a real or virtual vehicle to follow & set target state
+          // ***************************************************************************  
+            
+          //TODO: ...complet this...
+          
+          
+          
           /*                ["sensor_fusion"] A 2d vector of cars and then that car's 
           
                             car's unique ID, 
@@ -361,7 +395,7 @@ int main() {
           
           
           // ***************************************************************************
-          // run finite state machine
+          // 4 run finite state machine & evaluate possible trajectories & costs
           // ***************************************************************************
 
 /*
@@ -461,7 +495,8 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
                         4 0.0013479
             
             */
-                        
+            
+            /*            
             // test vehicle creation 
             Vehicle mycar(23,0,0,50,10,100,4,0,0,3.5); // int id, double x, double y, double vx, double vy, double s, double d, double a, double d_dot, double d_double_dot
             mycar.display(mycar);
@@ -469,7 +504,7 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
             // test prediction state in 5s
             vector<double> mystate = mycar.state_at(5);
             pf.output_vector(mystate);
-            
+            */
             
           }
           
@@ -491,9 +526,16 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
             return best_next_state
 
 */           
-          
+            
           // ***************************************************************************
-          // generate path (test with circle)
+          // 5 generate path coordinates
+          // ***************************************************************************
+          
+          //TODO: ...complet this...
+            
+            
+          // ***************************************************************************
+          // XX generate path (test with circle)
           // ***************************************************************************
                   
           // variables for actual vehicle data
@@ -542,8 +584,10 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
           
           
           
+// =====================================================================================          
+// ==== rbx ============================================================================
+// =====================================================================================
           
-// ==== rbx =======================================================================
           	msgJson["next_x"] = next_x_vals;
           	msgJson["next_y"] = next_y_vals;
 
