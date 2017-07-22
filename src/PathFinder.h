@@ -114,6 +114,9 @@ class PathFinder
   
     double goal_s;
     
+    // id of target vehicle to follow
+    int target_vehicle; // 99 if no vehicle in range
+    
     
     //###
     

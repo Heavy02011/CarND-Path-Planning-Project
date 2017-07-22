@@ -328,22 +328,45 @@ int main() {
           // keep vehicles in range in this vector      
           vector<Vehicle> vehicles_inrange;
           
+          // select the car that has largest distance & velocity in front of us as target
+          
+              // create instance for mytargetcar
+              Vehicle mytargetcar(99,0,0,0,0,0,0,0,0,0);
+              
+              // largest distance in front
+              double ld_front = -999999;
+              
+              // largest velocity in front
+              double lv_front = -999999;
+              
+              // id of potential target car
+              int id_front;
+          
           // loop over all vehicles
           for (int k=0; k<sensor_fusion.size(); k++) {
             
-            // generate a test vehicle 
+            // generate a test vehicle for every entry in sensor_fusion
             Vehicle othercar(sensor_fusion[k][0], sensor_fusion[k][1], sensor_fusion[k][2], sensor_fusion[k][3], sensor_fusion[k][4], sensor_fusion[k][5], sensor_fusion[k][6], 0, 0, 0);
             
             // determine distance to my car
             double distance = pf.distance2car(othercar);
             cout << "distance = " << distance << endl;
             
+            // check whether car is suitable as target car withen next 500m in front of us
+            if ((distance > ld_front) and ((othercar.s > car_s) and (othercar.s < car_s+500)) and (othercar.v > lv_front)) {
+              id_front = k;
+              mytargetcar = othercar;
+            }
+              
             // store vehicles in range
             if (distance < 50) {
               vehicles_inrange.push_back(othercar);
             }
             
           }
+          cout << "*** id of target car: " << id_front << " ***" << endl;
+          mytargetcar.display(mytargetcar);
+          
           cout << "*** " << vehicles_inrange.size() << " vehicles in range 50m detected ***" << endl;
 
           for (int ii=0; ii<vehicles_inrange.size(); ii++) {
@@ -356,7 +379,7 @@ int main() {
           // ***************************************************************************  
             
           //TODO: ...complete this... 
-          
+
           
           
           /*                ["sensor_fusion"] A 2d vector of cars and then that car's 
@@ -397,6 +420,12 @@ int main() {
           cout << endl;
           cout << "==========================================================================" << endl;          
           cout << endl;
+
+          
+          // create a target vehicle 
+          //Vehicle mytargetcar(99,x,y,vx,vy,s,d,0,0,0); 
+          // int id, double x, double y, double vx, double vy, double s, double d, double a, double d_dot, double d_double_dot
+          
           
           
           // ***************************************************************************
@@ -533,6 +562,7 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
           }
 
           // generate circle
+          /*
           double dist_inc = 0.5;
           for(int i = 0; i < 50-path_size; i++)
           {    
@@ -542,6 +572,68 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
               pos_x += (dist_inc)*cos(angle+(i+1)*(pi()/100));
               pos_y += (dist_inc)*sin(angle+(i+1)*(pi()/100));
             
+          }
+          */
+          
+          // ########
+          
+          //double max_car_speed = 0.8 * 50.0 * 0.44704; // apply safety factor of 90%
+          double max_car_speed = 0.9 * pf.SPEED_LIMIT; // apply safety factor of 90%
+          
+          // position
+          double b = 0.8*10.0; //10.0; // m/s2
+          double c = 0.8*10.0; //50.0; // m/s3
+          double dt = 0.02;        // s          
+          double x0 = 0; //car_s;
+          double v0 = max_car_speed; // change to variable speed according to traffic conditions later
+          double xt = x0 + v0 * dt + b * dt*dt/2 + c * dt*dt*dt/6;
+          cout << "==========================================================================" << endl;
+          cout << "car_s, car_d, xt, v0 = " << car_s << " " << car_d << " " << xt << " " << v0 << endl;
+          cout << endl;
+          double x_smooth = waypointspline_x(car_s);
+          cout <<  "smooth x = " << x_smooth << endl;
+          cout << endl;
+          cout << endl;
+          cout << "==========================================================================" << endl;
+          
+          double ds = xt; //0.4; // increment along s for time interval dt  
+          double dd = 2.0; //car_s - 6.0; //0.0; // increment for changing lane  
+          
+          // ########
+          
+          
+          // generate path in middle lane
+          double dist_inc = 0.5;
+          //for(int i = 0; i < 50-path_size; i++)
+          for(int i = path_size; i < 50; i++)              
+          {  
+           
+            // new increments along s,d
+            double delta_s = car_s + i * ds;
+            double delta_d = car_d + i * dd;
+            
+            // use spline to get smooth new path points of road center
+            double new_x0 = waypointspline_x(delta_s);
+            double new_y0 = waypointspline_y(delta_s);
+            double new_dx0 = waypointspline_dx(delta_s);
+            double new_dy0 = waypointspline_dy(delta_s);
+                       
+            // adjust for lane
+            double new_x = new_x0 + new_dx0 * dd;
+            double new_y = new_y0 + new_dy0 * dd;
+            
+            // store the calculated path
+            next_x_vals.push_back(new_x); 
+            next_y_vals.push_back(new_y);   
+           
+           /* 
+            // straight line
+            double my_x = car_x+(dist_inc*i)*cos(deg2rad(car_yaw));
+            double my_y = car_y+(dist_inc*i)*sin(deg2rad(car_yaw));
+            
+            next_x_vals.push_back(my_x); 
+            next_y_vals.push_back(my_y);   
+            */
           }
           
           
