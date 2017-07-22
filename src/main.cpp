@@ -308,6 +308,13 @@ int main() {
           pf.y = car_y;
           pf.v = car_speed;
           
+          // test lane detection
+          for (int k=0; k<sensor_fusion.size(); k++) {
+            double my_d = sensor_fusion[k][6];
+            lane my_lane = pf.in_lane(my_d);
+            cout << k << " d = " << my_d << " lane = " << my_lane << endl;
+          }
+          
           // limit investigation of traffic to a smaller range out of sensor_fusion       
           //TODO: ...store subset in a Vehicle class
           
@@ -456,12 +463,13 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
             */
                         
             // test vehicle creation 
-            Vehicle mycar(23,0,0,50,10,100,4,0,0,0); // int id, double x, double y, double vx, double vy, double s, double d
+            Vehicle mycar(23,0,0,50,10,100,4,0,0,3.5); // int id, double x, double y, double vx, double vy, double s, double d, double a, double d_dot, double d_double_dot
             mycar.display(mycar);
             
             // test prediction state in 5s
             vector<double> mystate = mycar.state_at(5);
             pf.output_vector(mystate);
+            
             
           }
           

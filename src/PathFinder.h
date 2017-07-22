@@ -35,6 +35,12 @@ typedef enum { KL,           // 0 keep lane
                PLCR,         // 2 prepare lane change right
                LCL,          // 3 lane change left
                LCR } states; // 4 lane change right             
+ 
+typedef enum { OUTSIDE_LANE_LEFT,
+               LEFT_LANE,
+               MIDDLE_LANE,
+               RIGHT_LANE,
+               OUTSIDE_LANE_RIGHT } lane;
                
 class PathFinder 
 {
@@ -150,6 +156,9 @@ class PathFinder
      
     // calculate distance of othercar to my car 
     double distance2car(Vehicle othercar);
+    
+    // determine the lane othercar is driving in
+    lane in_lane(double d);
     
     
   private:

@@ -288,6 +288,21 @@ double PathFinder::distance2car(Vehicle othercar) {
   return dist;
 }
 
+// determine the lane othercar is driving in
+lane PathFinder::in_lane(double d) {
+  if (d < 0.0) {
+    return OUTSIDE_LANE_LEFT;
+  } else if ((d >= 0.0) and (d <= 4.0)) {
+    return LEFT_LANE;
+  } else if ((d >  4.0) and (d <= 8.0)) {
+    return MIDDLE_LANE;
+  } else if ((d >  8.0) and (d <= 12.0)) {
+    return RIGHT_LANE;
+  } else {
+    return OUTSIDE_LANE_RIGHT;
+  }
+}
+
 
 /* //######
 
