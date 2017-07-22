@@ -235,7 +235,9 @@ int main() {
             
 
   // generate PathFinder class & initial states
-  PathFinder pf;
+  //PathFinder pf;
+  PathFinder pf(2, 0, 0, 0); // double lane, double s, double v, double a
+  
   pf.state = KL;
   
   /*
@@ -295,8 +297,24 @@ int main() {
           	// TODO: define a path made up of (x,y) points that the car will visit sequentially every .02 seconds
             
 // ==== rbx =======================================================================
-                    
-          /*
+            
+    
+          // update my cars data in PathFinder object
+          pf.s = car_s;
+  
+            
+          /*                ["sensor_fusion"] A 2d vector of cars and then that car's 
+          
+                            car's unique ID, 
+                            car's x position in map coordinates, 
+                            car's y position in map coordinates, 
+                            car's x velocity in m/s, 
+                            car's y velocity in m/s, 
+                            car's s position in frenet coordinates, 
+                            car's d position in frenet coordinates.
+                            
+          car x,y,s,d,yaw,speed = 909.48 1128.67 124.834 6.16483 0 0
+          
           sensor_fusion = [ [0 ,1022.598,1147.169,14.19477 ,10.3549   ,237.563  , 8.870655],
                             [1 ,1044.688,1155.066,15.69208 ,6.39629   ,261.0865 , 9.971673],
                             [2 ,1133.548,1187.77 ,14.78464 ,1.11656   ,357.6642 , 1.827328],
@@ -327,18 +345,81 @@ int main() {
           // ***************************************************************************
           // run finite state machine
           // ***************************************************************************
+
+/*
+def transition_function(predictions, current_fsm_state, current_pose, cost_functions, weights):
+    
+          # only consider states which can be reached from current FSM state.
+          possible_successor_states = successor_states(current_fsm_state)
+*/
           
-          cout << "test Finite State Machine" << endl;  
+          // determine possible succesor states based on actual state
+          vector<states> possible_successor_states = pf.successor_states(pf.state); 
+
+/*
+          # keep track of the total cost of each state.
+          costs = []
+          for state in possible_successor_states: 
+              # generate a rough idea of what trajectory we would
+              # follow IF we chose this state.
+              trajectory_for_state = generate_trajectory(state, current_pose, predictions)
+      
+              # calculate the "cost" associated with that trajectory.
+              cost_for_state = 0
+              for i in range(len(cost_functions)) :
+                  # apply each cost function to the generated trajectory
+                  cost_function = cost_functions[i]
+                  cost_for_cost_function = cost_function(trajectory_for_state, predictions)
+      
+                  # multiply the cost by the associated weight
+                  weight = weights[i]
+                  cost_for_state += weight * cost_for_cost_function
+                  costs.append({'state' : state, 'cost' : cost_for_state})
+
+*/
+     
+          // loop over possible succesor states
+          for (int istate=0; istate < possible_successor_states.size(); istate++) {
+            
+            // out current investigated state
+            cout << "investigating state: " << possible_successor_states[istate] << endl;;
+            
+            // check for state
+            if (possible_successor_states[istate] == KL )  cout << "KL   possible" << endl;
+            if (possible_successor_states[istate] == PLCL) cout << "PLCL possible" << endl;
+            if (possible_successor_states[istate] == PLCR) cout << "PLCR possible" << endl;
+            if (possible_successor_states[istate] == LCL)  cout << "LCR  possible" << endl;
+            if (possible_successor_states[istate] == LCR)  cout << "LCR  possible" << endl;
+            
+            // generate path for current state
+            // trajectory_for_state = generate_trajectory(state, current_pose, predictions)
+            
+            vector<double> start = {car_s, 0, 0};
+            vector<double> end   = {car_s, 0, 0};
+            double T = 1;
+
+
+            //vector<double> PathFinder::JMT(vector<double> start, vector <double> end, double T)
+            start = {pf.s, pf.v, pf.a}; // actual state of my car
+            end   = {pf.s+10, pf.SPEED_LIMIT, pf.MAX_ACCEL};
+            T     = 20;
+            vector<double> coefficents = pf.JMT(start, end, T);
+            cout << "coefficents = " << endl;
+            pf.output_vector(coefficents);
+            
+          }
           
+          
+//##########  
+  
+ /*         
           // loop over all states
           for (int istate=0; istate<pf.all_states.size(); istate++) {
             cout << istate << " " << pf.all_states[istate] << endl;
             
             // set a new state
             pf.state = pf.all_states[istate];
-            
-            // check for possible succesor states
-            vector<states> my_possible_states = pf.successor_states(pf.state); 
+                
             
             // print results
             for (int kk=0; kk<my_possible_states.size(); kk++) {
@@ -349,7 +430,28 @@ int main() {
             if (pf.state == LCL) cout << "LCR detected" << endl;
             
           }  
+ */
           
+          
+          /*
+
+ 
+
+          
+
+    # Find the minimum cost state.
+    best_next_state = None
+    min_cost = 9999999
+    for i in range(len(possible_successor_states)):
+        state = possible_successor_states[i]
+        cost  = costs[i]
+        if cost < min_cost:
+            min_cost = cost
+            best_next_state = state 
+
+            return best_next_state
+
+*/           
           
           // ***************************************************************************
           // generate path (test with circle)

@@ -15,14 +15,23 @@ using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
 
-PathFinder::PathFinder() {
+PathFinder::PathFinder(double lane, double s, double v, double a) {
+ 
+  // store data of my car here
+  this->lane = lane;
+  this->s = s;
+  this->v = v;
+  this->a = a;
+  state = KL;
+  max_acceleration = -1;
+ 
   
-  // sigmas for generating perturbed goal points according to lesson 5.30
-  SIGMA_S << 10.0, 4.0, 2.0 ;
-  SIGMA_D << 1.0, 1.0, 1.0 ;
+      // sigmas for generating perturbed goal points according to lesson 5.30
+    //SIGMA_S << 10.0, 4.0, 2.0 ;
+    //SIGMA_D << 1.0, 1.0, 1.0 ;
       
-  // populate vector with all states
-  all_states = { KL, PLCL, PLCR, LCL, LCR }; 
+    // populate vector with all states
+  //all_states = { KL, PLCL, PLCR, LCL, LCR }; 
   
 }
 
@@ -38,7 +47,7 @@ double PathFinder::myfunc(double deg) {
     return deg * M_PI / 180.0;
 }
 
-vector<double> PathFinder::JMT(vector< double> start, vector <double> end, double T)
+vector<double> PathFinder::JMT(vector<double> start, vector <double> end, double T)
 {
     /*
     Calculate the Jerk Minimizing Trajectory that connects the initial state
@@ -228,6 +237,14 @@ vector<states> PathFinder::successor_states(states input)
 
 double PathFinder::logistic(double x) {
   return 2.0 / (1 + exp(-x)) - 1.0;
+}
+
+
+void PathFinder::output_vector(vector<double> x) {
+  for (int i=0; i<x.size(); i++) {
+    cout << i << " " << x[i] << endl;  
+  }
+  
 }
 
 /*

@@ -39,7 +39,7 @@ class PathFinder
 
   public:
         
-    PathFinder();
+    PathFinder(double lane, double s, double v, double a);
 
     virtual ~PathFinder();
         
@@ -63,16 +63,43 @@ class PathFinder
     // sigmas for generating perturbed goal points according to lesson 5.30
     //const vector<double> SIGMA_S = {10.0, 4.0, 2.0}; // s, s_dot, s_double_dot
     //const vector<double> SIGMA_D = {1.0, 1.0, 1.0};
-    VectorXd SIGMA_S = VectorXd(3);
-    VectorXd SIGMA_D = VectorXd(3);
+    //VectorXd SIGMA_S = VectorXd(3);
+    //VectorXd SIGMA_D = VectorXd(3);
+    vector<double> SIGMA_S = { 10.0, 4.0, 2.0 }; // SIGMA for s, s_dot, s_double_dot
+    vector<double> SIGMA_D = { 1.0, 1.0, 1.0 };  // SIGMA for d, d_dot, d_double_dot
     const double SIGMA_T = 2.0;
     
     // define initial state
     states state = KL;
     
     // define a vector of all states
-    vector<states> all_states; 
+    vector<states> all_states = { KL, PLCL, PLCR, LCL, LCR }; 
+    
+    //###
+    
+    // definition of lesson 4.16
   
+    int lane;
+  
+    double s;
+  
+    double v;
+  
+    double a;
+  
+    double target_speed;
+  
+    //int lanes_available;
+  
+    double max_acceleration;
+  
+    double goal_lane;
+  
+    double goal_s;
+    
+    
+    //###
+    
     // sample function
     double myfunc(double deg);
     
@@ -90,10 +117,15 @@ class PathFinder
     
     //===== helper functions =====
     double logistic(double x);
+    
+    void output_vector(vector<double> x);
       
   private:
       
       
 };
+
+
+
 
 #endif /* PATHFINDER_H */
