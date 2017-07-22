@@ -294,67 +294,9 @@ int main() {
 
           	// TODO: define a path made up of (x,y) points that the car will visit sequentially every .02 seconds
             
-//rbx            
-          cout << "previous_path_x = " << previous_path_x << endl;  
-          cout << "previous_path_y = " << previous_path_y << endl;     
-          cout << "end_path_s = " << end_path_s << endl;  
-          cout << "end_path_d = " << end_path_d << endl; 
-          cout << "sensor_fusion = " << sensor_fusion << endl;
-          cout << "car x,y,s,d,yaw,speed = " << car_x << " " << car_y << " " << car_s << " " << car_d << " " << car_yaw << " " << car_speed << endl;
-          
-          cout << endl;
-          //cout << "pf.* = " << pf.N_SAMPLES << " " << pf.SPEED_LIMIT << " " << pf.VEHICLE_RADIUS << " " << pf.MAX_JERK << " " << pf.MAX_ACCEL << " " << pf.EXPECTED_JERK_IN_ONE_SEC << " " << pf.EXPECTED_ACC_IN_ONE_SEC << endl;
-                    // pf.* = 10 50 1.5 10 10 2 1
-          //cout << "pf.myfunc = " << pf.myfunc(180.) << endl;
-          //cout << "pf.logistic(0.5) = " << pf.logistic(0.5) << endl;
-          //cout << endl;
-          
-          //############## test code for pf.JMT
-          
-/*  
-	vector<test_case> tc;
-
-	test_case tc1;
-	tc1.start = {0,10,0};
-	tc1.end = {10,10,0};
-	tc1.T = 1;
-	tc.push_back(tc1);
-
-	test_case tc2;
-	tc2.start = {0,10,0};
-	tc2.end = {20,15,20};
-	tc2.T = 2;
-	tc.push_back(tc2);
-
-	test_case tc3;
-	tc3.start = {5,10,2};
-	tc3.end = {-30,-20,-4};
-	tc3.T = 5;
-	tc.push_back(tc3);
-
-	bool total_correct = true;
-	for(int i = 0; i < tc.size(); i++)
-	{
-		vector< double > jmt = pf.JMT(tc[i].start, tc[i].end, tc[i].T);
-    
-		//cout << jmt2 << endl;
-    cout << "test pf.JMT" << endl;
-    for (int j=0; j<jmt.size(); j++) {
-
-        cout << jmt[j] << endl;
-       
-    }
-  
-	}
-*/  
-          
-          //##############
-          
+// ==== rbx =======================================================================
+                    
           /*
-          previous_path_x = []
-          previous_path_y = []
-          end_path_s = 0
-          end_path_d = 0
           sensor_fusion = [ [0 ,1022.598,1147.169,14.19477 ,10.3549   ,237.563  , 8.870655],
                             [1 ,1044.688,1155.066,15.69208 ,6.39629   ,261.0865 , 9.971673],
                             [2 ,1133.548,1187.77 ,14.78464 ,1.11656   ,357.6642 , 1.827328],
@@ -367,110 +309,52 @@ int main() {
                             [9 ,1096.84 ,1174.888,17.36887 ,4.232598  ,332.6492 ,10.20708 ],
                             [10,1071.899,1174.909,16.43713 ,6.889896  ,293.7626 , 2.037921],
                             [11,836.1995,1132.793,20.70742 ,0.03320942, 51.60747, 2.123863] ]        
-          */                  
-                         
-/*                            
-          // store x,y of other cars                  
-          vector<double> maps_x; 
-          vector<double> maps_y;          
-          for (int i = 0; i < sensor_fusion.size(); i++) {
-            maps_x.push_back(sensor_fusion[i][1]);
-            maps_y.push_back(sensor_fusion[i][2]);
-          }
-          
-          // determine closest waypoint
-          int cpoint = ClosestWaypoint(car_x, car_y, maps_x, maps_y);
-          cout << "closest point = " << cpoint << endl;     
-         
-          // Transform from Cartesian x,y coordinates to Frenet s,d coordinates          
-          double theta = 0;
-          vector<double> cars_sd = getFrenet(car_x, car_y,theta, map_waypoints_x, map_waypoints_y);
-          cout << "car_sd = " << cars_sd[0] << " " << cars_sd[1] << endl;   
-          // car x,y,s,d,yaw,speed = 909.48 1128.67 124.834 6.16483 0 0
-          // car_sd = 124.834 6.16497  
-*/                      
-          
-          // calculate new car path without smoothing and store in next_x_vals0, next_y_vals0   
-          // http://hyperphysics.phy-astr.gsu.edu/hbase/avari.html          
-          // ds = v * dt --> v = ds / dt with 
-          
-          //double max_car_speed = 0.8 * 50.0 * 0.44704; // apply safety factor of 90%
-          double max_car_speed = 0.8 * pf.SPEED_LIMIT * 0.44704; // apply safety factor of 90%
-          
-          // position
-          double b = 0.8*10.0; //10.0; // m/s2
-          double c = 0.8*50.0; //50.0; // m/s3
-          double dt = 0.02;        // s          
-          double x0 = 0; //car_s;
-          double v0 = max_car_speed; // change to variable speed according to traffic conditions later
-          double xt = x0 + v0 * dt + b * dt*dt/2 + c * dt*dt*dt/6;
-          cout << "==========================================================================" << endl;
-          cout << "car_s, car_d, xt, v0 = " << car_s << " " << car_d << " " << xt << " " << v0 << endl;
+          */    
+            
+          // output of path data  
+          cout << "==========================================================================" << endl;          
+          cout << "previous_path_x = " << previous_path_x << endl;  
+          cout << "previous_path_y = " << previous_path_y << endl;     
+          cout << "end_path_s = " << end_path_s << endl;  
+          cout << "end_path_d = " << end_path_d << endl; 
+          cout << "sensor_fusion = " << sensor_fusion << endl;
+          cout << "car x,y,s,d,yaw,speed = " << car_x << " " << car_y << " " << car_s << " " << car_d << " " << car_yaw << " " << car_speed << endl;       
           cout << endl;
-          double x_smooth = waypointspline_x(car_s);
-          cout <<  "smooth x = " << x_smooth << endl;
-          
-          cout << pf.SIGMA_S << endl;
-          cout << pf.SIGMA_D << endl;
-                    
-          cout << pf.SIGMA_S[0] << " " << pf.SIGMA_S[1] << " " << pf.SIGMA_S[2] << " " <<endl;
-          cout << pf.SIGMA_D[0] << " " << pf.SIGMA_D[1] << " " << pf.SIGMA_D[2] << " " <<endl;
+          cout << "==========================================================================" << endl;          
           cout << endl;
-          cout << endl;
-          cout << "==========================================================================" << endl;
           
-          double ds = xt; //0.4; // increment along s for time interval dt  
-          double dd = 6.0; //car_s - 6.0; //0.0; // increment for changing lane  
           
-          // placeholder for unsmoothed waypoints
-          vector<double> next_x_vals0;
-          vector<double> next_y_vals0; 
+          // ***************************************************************************
+          // run finite state machine
+          // ***************************************************************************
           
-          // set number of path points 
-          int n_points = 50;
-          for (int i=0; i<n_points; i++) {
-            
-            // new increments along s,d
-            double delta_s = car_s + i * ds;
-            double delta_d = car_d + i * dd;
-            
-            // use spline to get smooth new path points of road center
-            double new_x0 = waypointspline_x(delta_s);
-            double new_y0 = waypointspline_y(delta_s);
-            double new_dx0 = waypointspline_dx(delta_s);
-            double new_dy0 = waypointspline_dy(delta_s);
-                       
-            // adjust for lane
-            double new_x = new_x0 + new_dx0 * dd;
-            double new_y = new_y0 + new_dy0 * dd;
-            
-            // store the calculated path
-            next_x_vals.push_back(new_x); 
-            next_y_vals.push_back(new_y);   
-            
-          }
-         
-          // overwrite with straight path
-          //pf.generate_path_straight(car_x,car_y, car_yaw, &next_x_vals, &next_y_vals); //, &previous_path_x, &previous_path_y);
+          cout << "test Finite State Machine" << endl;  
           
-          // overwrite with circle
-          /*
-          vector<double> previous_x;
-          vector<double> previous_y;
-          int path_size = previous_path_x.size();
-          if (path_size > 0) {
+          // loop over all states
+          for (int istate=0; istate<pf.all_states.size(); istate++) {
+            cout << istate << " " << pf.all_states[istate] << endl;
             
-            for (int i=0; i <n_points; i++) {
-              previous_x.push_back(previous_path_x[i]);
-              previous_y.push_back(previous_path_y[i]);
-                        pf.generate_path_circle(car_x,car_y, car_yaw, &next_x_vals, &next_y_vals, &previous_x, &previous_y);
-                        
+            // set a new state
+            pf.state = pf.all_states[istate];
+            
+            // check for possible succesor states
+            vector<states> my_possible_states = pf.successor_states(pf.state); 
+            
+            // print results
+            for (int kk=0; kk<my_possible_states.size(); kk++) {
+              cout << my_possible_states[kk] << endl;
             } 
-          } else {
-            cout << "first time!!!" << endl;
-          }
-          */
+            
+            // test check for state
+            if (pf.state == LCL) cout << "LCR detected" << endl;
+            
+          }  
           
+          
+          // ***************************************************************************
+          // generate path (test with circle)
+          // ***************************************************************************
+                  
           // variables for actual vehicle data
           double pos_x;
           double pos_y;
@@ -509,36 +393,16 @@ int main() {
           {    
               next_x_vals.push_back(pos_x+(dist_inc)*cos(angle+(i+1)*(pi()/100)));
               next_y_vals.push_back(pos_y+(dist_inc)*sin(angle+(i+1)*(pi()/100)));
+              
               pos_x += (dist_inc)*cos(angle+(i+1)*(pi()/100));
               pos_y += (dist_inc)*sin(angle+(i+1)*(pi()/100));
             
           }
           
-          // test Finite State Machine
-          cout << "test Finite State Machine" << endl;  
-          
-          // loop over all states
-          for (int istate=0; istate<pf.all_states.size(); istate++) {
-            cout << istate << " " << pf.all_states[istate] << endl;
-            
-            // set a new state
-            pf.state = pf.all_states[istate];
-            
-            // check for possible succesor states
-            vector<states> my_possible_states = pf.successor_states(pf.state); 
-            
-            // print results
-            for (int kk=0; kk<my_possible_states.size(); kk++) {
-              cout << my_possible_states[kk] << endl;
-            } 
-            
-            // test check for state
-            if (pf.state == LCL) cout << "LCR detected" << endl;
-            
-          }         
           
           
-//rbx
+          
+// ==== rbx =======================================================================
           	msgJson["next_x"] = next_x_vals;
           	msgJson["next_y"] = next_y_vals;
 
