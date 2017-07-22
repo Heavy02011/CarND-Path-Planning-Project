@@ -346,11 +346,16 @@ int main() {
           }
           cout << "*** " << vehicles_inrange.size() << " vehicles in range 50m detected ***" << endl;
 
+          for (int ii=0; ii<vehicles_inrange.size(); ii++) {
+            vehicles_inrange[ii].display(vehicles_inrange[ii]);
+          }
+          
+
           // ***************************************************************************
           // 3 select a real or virtual vehicle to follow & set target state
           // ***************************************************************************  
             
-          //TODO: ...complet this...
+          //TODO: ...complete this... 
           
           
           
@@ -398,6 +403,9 @@ int main() {
           // 4 run finite state machine & evaluate possible trajectories & costs
           // ***************************************************************************
 
+          //TODO: implement PTG.py here
+          
+          
 /*
 def transition_function(predictions, current_fsm_state, current_pose, cost_functions, weights):
     
@@ -428,12 +436,23 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
                   cost_for_state += weight * cost_for_cost_function
                   costs.append({'state' : state, 'cost' : cost_for_state})
 
+          # Find the minimum cost state.
+          best_next_state = None
+          min_cost = 9999999
+          for i in range(len(possible_successor_states)):
+              state = possible_successor_states[i]
+              cost  = costs[i]
+              if cost < min_cost:
+                  min_cost = cost
+                  best_next_state = state 
+      
+                  return best_next_state
 */
      
           // loop over possible succesor states
           for (int istate=0; istate < possible_successor_states.size(); istate++) {
             
-            // out current investigated state
+            // output of current investigated state
             cout << "investigating state: " << possible_successor_states[istate] << endl;;
             
             // check for state
@@ -444,88 +463,31 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
             if (possible_successor_states[istate] == LCR)  cout << "LCR  possible" << endl;
             
             // generate path for current state
-            // trajectory_for_state = generate_trajectory(state, current_pose, predictions)
-            
+            // trajectory_for_state = generate_trajectory(state, current_pose, predictions)           
             vector<double> start = {car_s, 0, 0};
             vector<double> end   = {car_s, 0, 0};
             double T = 1;
-
 
             // setup input for JMT & output results
             start = {pf.s, pf.v, pf.a}; // actual state of my car
             end   = {pf.s+10, pf.SPEED_LIMIT, pf.MAX_ACCEL};
             T     = 20;
-            cout << "start/end/T = " << endl;
-            pf.output_vector(start);
-            pf.output_vector(end);
-            cout << T << endl;;
+            //cout << "start/end/T = " << endl;
+            //pf.output_vector(start);
+            //pf.output_vector(end);
+            //cout << T << endl;;
                         
             // call JMT & output results
             vector<double> coefficients = pf.JMT(start, end, T);
-            cout << "coefficients = " << endl;
-            pf.output_vector(coefficients);
+            //cout << "coefficients = " << endl;
+            //pf.output_vector(coefficients);
             
             // test differentiate & output results
             vector<double> diff_coeff = pf.differentiate(coefficients);
-            cout << "diff_coefficeints = " << endl;
-            pf.output_vector(diff_coeff);
+            //cout << "diff_coefficients = " << endl;
+            //pf.output_vector(diff_coeff);
             
-            /*
-            
-            start/end/T = 
-                        0 109.456
-                        1 0
-                        2 0
-                        0 119.456
-                        1 22.352
-                        2 10
-                        20
-            coefficients = 
-                        0 109.456
-                        1 0
-                        2 0
-                        3 0.03898
-                        4 -0.0063795
-                        5 0.00022465
-            diff_coefficeints = 
-                        0 0
-                        1 0
-                        2 0.15592
-                        3 -0.0318975
-                        4 0.0013479
-            
-            */
-            
-            /*            
-            // test vehicle creation 
-            Vehicle mycar(23,0,0,50,10,100,4,0,0,3.5); // int id, double x, double y, double vx, double vy, double s, double d, double a, double d_dot, double d_double_dot
-            mycar.display(mycar);
-            
-            // test prediction state in 5s
-            vector<double> mystate = mycar.state_at(5);
-            pf.output_vector(mystate);
-            */
-            
-          }
-          
-          
-//##########  
-  
-/*          
-
-    # Find the minimum cost state.
-    best_next_state = None
-    min_cost = 9999999
-    for i in range(len(possible_successor_states)):
-        state = possible_successor_states[i]
-        cost  = costs[i]
-        if cost < min_cost:
-            min_cost = cost
-            best_next_state = state 
-
-            return best_next_state
-
-*/           
+          }          
             
           // ***************************************************************************
           // 5 generate path coordinates

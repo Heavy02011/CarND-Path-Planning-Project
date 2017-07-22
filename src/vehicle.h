@@ -26,6 +26,10 @@ public:
     
   };
   
+  // test vehicle creation 
+  // Vehicle mycar(23,0,0,50,10,100,4,0,0,3.5); // int id, double x, double y, double vx, double vy, double s, double d, double a, double d_dot, double d_double_dot
+  // mycar.display(mycar);
+  
   ~Vehicle() {};
     
     // car's unique ID     
@@ -80,6 +84,8 @@ public:
             
     };
     
+    
+    
     // Predicts state of vehicle in t seconds (assuming constant acceleration along s & d)
     vector<double> state_at(double t) {
       
@@ -93,6 +99,10 @@ public:
       
       return {s, v, this->a, d, d_dot, this->d_double_dot};
     } 
+    
+    // test prediction state in 5s
+    // vector<double> mystate = mycar.state_at(5);
+    // pf.output_vector(mystate);
     
 };
 
