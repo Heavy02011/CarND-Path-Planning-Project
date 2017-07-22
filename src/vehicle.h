@@ -10,7 +10,7 @@ class Vehicle
 {
 public:
   
-  Vehicle(int id, double x, double y, double vx, double vy, double s, double d, double a) { 
+  Vehicle(int id, double x, double y, double vx, double vy, double s, double d, double a, double d_dot, double d_double_dot) { 
     
     this->id = id;
     this->x  = x; 
@@ -21,6 +21,8 @@ public:
     this->d  = d;  
     this->v  = sqrt(vx*vx + vy*vy); 
     this->a  = a; 
+    this->d_dot = d_dot;
+    this->d_double_dot = d_double_dot;
     
   };
   
@@ -48,22 +50,31 @@ public:
     double d;
     
     // car's total velocity in m/s
-    double v;
+    double v; // s_dot
     
     // car's total acceleration in m/s/s
-    double a;
+    double a; // s_double_dot
+    
+    // car's d velocity in m/s
+    double d_dot;
+
+    // car's d acceleration in m/s/s
+    double d_double_dot;
     
     void display(Vehicle &car) { 
       cout << "=== car =================" << endl;
-      cout << "id: " << car.id << endl;
-      cout << "x:  " << car.x << endl;
-      cout << "y:  " << car.y << endl;
-      cout << "vx: " << car.vx << endl;
-      cout << "vy: " << car.vy << endl;
-      cout << "s:  " << car.s << endl;
-      cout << "d:  " << car.d << endl;
-      cout << "v:  " << car.v << endl;
-      cout << "a:  " << car.a << endl;
+      cout << "id:           " << car.id << endl;
+      cout << "x:            " << car.x << endl;
+      cout << "y:            " << car.y << endl;
+      cout << "vx:           " << car.vx << endl;
+      cout << "vy:           " << car.vy << endl;
+      cout << "=== car state ===========" << endl;     
+      cout << "s:            " << car.s << endl;
+      cout << "v (s_dot)     " << car.v << endl;
+      cout << "a (s_dbl_dot):" << car.a << endl;
+      cout << "d:            " << car.d << endl;
+      cout << "d_dot:        " << car.d_dot << endl;
+      cout << "d_double_dot: " << car.d_double_dot << endl;     
       cout << "=========================" << endl;
       cout << endl;
             

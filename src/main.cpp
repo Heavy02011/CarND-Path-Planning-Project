@@ -303,6 +303,10 @@ int main() {
     
           // update my cars data in PathFinder object
           pf.s = car_s;
+          
+          // limit investigation of traffic to a smaller range out of sensor_fusion       
+          //TODO: ...store subset in a Vehicle class
+          
   
             
           /*                ["sensor_fusion"] A 2d vector of cars and then that car's 
@@ -448,7 +452,7 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
             */
                         
             // test vehicle creation 
-            Vehicle mycar(23,0,0,50,10,100,4,0); // int id, double x, double y, double vx, double vy, double s, double d
+            Vehicle mycar(23,0,0,50,10,100,4,0,0,0); // int id, double x, double y, double vx, double vy, double s, double d
             mycar.display(mycar);
             
             // test prediction state in 5s
