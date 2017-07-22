@@ -46,8 +46,11 @@ class PathFinder
     // number of sample points on track
     const int N_SAMPLES = 10;
       
-    // set max speed
-    const double SPEED_LIMIT = 50.0;
+    // convert from MPH to m/s
+    const double MPH2MPS = 0.44704;
+    
+    // set max speed im m/s
+    const double SPEED_LIMIT = 50.0 * MPH2MPS;
     
     // vehicle radius, model vehicle as circle to simplify collision detection
     const double VEHICLE_RADIUS = 1.5; 
@@ -116,9 +119,26 @@ class PathFinder
     vector<states> successor_states(states input);
     
     //===== helper functions =====
+    
+    // A function that returns a value between 0 and 1 for x in the 
+    // range [0, infinity] and -1 to 1 for x in the range [-infinity, infinity].
+    // Useful for cost functions.
     double logistic(double x);
     
+    // pass a vector x to cout
     void output_vector(vector<double> x);
+    
+    // evaluate a polynomal 5th order determined by coefficients at value x
+    double evaluate_polynomal(vector<double> coeffcients, double x);
+    
+    //std::function<int()> f();
+    //std::function<int(double)> f(char);
+    
+    //function<double()> to_equation();
+    //function<double(vector<double>)> to_equation(vector<double> coefficents);
+    
+    //calculates the derivative of a polynomial and returns the corresponding coefficients. ref: helpers.py in lesson 5.30
+    vector<double> differentiate(vector<double> coefficients);
       
   private:
       

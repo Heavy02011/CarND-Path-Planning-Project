@@ -399,13 +399,50 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
             double T = 1;
 
 
-            //vector<double> PathFinder::JMT(vector<double> start, vector <double> end, double T)
+            // setup input for JMT & output results
             start = {pf.s, pf.v, pf.a}; // actual state of my car
             end   = {pf.s+10, pf.SPEED_LIMIT, pf.MAX_ACCEL};
             T     = 20;
-            vector<double> coefficents = pf.JMT(start, end, T);
-            cout << "coefficents = " << endl;
-            pf.output_vector(coefficents);
+            cout << "start/end/T = " << endl;
+            pf.output_vector(start);
+            pf.output_vector(end);
+            cout << T << endl;;
+                        
+            // call JMT & output results
+            vector<double> coefficients = pf.JMT(start, end, T);
+            cout << "coefficients = " << endl;
+            pf.output_vector(coefficients);
+            
+            // test differentiate & output results
+            vector<double> diff_coeff = pf.differentiate(coefficients);
+            cout << "diff_coefficeints = " << endl;
+            pf.output_vector(diff_coeff);
+            
+            /*
+            
+            start/end/T = 
+                        0 109.456
+                        1 0
+                        2 0
+                        0 119.456
+                        1 22.352
+                        2 10
+                        20
+            coefficients = 
+                        0 109.456
+                        1 0
+                        2 0
+                        3 0.03898
+                        4 -0.0063795
+                        5 0.00022465
+            diff_coefficeints = 
+                        0 0
+                        1 0
+                        2 0.15592
+                        3 -0.0318975
+                        4 0.0013479
+            
+            */
             
           }
           

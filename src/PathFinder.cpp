@@ -225,6 +225,9 @@ vector<states> PathFinder::successor_states(states input)
         succ_states.push_back(LCR);  // 4
         succ_states.push_back(KL);   // 0
         return succ_states;
+    default:
+        cerr << "PathFinder::successor_states: state not defined -> " << state << endl;
+        break;
   }
 }
 
@@ -234,18 +237,93 @@ vector<states> PathFinder::successor_states(states input)
 // A function that returns a value between 0 and 1 for x in the 
 // range [0, infinity] and -1 to 1 for x in the range [-infinity, infinity].
 // Useful for cost functions.
-
 double PathFinder::logistic(double x) {
   return 2.0 / (1 + exp(-x)) - 1.0;
 }
 
-
+// pass a vector x to cout
 void PathFinder::output_vector(vector<double> x) {
   for (int i=0; i<x.size(); i++) {
     cout << i << " " << x[i] << endl;  
-  }
-  
+  } 
 }
+
+// evaluate a polynomal 5th order determined by coefficients at value x
+double PathFinder::evaluate_polynomal(vector<double> coeffcients, double x) {
+  double function = 0.0;
+  for (int i = 0; i < coeffcients.size(); i++) {
+    function += coeffcients[i] * pow(x, i);
+  }
+  return function;
+}
+
+/*
+function<int(double)> PathFinder::f(char c) {
+  double g(double x) {
+    g = 23.0*x;
+    return g*g;
+  }
+}
+*/
+
+/*
+function<double(vector<double>)> PathFinder::to_equation(vector<double> coefficents) {
+  
+  double function(vector<double> coefficents, double x) {
+    for (int i = 0; i < coeffcients.size(); i++) {
+      function += coeffcients[i] * pow(x, i);
+    }
+  }
+  return function;
+}
+*/
+
+//calculates the derivative of a polynomial and returns the corresponding coefficients. ref: helpers.py in lesson 5.30
+vector<double> PathFinder::differentiate(vector<double> coefficients) {
+  vector<double> new_coeff;
+  for (int i = 1; i < coefficients.size(); i++) {
+    new_coeff.push_back( (float(i)+1.0) * coefficients[i] );
+  }
+  return new_coeff;
+}
+
+
+/* //######
+
+def differentiate(coefficients):
+    """
+    Calculates the derivative of a polynomial and returns
+    the corresponding coefficients.
+    """
+    new_cos = []
+    for deg, prev_co in enumerate(coefficients[1:]):
+        new_cos.append((deg+1) * prev_co)
+        return new_cos
+
+*/ //######
+
+/*
+
+std::function<int(double)> f(char);
+https://stackoverflow.com/questions/31387238/c-function-returning-function
+
+lesson 5.30
+
+def to_equation(coefficients):
+    """
+    Takes the coefficients of a polynomial and creates a function of
+    time from them.
+    """
+    def f(t):
+        total = 0.0
+        for i, c in enumerate(coefficients): 
+            total += c * t ** i
+        return total
+        return f
+
+*/
+
+
 
 /*
 
