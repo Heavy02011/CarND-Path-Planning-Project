@@ -242,6 +242,9 @@ int main() {
   
   pf.state = KL;
   
+  // setup a counter for every time step
+  int counter = 0;
+  
   /*
     h.onMessage([&count,&pp, &map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy,&WP_spline_x,&WP_spline_y,&WP_spline_dx,&WP_spline_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
     uWS::OpCode opCode) {
@@ -250,7 +253,7 @@ int main() {
 //rbx
   //ur h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
       
-  h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy, &waypointspline_x, &waypointspline_y, &waypointspline_dx, &waypointspline_dy, &pf](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
+  h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy, &waypointspline_x, &waypointspline_y, &waypointspline_dx, &waypointspline_dy, &pf, &counter](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                      uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -301,6 +304,11 @@ int main() {
 // =====================================================================================          
 // ==== rbx ============================================================================
 // =====================================================================================
+          
+          cout << "***********************************************************" << endl;
+          cout << "*** time step: " << counter << endl;
+          cout << "***********************************************************" << endl;
+                
             
           // ***************************************************************************
           // 1 update my cars data in PathFinder object
@@ -311,15 +319,7 @@ int main() {
           pf.x = car_x;
           pf.y = car_y;
           pf.v = car_speed;
-          
-          // test lane detection
-          /*
-          for (int k=0; k<sensor_fusion.size(); k++) {
-            double my_d = sensor_fusion[k][6];
-            lane my_lane = pf.in_lane(my_d);
-            cout << k << " d = " << my_d << " lane = " << my_lane << endl;
-          }
-          */
+  
 
           // ***************************************************************************
           // 2 limit investigation of traffic to a smaller range out of sensor_fusion
@@ -352,8 +352,8 @@ int main() {
             double distance = pf.distance2car(othercar);
             cout << "distance = " << distance << endl;
             
-            // check whether car is suitable as target car withen next 500m in front of us
-            if ((distance > ld_front) and ((othercar.s > car_s) and (othercar.s < car_s+500)) and (othercar.v > lv_front)) {
+            // check whether car is suitable as target car withen next 50-500m in front of us
+            if ((distance > ld_front) and ((othercar.s > car_s+50) and (othercar.s < car_s+500)) and (othercar.v > lv_front)) {
               id_front = k;
               mytargetcar = othercar;
             }
@@ -560,7 +560,9 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
               double pos_y2 = previous_path_y[path_size-2];
               angle = atan2(pos_y-pos_y2,pos_x-pos_x2);
           }
-
+          
+          next_x_vals.push_back(pos_x);
+          next_y_vals.push_back(pos_y);
           // generate circle
           /*
           double dist_inc = 0.5;
@@ -583,7 +585,7 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
           // position
           double b = 0.8*10.0; //10.0; // m/s2
           double c = 0.8*10.0; //50.0; // m/s3
-          double dt = 0.02;        // s          
+          double dt = 0.8* 0.02;        // s          
           double x0 = 0; //car_s;
           double v0 = max_car_speed; // change to variable speed according to traffic conditions later
           double xt = x0 + v0 * dt + b * dt*dt/2 + c * dt*dt*dt/6;
@@ -636,6 +638,9 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
             */
           }
           
+          
+          // increment the counter
+          counter += 1;
           
           
 // =====================================================================================          

@@ -303,6 +303,15 @@ lane PathFinder::in_lane(double d) {
   }
 }
 
+// test lane detection
+/*
+for (int k=0; k<sensor_fusion.size(); k++) {
+  double my_d = sensor_fusion[k][6];
+  lane my_lane = pf.in_lane(my_d);
+  cout << k << " d = " << my_d << " lane = " << my_lane << endl;
+}
+*/
+
 
 
 
