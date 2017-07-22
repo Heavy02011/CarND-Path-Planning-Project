@@ -15,13 +15,14 @@ using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
 
-PathFinder::PathFinder(double lane, double s, double v, double a) {
+PathFinder::PathFinder(double x, double y, double d, double s, double v, double a, double yaw) {
  
   // store data of my car here
-  this->lane = lane;
+  this->d = d;
   this->s = s;
   this->v = v;
   this->a = a;
+  this->yaw = yaw;
   state = KL;
   max_acceleration = -1;
   
@@ -278,6 +279,13 @@ vector<double> PathFinder::differentiate(vector<double> coefficients) {
     new_coeff.push_back( (float(i)+1.0) * coefficients[i] );
   }
   return new_coeff;
+}
+
+// calculate distance of othercar to my car
+double PathFinder::distance2car(Vehicle othercar) {
+  double dist = 0.0;
+  dist = sqrt(2);
+  return dist;
 }
 
 

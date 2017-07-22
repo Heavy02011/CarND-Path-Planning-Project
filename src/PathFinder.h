@@ -41,7 +41,7 @@ class PathFinder
 
   public:
         
-    PathFinder(double lane, double s, double v, double a);
+    PathFinder(double x, double y, double d, double s, double v, double a, double yaw);
 
     virtual ~PathFinder();
         
@@ -84,14 +84,20 @@ class PathFinder
     
     // definition of lesson 4.16
   
-    int lane;
+    double d;
   
+    double x;
+    
+    double y;
+    
     double s;
   
     double v;
   
     double a;
-  
+    
+    double yaw;
+      
     double target_speed;
   
     //int lanes_available;
@@ -141,7 +147,11 @@ class PathFinder
     
     //calculates the derivative of a polynomial and returns the corresponding coefficients. ref: helpers.py in lesson 5.30
     vector<double> differentiate(vector<double> coefficients);
-      
+     
+    // calculate distance of othercar to my car 
+    double distance2car(Vehicle othercar);
+    
+    
   private:
       
       

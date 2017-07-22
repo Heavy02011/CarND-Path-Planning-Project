@@ -238,7 +238,7 @@ int main() {
 
   // generate PathFinder class & initial states
   //PathFinder pf;
-  PathFinder pf(2, 0, 0, 0); // double lane, double s, double v, double a
+  PathFinder pf(0, 0, 0, 0, 0, 0, 0); // double x, double y, double d, double s, double v, double a, double yaw
   
   pf.state = KL;
   
@@ -303,6 +303,10 @@ int main() {
     
           // update my cars data in PathFinder object
           pf.s = car_s;
+          pf.d = car_d;
+          pf.x = car_x;
+          pf.y = car_y;
+          pf.v = car_speed;
           
           // limit investigation of traffic to a smaller range out of sensor_fusion       
           //TODO: ...store subset in a Vehicle class
@@ -464,32 +468,7 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
           
 //##########  
   
- /*         
-          // loop over all states
-          for (int istate=0; istate<pf.all_states.size(); istate++) {
-            cout << istate << " " << pf.all_states[istate] << endl;
-            
-            // set a new state
-            pf.state = pf.all_states[istate];
-                
-            
-            // print results
-            for (int kk=0; kk<my_possible_states.size(); kk++) {
-              cout << my_possible_states[kk] << endl;
-            } 
-            
-            // test check for state
-            if (pf.state == LCL) cout << "LCR detected" << endl;
-            
-          }  
- */
-          
-          
-          /*
-
- 
-
-          
+/*          
 
     # Find the minimum cost state.
     best_next_state = None
