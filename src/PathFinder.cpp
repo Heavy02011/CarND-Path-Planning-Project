@@ -242,6 +242,18 @@ void PathFinder::output_vector(vector<double> x) {
   cout << endl;
 }
 
+// pass a vector of vectors x to cout
+void PathFinder::output_vector2(vector<vector<double>> x) {
+  for (int i=0; i<x.size(); i++) {
+    cout << "i=" << i << endl;
+    for (int j=0; j<x[j].size(); j++) {
+          cout << x[i][j] << " ";
+    }
+    cout << endl; 
+  } 
+  cout << endl;
+}
+
 // evaluate a polynomal 5th order determined by coefficients at value x
 double PathFinder::evaluate_polynomal(vector<double> coeffcients, double x) {
   double function = 0.0;
@@ -464,7 +476,9 @@ vector<vector<double>> PathFinder::PTG_2_trajectories(vector<vector<double>> all
 
 // generate predictions of given allcars over horizon
 vector<vector<double>> PathFinder::CARpredictions(vector<Vehicle> mycars, int horizon = 10) {
-
+    
+    cout << "PathFinder::CARpredictions..." << endl;;
+      
     // store predictions here
     vector<vector<double>>  predictions;
     
@@ -475,12 +489,14 @@ vector<vector<double>> PathFinder::CARpredictions(vector<Vehicle> mycars, int ho
       
       // check for this car
       Vehicle mycar = mycars[j];
+      cout << "car id: " << mycar.id << endl;;
       
       // loop over horizon
       for( int i = 0; i < horizon; i++)
       {
         vector<double> carstate = mycar.state_at(i*dt); // {s, v, this->a, d, d_dot, this->d_double_dot}
-        predictions.push_back({carstate[0],carstate[3]});
+        predictions.push_back({carstate[0], carstate[3]}); // id, s, d
+        cout << i << " " << carstate[0] << " " << carstate[3] << endl;
         //vector<double> check1 = state_at(i);
         //vector<int> lane_s = {check1[0], check1[1]};
         //predictions.push_back(lane_s);

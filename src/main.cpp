@@ -328,17 +328,7 @@ int main() {
                     
           */    
             
-          // output of path data  
-          cout << "==========================================================================" << endl;          
-          cout << "previous_path_x = " << previous_path_x << endl;  
-          cout << "previous_path_y = " << previous_path_y << endl;     
-          cout << "end_path_s = " << end_path_s << endl;  
-          cout << "end_path_d = " << end_path_d << endl; 
-          cout << "sensor_fusion = " << sensor_fusion << endl;
-          cout << "car x,y,s,d,yaw,speed = " << car_x << " " << car_y << " " << car_s << " " << car_d << " " << car_yaw << " " << car_speed << endl;       
-          cout << endl;
-          cout << "==========================================================================" << endl;          
-          cout << endl;
+          
           
             
 // =====================================================================================          
@@ -347,13 +337,27 @@ int main() {
           
           cout << "***********************************************************" << endl;
           cout << "*** time step: " << counter << endl;
+          cout << "*** car s,d,yaw,speed = " << car_s << " " << car_d << " " << car_yaw << " " << car_speed << endl;   
           cout << "***********************************************************" << endl;
-                
+          
+          // output of path data  
+          cout << "==========================================================================" << endl;          
+          cout << "previous_path_x = " << previous_path_x << endl;  
+          cout << "previous_path_y = " << previous_path_y << endl;     
+          cout << "end_path_s = " << end_path_s << endl;  
+          cout << "end_path_d = " << end_path_d << endl; 
+          cout << "sensor_fusion = " << sensor_fusion << endl; 
+          //cout << "*** car x,y,s,d,yaw,speed = " << car_x << " " << car_y << " " << car_s << " " << car_d << " " << car_yaw << " " << car_speed << endl; 
+          cout << "*** car x,y = " << car_x << " " << car_y<< endl;         
+          cout << endl;
+          cout << "==========================================================================" << endl;          
+          cout << endl;                
             
           // ***************************************************************************
           // 1 update my cars data in PathFinder object
           // ***************************************************************************
-            
+          
+          // store actual car state & DELAY 1-2s ????????????????????  
           pf.s = car_s;
           pf.d = car_d;
           pf.x = car_x;
@@ -414,8 +418,17 @@ int main() {
           int horizon = 10;
           vector<vector<double>> predictions = pf.CARpredictions(vehicles_inrange, horizon);
           cout << "*** " << predictions.size() << " predictions generated ***" << endl;
-                    
+          //pf.output_vector2(predictions);          
           
+          // output of predictions
+          for (int j = 0; j < vehicles_inrange.size(); j++) {
+            cout << "car " << j << "> id: " << vehicles_inrange[j].id << "> ";
+            for( int i = 0; i < horizon; i++)
+            {
+              cout << predictions[j][i] << " "; // id, s, d
+            }
+            cout << endl;
+          }  
           
 
           // ***************************************************************************
@@ -641,8 +654,10 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
           {  
            
             // new increments along s,d
-            double delta_s = car_s + i * ds;
-            double delta_d = car_d + i * dd;
+            //double delta_s = car_s + i * ds;
+            //double delta_d = car_d + i * dd;
+            double delta_s = pf.s + i * ds;
+            double delta_d = pf.d + i * dd;
             
             // use spline to get smooth new path points of road center
             double new_x0 = waypointspline_x(delta_s);

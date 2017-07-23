@@ -146,6 +146,9 @@ class PathFinder
     // pass a vector x to cout
     void output_vector(vector<double> x);
     
+    // pass a vector of vectors x to cout
+    void output_vector2(vector<vector<double>> x);
+    
     // evaluate a polynomal 5th order determined by coefficients at value x
     double evaluate_polynomal(vector<double> coeffcients, double x);
     
