@@ -331,27 +331,23 @@ vector<double> PathFinder::predictions(Vehicle targetcar, double T, vector<doubl
   vector<double> target_state = targetcar.state_at(T);
   // store in temporary vectors
   vector<double> a = delta; //{100, 10, 0, 0, 0, 0};
-  vector<double> b = target_state; //{-10, 0, 0, 4, 0, 0};
-  //cout << "input a: " << endl;
-  //output_vector(a);
-  //cout << "input b: " << endl;
-  //output_vector(b);
-  
+  vector<double> b = target_state; //{-10, 0, 0, 4, 0, 0}; 
   // add vector delta to it
   transform (a.begin(), a.end(), b.begin(), b.begin(), plus<double>()); // result in b!!!
-  //cout << "a: " << endl;
-  //output_vector(a);
-  //cout << "b: " << endl;
-  //output_vector(b);
-  
-  //vector<double> target = {s, s_dot, s_ddot, d, d_dot, d_ddot};
   return b;
 }
-// prediction state of target vehicle & generate further goals
+// test predixctions
 //double T = 5;
 //vector<double> delta = {10,0,0,4,0,0};
 //vector<double> target_state = pf.predictions(mytargetcar, T, delta);
 //pf.output_vector(target_state);
+
+
+
+
+
+
+
 
 //#######################################################################
 /*
