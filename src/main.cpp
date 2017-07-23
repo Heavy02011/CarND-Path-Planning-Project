@@ -301,8 +301,48 @@ int main() {
 
           	// TODO: define a path made up of (x,y) points that the car will visit sequentially every .02 seconds
             
+          /*                ["sensor_fusion"] A 2d vector of cars and then that car's 
+          
+                            car's unique ID, 
+                            car's x position in map coordinates, 
+                            car's y position in map coordinates, 
+                            car's x velocity in m/s, 
+                            car's y velocity in m/s, 
+                            car's s position in frenet coordinates, 
+                            car's d position in frenet coordinates.
+                                                  
+          sensor_fusion = [ [0 ,1022.598,1147.169,14.19477 ,10.3549   ,237.563  , 8.870655],
+                            [1 ,1044.688,1155.066,15.69208 ,6.39629   ,261.0865 , 9.971673],
+                            [2 ,1133.548,1187.77 ,14.78464 ,1.11656   ,357.6642 , 1.827328],
+                            [3 ,904.5436,1124.697, 2.529505,2.679815  ,119.9534 ,10.10191 ],
+                            [4 ,949.4061,1134.024,15.38097 ,1.409398  ,164.616  , 2.596563],
+                            [5 ,1156.399,1189.374,15.09513 ,1.014567  ,380.5711 , 1.956437],
+                            [6 ,1166.188,1181.94 ,16.5754  ,0.8770281 ,390.0564 , 9.954964],
+                            [7 ,901.1926,1124.588, 2.646314,0.4060514 ,124.8682 ,10.17496 ],
+                            [8 ,892.0728,1130.129,18.83123 ,1.271136  ,107.481  , 4.67399 ],
+                            [9 ,1096.84 ,1174.888,17.36887 ,4.232598  ,332.6492 ,10.20708 ],
+                            [10,1071.899,1174.909,16.43713 ,6.889896  ,293.7626 , 2.037921],
+                            [11,836.1995,1132.793,20.70742 ,0.03320942, 51.60747, 2.123863] ]  
+                      
+          car x,y,s,d,yaw,speed = 909.48 1128.67 124.834 6.16483 0 0
+                    
+          */    
+            
+          // output of path data  
+          cout << "==========================================================================" << endl;          
+          cout << "previous_path_x = " << previous_path_x << endl;  
+          cout << "previous_path_y = " << previous_path_y << endl;     
+          cout << "end_path_s = " << end_path_s << endl;  
+          cout << "end_path_d = " << end_path_d << endl; 
+          cout << "sensor_fusion = " << sensor_fusion << endl;
+          cout << "car x,y,s,d,yaw,speed = " << car_x << " " << car_y << " " << car_s << " " << car_d << " " << car_yaw << " " << car_speed << endl;       
+          cout << endl;
+          cout << "==========================================================================" << endl;          
+          cout << endl;
+          
+            
 // =====================================================================================          
-// ==== rbx ============================================================================
+// ==== start implementation ===========================================================
 // =====================================================================================
           
           cout << "***********************************************************" << endl;
@@ -350,7 +390,7 @@ int main() {
             
             // determine distance to my car
             double distance = pf.distance2car(othercar);
-            cout << "distance = " << distance << endl;
+            //cout << "distance = " << distance << endl;
             
             // check whether car is suitable as target car withen next 50-500m in front of us
             if ((distance > ld_front) and ((othercar.s > car_s+50) and (othercar.s < car_s+500)) and (othercar.v > lv_front)) {
@@ -363,10 +403,7 @@ int main() {
               vehicles_inrange.push_back(othercar);
             }
             
-          }
-          cout << "*** id of target car: " << id_front << " ***" << endl;
-          mytargetcar.display(mytargetcar);
-          
+          }     
           cout << "*** " << vehicles_inrange.size() << " vehicles in range 50m detected ***" << endl;
 
           for (int ii=0; ii<vehicles_inrange.size(); ii++) {
@@ -379,48 +416,17 @@ int main() {
           // ***************************************************************************  
             
           //TODO: ...complete this... 
-
+          cout << "*** id of target car: " << id_front << " ***" << endl;
+          mytargetcar.display(mytargetcar);
+                
+          // prediction state of target vehicle & generate further goals
+          double T = 5;
+          vector<double> delta = {10,0,0,4,0,0};
+          vector<double> target_state = pf.predictions(mytargetcar, T, delta);
+          pf.output_vector(target_state);
           
           
-          /*                ["sensor_fusion"] A 2d vector of cars and then that car's 
           
-                            car's unique ID, 
-                            car's x position in map coordinates, 
-                            car's y position in map coordinates, 
-                            car's x velocity in m/s, 
-                            car's y velocity in m/s, 
-                            car's s position in frenet coordinates, 
-                            car's d position in frenet coordinates.
-                                                  
-          sensor_fusion = [ [0 ,1022.598,1147.169,14.19477 ,10.3549   ,237.563  , 8.870655],
-                            [1 ,1044.688,1155.066,15.69208 ,6.39629   ,261.0865 , 9.971673],
-                            [2 ,1133.548,1187.77 ,14.78464 ,1.11656   ,357.6642 , 1.827328],
-                            [3 ,904.5436,1124.697, 2.529505,2.679815  ,119.9534 ,10.10191 ],
-                            [4 ,949.4061,1134.024,15.38097 ,1.409398  ,164.616  , 2.596563],
-                            [5 ,1156.399,1189.374,15.09513 ,1.014567  ,380.5711 , 1.956437],
-                            [6 ,1166.188,1181.94 ,16.5754  ,0.8770281 ,390.0564 , 9.954964],
-                            [7 ,901.1926,1124.588, 2.646314,0.4060514 ,124.8682 ,10.17496 ],
-                            [8 ,892.0728,1130.129,18.83123 ,1.271136  ,107.481  , 4.67399 ],
-                            [9 ,1096.84 ,1174.888,17.36887 ,4.232598  ,332.6492 ,10.20708 ],
-                            [10,1071.899,1174.909,16.43713 ,6.889896  ,293.7626 , 2.037921],
-                            [11,836.1995,1132.793,20.70742 ,0.03320942, 51.60747, 2.123863] ]  
-                      
-          car x,y,s,d,yaw,speed = 909.48 1128.67 124.834 6.16483 0 0
-                    
-          */    
-            
-          // output of path data  
-          cout << "==========================================================================" << endl;          
-          cout << "previous_path_x = " << previous_path_x << endl;  
-          cout << "previous_path_y = " << previous_path_y << endl;     
-          cout << "end_path_s = " << end_path_s << endl;  
-          cout << "end_path_d = " << end_path_d << endl; 
-          cout << "sensor_fusion = " << sensor_fusion << endl;
-          cout << "car x,y,s,d,yaw,speed = " << car_x << " " << car_y << " " << car_s << " " << car_d << " " << car_yaw << " " << car_speed << endl;       
-          cout << endl;
-          cout << "==========================================================================" << endl;          
-          cout << endl;
-
           
           // create a target vehicle 
           //Vehicle mytargetcar(99,x,y,vx,vy,s,d,0,0,0); 
@@ -644,7 +650,7 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
           
           
 // =====================================================================================          
-// ==== rbx ============================================================================
+// ==== end implementation =============================================================
 // =====================================================================================
           
           	msgJson["next_x"] = next_x_vals;

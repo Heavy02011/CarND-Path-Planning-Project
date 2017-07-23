@@ -312,9 +312,48 @@ for (int k=0; k<sensor_fusion.size(); k++) {
 }
 */
 
+// calculate state of target vehicle using offset delta at time T 
+/*
+     target_vehicle - id of leading vehicle (int) which can be used to retrieve
+       that vehicle from the "predictions" dictionary. This is the vehicle that 
+       we are setting our trajectory relative to.
 
+     delta - a length 6 array indicating the offset we are aiming for between us
+       and the target_vehicle. So if at time 5 the target vehicle will be at 
+       [100, 10, 0, 0, 0, 0] and delta is [-10, 0, 0, 4, 0, 0], then our goal 
+       state for t = 5 will be [90, 10, 0, 4, 0, 0]. This would correspond to a 
+       goal of "follow 10 meters behind and 4 meters to the right of target vehicle"
 
+     T - the desired time at which we will be at the goal (relative to now as t=0)
+*/
+vector<double> PathFinder::predictions(Vehicle targetcar, double T, vector<double> delta) {
+  // get current state of target vehicle & predict state of targetvehicle at time T
+  vector<double> target_state = targetcar.state_at(T);
+  // store in temporary vectors
+  vector<double> a = delta; //{100, 10, 0, 0, 0, 0};
+  vector<double> b = target_state; //{-10, 0, 0, 4, 0, 0};
+  //cout << "input a: " << endl;
+  //output_vector(a);
+  //cout << "input b: " << endl;
+  //output_vector(b);
+  
+  // add vector delta to it
+  transform (a.begin(), a.end(), b.begin(), b.begin(), plus<double>()); // result in b!!!
+  //cout << "a: " << endl;
+  //output_vector(a);
+  //cout << "b: " << endl;
+  //output_vector(b);
+  
+  //vector<double> target = {s, s_dot, s_ddot, d, d_dot, d_ddot};
+  return b;
+}
+// prediction state of target vehicle & generate further goals
+//double T = 5;
+//vector<double> delta = {10,0,0,4,0,0};
+//vector<double> target_state = pf.predictions(mytargetcar, T, delta);
+//pf.output_vector(target_state);
 
+//#######################################################################
 /*
 
 std::function<int(double)> f(char);

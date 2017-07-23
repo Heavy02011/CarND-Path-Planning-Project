@@ -163,6 +163,9 @@ class PathFinder
     // determine the lane othercar is driving in
     lane in_lane(double d);
     
+    // calculate state of target vehicle using offset delta at time T 
+    vector<double> predictions(Vehicle targetcar, double T, vector<double> delta);
+    
     
   private:
       
