@@ -531,6 +531,14 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
             //cout << "diff_coefficients = " << endl;
             //pf.output_vector(diff_coeff);
             
+            // determine costs according to lesson 4.16 behavioural planning for each successing possible state
+            // #############################################################
+            // ....
+            
+            
+            
+            
+            
           }          
             
           // ***************************************************************************
