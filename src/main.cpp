@@ -413,68 +413,38 @@ int main() {
           for (int ii=0; ii<vehicles_inrange.size(); ii++) {
             vehicles_inrange[ii].display(vehicles_inrange[ii]);
           }
-         
+        
           // calculate predictions of vehicles_inrange over time horizon time steps
           int horizon = 10;
           //vector<vector<double>> predictions = pf.CARpredictions(vehicles_inrange, horizon);
-          map<int, vector<double>> predictions = pf.CARpredictions(vehicles_inrange, horizon);
+          map<int, vector<vector<double>>> predictions = pf.CARpredictions(vehicles_inrange, horizon);
           
             
           cout << "*** " << predictions.size() << " predictions generated ***" << endl;
           //pf.output_vector2(predictions); 
        
           // output of map predictions
-          map<int, vector<double>>::iterator it= predictions.begin();
+          map<int, vector<vector<double>>>::iterator it= predictions.begin();
           //map<int, vector<vector<int> > >::iterator it = predictions.begin();
           //vector<vector<double> > > at_behind;
           while(it != predictions.end())
           {
-          	int car_id = it->first;
-              vector<double> state_vector = it->second;
+              int car_id = it->first;
+              vector<vector<double>> state_vector = it->second;
               cout << "key: " << car_id << " " << endl;
+              pf.output_vector2(state_vector); 
+              /*
               for( int i = 0; i < state_vector.size(); i++)
               {
                 cout << state_vector[i] << " "; // id, s, d
               }
               cout << endl;
+              */
               
               it++;
             }
           
-/*
-          for ( it = predictions.begin(); it != predictions.end(); it++ )
-          {
-              cout << "key: " << it->first << " " << endl;
-              //cout << "values: " << it->second[0] << " " << it->second[0] << endl;
-              for (int i=0; i < it->second.size(); i++) {
-                cout << it->second[i] << " ";
-              }
-              cout << endl;
-          }   
-*/
-/*          
-          // output of predictions
-          for (int j = 0; j < predictions.size(); j++) {
-            //cout << "car " << j << "> id: " << predictions[j] << "> ";
-            for( int i = 0; i < horizon; i++)
-            {
-              cout << predictions[j][i] << " "; // id, s, d
-            }
-            cout << endl;
-          }  
-*/    
-          
-/*          
-          // output of predictions
-          for (int j = 0; j < vehicles_inrange.size(); j++) {
-            cout << "car " << j << "> id: " << vehicles_inrange[j].id << "> ";
-            for( int i = 0; i < horizon; i++)
-            {
-              cout << predictions[j][i] << " "; // id, s, d
-            }
-            cout << endl;
-          }  
-*/          
+            
 
           // ***************************************************************************
           // 3 select a real or virtual vehicle to follow & set target state

@@ -181,7 +181,7 @@ class PathFinder
     vector<vector<double>> PTG_2_trajectories(vector<vector<double>> all_goals, vector<double> current_state);
     
     //vector<vector<double>> CARpredictions(vector<Vehicle>, int horizon);
-    map<int, vector<double>> CARpredictions(vector<Vehicle>, int horizon);
+    map<int, vector<vector<double>>> CARpredictions(vector<Vehicle>, int horizon);
     
   private:
       

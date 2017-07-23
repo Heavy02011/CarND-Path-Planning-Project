@@ -245,7 +245,7 @@ void PathFinder::output_vector(vector<double> x) {
 // pass a vector of vectors x to cout
 void PathFinder::output_vector2(vector<vector<double>> x) {
   for (int i=0; i<x.size(); i++) {
-    cout << "i=" << i << endl;
+    cout << "i=" << i << ": ";
     for (int j=0; j<x[j].size(); j++) {
           cout << x[i][j] << " ";
     }
@@ -482,10 +482,10 @@ std::map<char, char> my_map = {
 */
 // generate predictions of given allcars over horizon
 //vector<vector<double>> PathFinder::CARpredictions(vector<Vehicle> mycars, int horizon = 10) {
-map<int, vector<double>> PathFinder::CARpredictions(vector<Vehicle> mycars, int horizon = 10) {
+map<int, vector<vector<double>>> PathFinder::CARpredictions(vector<Vehicle> mycars, int horizon = 10) {
     // https://stackoverflow.com/questions/32679740/in-c-how-to-insert-key-and-value-in-empty-map-from-another-full-map
     // http://www.cplusplus.com/reference/map/map/insert/
-    // https://stackoverflow.com/questions/6952486/recommended-way-to-insert-elements-into-map
+    // https://stackoverflow.com/questions/6952486/recommended-wagy-to-insert-elements-into-map
     // myMap[ key ] = value;
     //assert( myMap.find( key )->second == value ); // post-condition
     // map.insert(std::pair<key_type, value_type>(key, value));
@@ -493,7 +493,7 @@ map<int, vector<double>> PathFinder::CARpredictions(vector<Vehicle> mycars, int 
     cout << "PathFinder::CARpredictions..." << endl;;
       
     // store predictions here
-    map<int, vector<double>>  predictions;
+    map<int, vector<vector<double>>>  predictions;
     
     // time step
     double dt = 0.2; 
@@ -502,6 +502,7 @@ map<int, vector<double>> PathFinder::CARpredictions(vector<Vehicle> mycars, int 
       
       // check for this car
       Vehicle mycar = mycars[j];
+      vector<vector<double>> storevec;
       cout << "car id: " << mycar.id << endl;;
       
       // loop over horizon
@@ -509,10 +510,11 @@ map<int, vector<double>> PathFinder::CARpredictions(vector<Vehicle> mycars, int 
       {
         vector<double> carstate = mycar.state_at(i*dt); // {s, v, this->a, d, d_dot, this->d_double_dot}
         vector<double> store = {carstate[0], carstate[3]};
+        storevec.push_back(store);
         //assert(predictions.find( mycar.id )->second == store ); // crashed während runtime
-        predictions.insert(pair<int, vector<double>>(mycar.id, store));
         cout << i << " " << carstate[0] << " " << carstate[3] << endl;
       }
+      predictions.insert(pair<int, vector<vector<double>>>(mycar.id, storevec));
     }  
 
     return predictions;
