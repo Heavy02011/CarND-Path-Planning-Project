@@ -410,6 +410,13 @@ int main() {
             vehicles_inrange[ii].display(vehicles_inrange[ii]);
           }
           
+          // calculate predictions of vehicles_inrange over time horizon time steps
+          int horizon = 10;
+          vector<vector<double>> predictions = pf.CARpredictions(vehicles_inrange, horizon);
+          cout << "*** " << predictions.size() << " predictions generated ***" << endl;
+                    
+          
+          
 
           // ***************************************************************************
           // 3 select a real or virtual vehicle to follow & set target state
@@ -422,7 +429,7 @@ int main() {
           // predict state of target vehicle at time T using offset delta
           double T = 5;
           vector<double> delta = {10,0,0,4,0,0};
-          vector<double> target_state = pf.predictions(mytargetcar, T, delta);
+          vector<double> target_state = pf.predictions0(mytargetcar, T, delta);
           cout << "target_state" << endl;
           pf.output_vector(target_state);
           

@@ -326,7 +326,7 @@ for (int k=0; k<sensor_fusion.size(); k++) {
 
      T - the desired time at which we will be at the goal (relative to now as t=0)
 */
-vector<double> PathFinder::predictions(Vehicle targetcar, double T, vector<double> delta) {
+vector<double> PathFinder::predictions0(Vehicle targetcar, double T, vector<double> delta) {
   // get current state of target vehicle & predict state of targetvehicle at time T
   vector<double> target_state = targetcar.state_at(T);
   // store in temporary vectors
@@ -462,6 +462,66 @@ vector<vector<double>> PathFinder::PTG_2_trajectories(vector<vector<double>> all
   return trajectories;
 }
 
+// generate predictions of given allcars over horizon
+vector<vector<double>> PathFinder::CARpredictions(vector<Vehicle> mycars, int horizon = 10) {
+
+    // store predictions here
+    vector<vector<double>>  predictions;
+    
+    // time step
+    double dt = 0.2; 
+
+    for (int j = 0; j < mycars.size(); j++) {
+      
+      // check for this car
+      Vehicle mycar = mycars[j];
+      
+      // loop over horizon
+      for( int i = 0; i < horizon; i++)
+      {
+        vector<double> carstate = mycar.state_at(i*dt); // {s, v, this->a, d, d_dot, this->d_double_dot}
+        predictions.push_back({carstate[0],carstate[3]});
+        //vector<double> check1 = state_at(i);
+        //vector<int> lane_s = {check1[0], check1[1]};
+        //predictions.push_back(lane_s);
+      }
+    }  
+
+    return predictions;
+
+}
+
+/*
+    INPUTS
+    - predictions 
+    A dictionary. The keys are ids of other vehicles and the values are arrays
+    where each entry corresponds to the vehicle's predicted location at the 
+    corresponding timestep. The FIRST element in the array gives the vehicle's
+    current position. Example (showing a car with id 3 moving at 2 m/s):
+
+    {
+      3 : [
+        {"s" : 4, "lane": 0},
+        {"s" : 6, "lane": 0},
+        {"s" : 8, "lane": 0},
+        {"s" : 10, "lane": 0},
+      ]
+      }
+      
+vector<vector<int> > Vehicle::generate_predictions(int horizon = 10) {
+
+	vector<vector<int> > predictions;
+    for( int i = 0; i < horizon; i++)
+    {
+      vector<int> check1 = state_at(i);
+      vector<int> lane_s = {check1[0], check1[1]};
+      predictions.push_back(lane_s);
+  	}
+    return predictions;
+
+    }
+
+*/
 
 //#######################################################################
         

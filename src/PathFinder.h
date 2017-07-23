@@ -165,7 +165,7 @@ class PathFinder
     lane in_lane(double d);
     
     // calculate state of target vehicle using offset delta at time T 
-    vector<double> predictions(Vehicle targetcar, double T, vector<double> delta);
+    vector<double> predictions0(Vehicle targetcar, double T, vector<double> delta);
     
     // generate a bunch of samples using gaussion noise
     vector<vector<double>> perturb_goal0(vector<double> target_state, int n_samples);
@@ -175,6 +175,8 @@ class PathFinder
     
     // PTG part 2: generate trajectories for all_goals
     vector<vector<double>> PTG_2_trajectories(vector<vector<double>> all_goals, vector<double> current_state);
+    
+    vector<vector<double>> CARpredictions(vector<Vehicle>, int horizon);
     
   private:
       
