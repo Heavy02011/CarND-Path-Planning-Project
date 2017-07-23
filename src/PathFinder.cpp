@@ -336,16 +336,59 @@ vector<double> PathFinder::predictions(Vehicle targetcar, double T, vector<doubl
   transform (a.begin(), a.end(), b.begin(), b.begin(), plus<double>()); // result in b!!!
   return b;
 }
-// test predixctions
+// test predictions
 //double T = 5;
 //vector<double> delta = {10,0,0,4,0,0};
 //vector<double> target_state = pf.predictions(mytargetcar, T, delta);
 //pf.output_vector(target_state);
 
 
+// generate a bunch of samples using gaussion noise
+vector<vector<double>> PathFinder::perturb_goal(vector<double> target_state, int n_samples) { 
+  // generate gaussians
+  default_random_engine gen;
+  // creates a normal (Gaussian) distribution for s, d
+  normal_distribution<double> dist_s1_init(target_state[0], SIGMA_S[0]);
+  normal_distribution<double> dist_s2_init(target_state[1], SIGMA_S[1]);
+  normal_distribution<double> dist_s3_init(target_state[2], SIGMA_S[2]);
+  normal_distribution<double> dist_d1_init(target_state[3], SIGMA_D[0]);
+  normal_distribution<double> dist_d2_init(target_state[4], SIGMA_D[1]);
+  normal_distribution<double> dist_d3_init(target_state[5], SIGMA_D[2]);  
+  // create vector for samples
+  vector<vector<double>> all_goals;
+  for (int i=0; i<n_samples; i++) {
+    // generate elements of new pertubed state
+    double s            = dist_s1_init(gen);
+    double s_dot        = dist_s2_init(gen);
+    double s_double_dot = dist_s2_init(gen);
+    double d            = dist_d1_init(gen);
+    double d_dot        = dist_d2_init(gen);
+    double d_double_dot = dist_d2_init(gen);
+    // store in new state vector
+    all_goals.push_back({s, s_dot, s_double_dot, d, d_dot, d_double_dot});    
+  }
+  return all_goals;
+}
 
 
+//#####
+/*
 
+def perturb_goal(goal_s, goal_d):
+    """
+    Returns a "perturbed" version of the goal.
+    """
+    new_s_goal = []
+    for mu, sig in zip(goal_s, SIGMA_S):
+        new_s_goal.append(random.gauss(mu, sig))
+
+    new_d_goal = []
+    for mu, sig in zip(goal_d, SIGMA_D):
+        new_d_goal.append(random.gauss(mu, sig))
+        
+        return tuple([new_s_goal, new_d_goal])
+
+*/
 
 
 

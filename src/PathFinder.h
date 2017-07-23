@@ -1,6 +1,7 @@
 #ifndef PATHFINDER_H
 #define PATHFINDER_H
 
+#include <random>
 #include <fstream>
 #include <math.h>
 #include <uWS/uWS.h>
@@ -166,6 +167,8 @@ class PathFinder
     // calculate state of target vehicle using offset delta at time T 
     vector<double> predictions(Vehicle targetcar, double T, vector<double> delta);
     
+    // generate a bunch of samples using gaussion noise
+    vector<vector<double>> perturb_goal(vector<double> target_state, int n_samples);
     
   private:
       

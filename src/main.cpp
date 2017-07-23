@@ -419,18 +419,28 @@ int main() {
           cout << "*** id of target car: " << id_front << " ***" << endl;
           mytargetcar.display(mytargetcar);
                 
-          // prediction state of target vehicle & generate further goals
+          // predict state of target vehicle at time T using offset delta
           double T = 5;
           vector<double> delta = {10,0,0,4,0,0};
           vector<double> target_state = pf.predictions(mytargetcar, T, delta);
+          cout << "target_state" << endl;
           pf.output_vector(target_state);
           
+          // split target state into s and d component
+          vector<double> goal_s(3); // = target_state[:3];
+          vector<double> goal_d(3); // = target_state[3:];
+          goal_s[0] = target_state[0];          
+          goal_s[1] = target_state[1];          
+          goal_s[2] = target_state[2];
+          goal_d[0] = target_state[3];          
+          goal_d[1] = target_state[4];          
+          goal_d[2] = target_state[5];   
+          
+          // generate pertubed goals
+          // ...
           
           
           
-          // create a target vehicle 
-          //Vehicle mytargetcar(99,x,y,vx,vy,s,d,0,0,0); 
-          // int id, double x, double y, double vx, double vy, double s, double d, double a, double d_dot, double d_double_dot
           
           
           
