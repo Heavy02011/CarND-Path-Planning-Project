@@ -370,7 +370,7 @@ vector<vector<double>> PathFinder::perturb_goal0(vector<double> target_state, in
   return all_goals;
 }
 
-// generate a bunch of salternative (pertubed) goals using gaussion noise based on target_states during T...T-4*dt
+// PTG part 1: generate a bunch of salternative (pertubed) goals using gaussion noise based on target_states during T...T-4*dt
 vector<vector<double>> PathFinder::PTG_1_all_goals(Vehicle targetcar, double T, vector<double> delta, int n_goals, double dt) { 
   
   // create vector for samples
@@ -408,7 +408,7 @@ vector<vector<double>> PathFinder::PTG_1_all_goals(Vehicle targetcar, double T, 
       double d_dot        = dist_d2_init(gen);
       double d_double_dot = dist_d2_init(gen);
       // store in new state vector
-      all_goals.push_back({s, s_dot, s_double_dot, d, d_dot, d_double_dot});    
+      all_goals.push_back({s, s_dot, s_double_dot, d, d_dot, d_double_dot, t});    
     }
     
     // increment time
@@ -418,8 +418,62 @@ vector<vector<double>> PathFinder::PTG_1_all_goals(Vehicle targetcar, double T, 
   return all_goals;
 }
 
+// PTG part 2: generate trajectories for all_goals
+vector<vector<double>> PathFinder::PTG_2_trajectories(vector<vector<double>> all_goals, vector<double> current_state) { 
+  
+  // create vector for trajectories
+  vector<vector<double>> trajectories;
+  
+  // split current state into s and d component
+  vector<double> start_s(3); 
+  vector<double> start_d(3);
+  vector<double> goal_s(3);
+  vector<double> goal_d(3);
+  
+  start_s[0] = current_state[0];          
+  start_s[1] = current_state[1];          
+  start_s[2] = current_state[2];
+  start_d[0] = current_state[3];          
+  start_d[1] = current_state[4];          
+  start_d[2] = current_state[5];  
+   
+  // loop over all_goals
+  for (int i = 0; i < all_goals.size(); i++) {
+    
+    // get  data from all_goals
+    goal_s[0] = all_goals[i][0];          
+    goal_s[1] = all_goals[i][1];          
+    goal_s[2] = all_goals[i][2];
+    goal_d[0] = all_goals[i][3];          
+    goal_d[1] = all_goals[i][4];          
+    goal_d[2] = all_goals[i][5];
+    double t = all_goals[i][6];  
+   
+    // generate coefficients for s & d
+    vector<double> s_coefficients = PathFinder::JMT(start_s, goal_s, t);
+    vector<double> d_coefficients = PathFinder::JMT(start_d, goal_d, t);
+      
+    //store reults
+    //trajectories.push_back({s_coefficients,d_coefficients,t}); 
+  trajectories.push_back({s_coefficients[0],s_coefficients[1],s_coefficients[2],d_coefficients[0],d_coefficients[1],d_coefficients[2],t});
+    
+  }  
+  
+  return trajectories;
+}
+
+/*
+
+    # find best trajectory
+    trajectories = []
+    for goal in all_goals:
+        s_goal, d_goal, t = goal
+        s_coefficients = JMT(start_s, s_goal, t)
+        d_coefficients = JMT(start_d, d_goal, t)
+        trajectories.append(tuple([s_coefficients, d_coefficients, t]))
 
 
+*/
 
 
 //#######################################################################
