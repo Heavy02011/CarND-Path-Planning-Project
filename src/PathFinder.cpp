@@ -371,24 +371,7 @@ vector<vector<double>> PathFinder::perturb_goal(vector<double> target_state, int
 }
 
 
-//#####
-/*
 
-def perturb_goal(goal_s, goal_d):
-    """
-    Returns a "perturbed" version of the goal.
-    """
-    new_s_goal = []
-    for mu, sig in zip(goal_s, SIGMA_S):
-        new_s_goal.append(random.gauss(mu, sig))
-
-    new_d_goal = []
-    for mu, sig in zip(goal_d, SIGMA_D):
-        new_d_goal.append(random.gauss(mu, sig))
-        
-        return tuple([new_s_goal, new_d_goal])
-
-*/
 
 
 
