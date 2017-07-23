@@ -462,43 +462,9 @@ vector<vector<double>> PathFinder::PTG_2_trajectories(vector<vector<double>> all
   return trajectories;
 }
 
-/*
-
-    # find best trajectory
-    trajectories = []
-    for goal in all_goals:
-        s_goal, d_goal, t = goal
-        s_coefficients = JMT(start_s, s_goal, t)
-        d_coefficients = JMT(start_d, d_goal, t)
-        trajectories.append(tuple([s_coefficients, d_coefficients, t]))
-
-
-*/
-
 
 //#######################################################################
-/*
-
-std::function<int(double)> f(char);
-https://stackoverflow.com/questions/31387238/c-function-returning-function
-
-lesson 5.30
-
-def to_equation(coefficients):
-    """
-    Takes the coefficients of a polynomial and creates a function of
-    time from them.
-    """
-    def f(t):
-        total = 0.0
-        for i, c in enumerate(coefficients): 
-            total += c * t ** i
-        return total
-        return f
-
-*/
-
-
+        
 
 /*
 
