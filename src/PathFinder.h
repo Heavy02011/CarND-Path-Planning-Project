@@ -14,6 +14,7 @@
 #include "spline.h" // rbx
 
 #include <cmath>
+#include <map>
 //#include "Dense"
 
 #include "vehicle.h"
@@ -179,7 +180,8 @@ class PathFinder
     // PTG part 2: generate trajectories for all_goals
     vector<vector<double>> PTG_2_trajectories(vector<vector<double>> all_goals, vector<double> current_state);
     
-    vector<vector<double>> CARpredictions(vector<Vehicle>, int horizon);
+    //vector<vector<double>> CARpredictions(vector<Vehicle>, int horizon);
+    map<int, vector<double>> CARpredictions(vector<Vehicle>, int horizon);
     
   private:
       

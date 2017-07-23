@@ -473,14 +473,27 @@ vector<vector<double>> PathFinder::PTG_2_trajectories(vector<vector<double>> all
   
   return trajectories;
 }
-
+/*
+std::map<char, char> my_map = {
+    { 'A', '1' },
+    { 'B', '2' },
+    { 'C', '3' }
+    };
+*/
 // generate predictions of given allcars over horizon
-vector<vector<double>> PathFinder::CARpredictions(vector<Vehicle> mycars, int horizon = 10) {
+//vector<vector<double>> PathFinder::CARpredictions(vector<Vehicle> mycars, int horizon = 10) {
+map<int, vector<double>> PathFinder::CARpredictions(vector<Vehicle> mycars, int horizon = 10) {
+    // https://stackoverflow.com/questions/32679740/in-c-how-to-insert-key-and-value-in-empty-map-from-another-full-map
+    // http://www.cplusplus.com/reference/map/map/insert/
+    // https://stackoverflow.com/questions/6952486/recommended-way-to-insert-elements-into-map
+    // myMap[ key ] = value;
+    //assert( myMap.find( key )->second == value ); // post-condition
+    // map.insert(std::pair<key_type, value_type>(key, value));
     
     cout << "PathFinder::CARpredictions..." << endl;;
       
     // store predictions here
-    vector<vector<double>>  predictions;
+    map<int, vector<double>>  predictions;
     
     // time step
     double dt = 0.2; 
@@ -495,11 +508,10 @@ vector<vector<double>> PathFinder::CARpredictions(vector<Vehicle> mycars, int ho
       for( int i = 0; i < horizon; i++)
       {
         vector<double> carstate = mycar.state_at(i*dt); // {s, v, this->a, d, d_dot, this->d_double_dot}
-        predictions.push_back({carstate[0], carstate[3]}); // id, s, d
+        vector<double> store = {carstate[0], carstate[3]};
+        //assert(predictions.find( mycar.id )->second == store ); // crashed während runtime
+        predictions.insert(pair<int, vector<double>>(mycar.id, store));
         cout << i << " " << carstate[0] << " " << carstate[3] << endl;
-        //vector<double> check1 = state_at(i);
-        //vector<int> lane_s = {check1[0], check1[1]};
-        //predictions.push_back(lane_s);
       }
     }  
 
@@ -580,3 +592,38 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
             return best_next_state
 
 */  
+            
+            
+/*
+vector<vector<double>> PathFinder::CARpredictions(vector<Vehicle> mycars, int horizon = 10) {
+  
+    cout << "PathFinder::CARpredictions..." << endl;;
+      
+    // store predictions here
+    vector<vector<double>>  predictions;
+    
+    // time step
+    double dt = 0.2; 
+
+    for (int j = 0; j < mycars.size(); j++) {
+      
+      // check for this car
+      Vehicle mycar = mycars[j];
+      cout << "car id: " << mycar.id << endl;;
+      
+      // loop over horizon
+      for( int i = 0; i < horizon; i++)
+      {
+        vector<double> carstate = mycar.state_at(i*dt); // {s, v, this->a, d, d_dot, this->d_double_dot}
+        predictions.push_back({carstate[0], carstate[3]}); // id, s, d
+        cout << i << " " << carstate[0] << " " << carstate[3] << endl;
+        //vector<double> check1 = state_at(i);
+        //vector<int> lane_s = {check1[0], check1[1]};
+        //predictions.push_back(lane_s);
+      }
+    }  
+
+    return predictions;
+
+    }
+*/
