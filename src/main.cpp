@@ -425,7 +425,7 @@ int main() {
           vector<double> target_state = pf.predictions(mytargetcar, T, delta);
           cout << "target_state" << endl;
           pf.output_vector(target_state);
-          
+/*          
           // split target state into s and d component
           vector<double> goal_s(3); // = target_state[:3];
           vector<double> goal_d(3); // = target_state[3:];
@@ -435,10 +435,18 @@ int main() {
           goal_d[0] = target_state[3];          
           goal_d[1] = target_state[4];          
           goal_d[2] = target_state[5];   
+*/          
+          // PTG part 1
+          // generate a bunch of salternative (pertubed) goals using gaussion noise based on target_states during T...T-4*dt
+          int n_goals = 50;
+          double timestep = 0.5;
+          vector<vector<double>> all_goals =  pf.PTG_1_all_goals(mytargetcar, T, delta, n_goals, timestep);         
+          cout << "*** " << all_goals.size() << " new goals generated ***" << endl;
+          //vector<vector<double>> all_goals = pf.perturb_goal0(target_state, n_samples);
           
-          // generate pertubed goals
+          // PTG part 2
+          // find best trajectory
           // ...
-          
           
           
           

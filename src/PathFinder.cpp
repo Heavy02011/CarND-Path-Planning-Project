@@ -344,7 +344,7 @@ vector<double> PathFinder::predictions(Vehicle targetcar, double T, vector<doubl
 
 
 // generate a bunch of samples using gaussion noise
-vector<vector<double>> PathFinder::perturb_goal(vector<double> target_state, int n_samples) { 
+vector<vector<double>> PathFinder::perturb_goal0(vector<double> target_state, int n_samples) { 
   // generate gaussians
   default_random_engine gen;
   // creates a normal (Gaussian) distribution for s, d
@@ -370,6 +370,53 @@ vector<vector<double>> PathFinder::perturb_goal(vector<double> target_state, int
   return all_goals;
 }
 
+// generate a bunch of salternative (pertubed) goals using gaussion noise based on target_states during T...T-4*dt
+vector<vector<double>> PathFinder::PTG_1_all_goals(Vehicle targetcar, double T, vector<double> delta, int n_goals, double dt) { 
+  
+  // create vector for samples
+  vector<vector<double>> all_goals;
+  
+  // while t <= T + 4 * timestep:
+  double t = T - 4 * dt;
+  
+  while (t <= T + 4 * dt) {
+    
+    // get current state of target vehicle & predict state of targetvehicle at time t
+    vector<double> a = delta; 
+    vector<double> b = targetcar.state_at(t); 
+    // add vector delta to it
+    transform (a.begin(), a.end(), b.begin(), b.begin(), plus<double>()); // result in b!!!
+    vector<double> target_state = b;
+    
+    // generate gaussians
+    default_random_engine gen;
+    // creates a normal (Gaussian) distribution for s, d
+    normal_distribution<double> dist_s1_init(target_state[0], SIGMA_S[0]);
+    normal_distribution<double> dist_s2_init(target_state[1], SIGMA_S[1]);
+    normal_distribution<double> dist_s3_init(target_state[2], SIGMA_S[2]);
+    normal_distribution<double> dist_d1_init(target_state[3], SIGMA_D[0]);
+    normal_distribution<double> dist_d2_init(target_state[4], SIGMA_D[1]);
+    normal_distribution<double> dist_d3_init(target_state[5], SIGMA_D[2]);  
+    
+    // generate goals
+    for (int i=0; i<n_goals; i++) {
+      // generate elements of new pertubed state
+      double s            = dist_s1_init(gen);
+      double s_dot        = dist_s2_init(gen);
+      double s_double_dot = dist_s2_init(gen);
+      double d            = dist_d1_init(gen);
+      double d_dot        = dist_d2_init(gen);
+      double d_double_dot = dist_d2_init(gen);
+      // store in new state vector
+      all_goals.push_back({s, s_dot, s_double_dot, d, d_dot, d_double_dot});    
+    }
+    
+    // increment time
+    t += dt;
+  }
+  
+  return all_goals;
+}
 
 
 
