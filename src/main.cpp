@@ -407,40 +407,26 @@ int main() {
               vehicles_inrange.push_back(othercar);
             }
             
-          }     
+          }    
+          // show vehicles_inrange 
           cout << "*** " << vehicles_inrange.size() << " vehicles in range 50m detected ***" << endl;
-
           for (int ii=0; ii<vehicles_inrange.size(); ii++) {
             vehicles_inrange[ii].display(vehicles_inrange[ii]);
           }
         
           // calculate predictions of vehicles_inrange over time horizon time steps
-          int horizon = 10;
-          //vector<vector<double>> predictions = pf.CARpredictions(vehicles_inrange, horizon);
-          map<int, vector<vector<double>>> predictions = pf.CARpredictions(vehicles_inrange, horizon);
-          
-            
+          int horizon = 50;
+          map<int, vector<vector<double>>> predictions = pf.CARpredictions(vehicles_inrange, horizon);      
           cout << "*** " << predictions.size() << " predictions generated ***" << endl;
-          //pf.output_vector2(predictions); 
        
           // output of map predictions
           map<int, vector<vector<double>>>::iterator it= predictions.begin();
-          //map<int, vector<vector<int> > >::iterator it = predictions.begin();
-          //vector<vector<double> > > at_behind;
           while(it != predictions.end())
           {
               int car_id = it->first;
               vector<vector<double>> state_vector = it->second;
               cout << "key: " << car_id << " " << endl;
               pf.output_vector2(state_vector); 
-              /*
-              for( int i = 0; i < state_vector.size(); i++)
-              {
-                cout << state_vector[i] << " "; // id, s, d
-              }
-              cout << endl;
-              */
-              
               it++;
             }
           
