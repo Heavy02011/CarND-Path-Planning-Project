@@ -532,6 +532,9 @@ int PathFinder::car_id(vector<Vehicle> cars, int car_id) {
   return -1; // not found
 }
 
+// identify a collision taking a set of predictions
+//TODO:....
+
 //#######################################################################
         
 

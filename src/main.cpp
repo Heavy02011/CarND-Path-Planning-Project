@@ -524,6 +524,8 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
             
             // check for possible collision in the future and adjust costs
             lane my_lane = pf.in_lane(pf.d);
+            //TODO: create a Vehicle for myself and make a prediction as for all_cars
+            //....
             double costs = 0;
             map<int, vector<vector<double>>>::iterator it= predictions.begin();
             while(it != predictions.end())
@@ -535,7 +537,7 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
                 double s = all_cars[othercar_id].s; // othercar s with car_id
                 lane othercar_lane = pf.in_lane(d); // lane of the othercar
                 
-              
+                //TODO:  function(state_vector) --> find collision index for s
                 if ((othercar_lane == my_lane) and ((state_vector[49][0]-s)< 5)) {
                   cout << "/////////////////////////////////" << endl;
                   cout << "////// collision ahead //////////" << endl;
