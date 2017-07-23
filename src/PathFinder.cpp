@@ -521,37 +521,16 @@ map<int, vector<vector<double>>> PathFinder::CARpredictions(vector<Vehicle> myca
 
 }
 
-/*
-    INPUTS
-    - predictions 
-    A dictionary. The keys are ids of other vehicles and the values are arrays
-    where each entry corresponds to the vehicle's predicted location at the 
-    corresponding timestep. The FIRST element in the array gives the vehicle's
-    current position. Example (showing a car with id 3 moving at 2 m/s):
-
-    {
-      3 : [
-        {"s" : 4, "lane": 0},
-        {"s" : 6, "lane": 0},
-        {"s" : 8, "lane": 0},
-        {"s" : 10, "lane": 0},
-      ]
-      }
-      
-vector<vector<int> > Vehicle::generate_predictions(int horizon = 10) {
-
-	vector<vector<int> > predictions;
-    for( int i = 0; i < horizon; i++)
-    {
-      vector<int> check1 = state_at(i);
-      vector<int> lane_s = {check1[0], check1[1]};
-      predictions.push_back(lane_s);
-  	}
-    return predictions;
-
+// get id of car with car_id in vector of Vehicles
+int PathFinder::car_id(vector<Vehicle> cars, int car_id) {
+  for (int i = 0; i < cars.size(); i++) {
+    Vehicle car = cars[i];
+    if (car.id == car_id) {
+      return i;
     }
-
-*/
+  }
+  return -1; // not found
+}
 
 //#######################################################################
         

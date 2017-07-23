@@ -183,6 +183,9 @@ class PathFinder
     //vector<vector<double>> CARpredictions(vector<Vehicle>, int horizon);
     map<int, vector<vector<double>>> CARpredictions(vector<Vehicle>, int horizon);
     
+    // get id of car with car_id in vector of Vehicles
+    int car_id(vector<Vehicle> cars, int car_id);
+    
   private:
       
       

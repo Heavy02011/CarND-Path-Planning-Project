@@ -371,6 +371,7 @@ int main() {
           
           // keep vehicles in range in this vector      
           vector<Vehicle> vehicles_inrange;
+          vector<Vehicle> all_cars;
           
           // select the car that has largest distance & velocity in front of us as target
           
@@ -406,6 +407,7 @@ int main() {
             if (distance < 50) {
               vehicles_inrange.push_back(othercar);
             }
+            all_cars.push_back(othercar);
             
           }    
           // show vehicles_inrange 
@@ -428,7 +430,7 @@ int main() {
               cout << "key: " << car_id << " " << endl;
               pf.output_vector2(state_vector); 
               it++;
-            }
+          }
           
             
 
@@ -519,6 +521,33 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
             
             // output of current investigated state
             cout << "investigating state: " << possible_successor_states[istate] << endl;;
+            
+            // check for possible collision in the future and adjust costs
+            lane my_lane = pf.in_lane(pf.d);
+            double costs = 0;
+            map<int, vector<vector<double>>>::iterator it= predictions.begin();
+            while(it != predictions.end())
+            {
+                int car_id = it->first;
+                vector<vector<double>> state_vector = it->second; // vectors of s, d over horizon
+                int othercar_id = pf.car_id(all_cars, car_id); // get index in all_cars for car_id
+                double d = all_cars[othercar_id].d; // othercar with car_id
+                double s = all_cars[othercar_id].s; // othercar s with car_id
+                lane othercar_lane = pf.in_lane(d); // lane of the othercar
+                
+              
+                if ((othercar_lane == my_lane) and ((state_vector[49][0]-s)< 5)) {
+                  cout << "/////////////////////////////////" << endl;
+                  cout << "////// collision ahead //////////" << endl;
+                  cout << "/////////////////////////////////" << endl; 
+                  cout << "car_id: " << othercar_id << " s: " << s << " d: " << d <<endl;
+                }
+                
+                //cout << "key: " << car_id << " " << endl;
+                //pf.output_vector2(state_vector); 
+                
+                it++;
+            }
             
             // check for state
             if (possible_successor_states[istate] == KL )  cout << "KL   possible" << endl;
@@ -624,12 +653,12 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
           // ########
           
           //double max_car_speed = 0.8 * 50.0 * 0.44704; // apply safety factor of 90%
-          double max_car_speed = 0.9 * pf.SPEED_LIMIT; // apply safety factor of 90%
+          double max_car_speed = 1.0 * pf.SPEED_LIMIT; // apply safety factor of 90%
           
           // position
           double b = 0.8*10.0; //10.0; // m/s2
           double c = 0.8*10.0; //50.0; // m/s3
-          double dt = 0.8* 0.02;        // s          
+          double dt = 0.02;        // s          
           double x0 = 0; //car_s;
           double v0 = max_car_speed; // change to variable speed according to traffic conditions later
           double xt = x0 + v0 * dt + b * dt*dt/2 + c * dt*dt*dt/6;
