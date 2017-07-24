@@ -470,6 +470,11 @@ int main() {
           cout << "target_state" << endl;
           pf.output_vector(target_state);
           
+          
+          // ***************************************************************************
+          // 4 run finite state machine & evaluate possible trajectories & costs
+          // ***************************************************************************
+/*
           // PTG part 1
           // generate a bunch of alternative (pertubed) goals using gaussion noise based on target_states during T...T-4*dt
           int n_goals = 50;
@@ -483,16 +488,7 @@ int main() {
           vector<double> current_state = {pf.s,pf.v,pf.a,pf.d,0,0 }; // check this d_dot, d_double_dot!!!!
           vector<vector<double>> trajectories = pf.PTG_2_trajectories(all_goals, current_state);
           cout << "*** " << trajectories.size() << " new trajectories generated ***" << endl;
-          
-          
-          
-          
-          // ***************************************************************************
-          // 4 run finite state machine & evaluate possible trajectories & costs
-          // ***************************************************************************
-
-          //TODO: implement PTG.py here
-          
+*/          
           
 /*
 def transition_function(predictions, current_fsm_state, current_pose, cost_functions, weights):
@@ -632,6 +628,7 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
           
           // current size of path
           int path_size = previous_path_x.size();
+          cout << "path_size = " << path_size << endl;
 
           // store previous path in new one for smooth transition 
           for(int i = 0; i < path_size; i++)
@@ -696,6 +693,7 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
           
           double ds = xt; //0.4; // increment along s for time interval dt  
           double dd = 2.0; //car_s - 6.0; //0.0; // increment for changing lane  
+          cout << ">>> ds = " << ds << endl;
           
           // ########
           
@@ -704,6 +702,7 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
           double dist_inc = 0.5;
           //for(int i = 0; i < 50-path_size; i++)
           for(int i = path_size; i < 50; i++)              
+          //for(int i = 0; i < 50; i++)              
           {  
            
             // new increments along s,d
