@@ -358,12 +358,33 @@ int main() {
           // ***************************************************************************
           
           // store actual car state & DELAY 1-2s ????????????????????  
+//car_s += 30; // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
           pf.s = car_s;
           pf.d = car_d;
           pf.x = car_x;
           pf.y = car_y;
           pf.v = car_speed*pf.MPH2MPS;
+          double my_dx = waypointspline_dx(car_s);
+          double my_dy = waypointspline_dy(car_s);
+
+/*          
+          // place my car in a vector of cars as well to be able to use state prediction
+          vector<Vehicle> mycars;
+          Vehicle mycar(23, car_x, car_y, my_dx*car_speed*pf.MPH2MPS, my_dy*car_speed*pf.MPH2MPS, car_s, car_d, 0, 0, 0);
+          mycars.push_back(mycar); // this will be done every time step again
   
+          // predict the state of my car in the future (1s)
+          vector<double> mystate = mycar.state_at(1);
+          vector<double> car_xy = getXY(mystate[0], mystate[3], map_waypoints_s, map_waypoints_x, map_waypoints_y);
+          
+          // upddate car data to future state
+          car_s = mystate[0];
+          car_d = mystate[3];
+          car_x = car_xy[0];
+          car_y = car_xy[1];
+*/          
+          // {s, v, this->a, d, d_dot, this->d_double_dot};
 
           // ***************************************************************************
           // 2 limit investigation of traffic to a smaller range out of sensor_fusion
@@ -686,10 +707,10 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
           {  
            
             // new increments along s,d
-            //double delta_s = car_s + i * ds;
-            //double delta_d = car_d + i * dd;
-            double delta_s = pf.s + i * ds;
-            double delta_d = pf.d + i * dd;
+            double delta_s = car_s + i * ds;
+            double delta_d = car_d + i * dd;
+            //double delta_s = pf.s + i * ds;
+            //double delta_d = pf.d + i * dd;
             
             // use spline to get smooth new path points of road center
             double new_x0 = waypointspline_x(delta_s);
