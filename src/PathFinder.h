@@ -52,6 +52,9 @@ class PathFinder
     PathFinder(double x, double y, double d, double s, double v, double a, double yaw);
 
     virtual ~PathFinder();
+
+    // test output
+    bool be_verbose = false;
         
     // number of sample points on track
     const int N_SAMPLES = 50;

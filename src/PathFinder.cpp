@@ -490,7 +490,7 @@ map<int, vector<vector<double>>> PathFinder::CARpredictions(vector<Vehicle> myca
     //assert( myMap.find( key )->second == value ); // post-condition
     // map.insert(std::pair<key_type, value_type>(key, value));
     
-    cout << "PathFinder::CARpredictions..." << endl;;
+    if (be_verbose) cout << "PathFinder::CARpredictions..." << endl;;
       
     // store predictions here
     map<int, vector<vector<double>>>  predictions;
@@ -503,7 +503,7 @@ map<int, vector<vector<double>>> PathFinder::CARpredictions(vector<Vehicle> myca
       // check for this car
       Vehicle mycar = mycars[j];
       vector<vector<double>> storevec;
-      cout << "car id: " << mycar.id << endl;;
+      if (be_verbose) cout << "car id: " << mycar.id << endl;;
       
       // loop over horizon
       for( int i = 0; i < horizon; i++)
@@ -512,7 +512,7 @@ map<int, vector<vector<double>>> PathFinder::CARpredictions(vector<Vehicle> myca
         vector<double> store = {carstate[0], carstate[3]};
         storevec.push_back(store);
         //assert(predictions.find( mycar.id )->second == store ); // crashed während runtime
-        cout << i << " " << carstate[0] << " " << carstate[3] << endl;
+        if (be_verbose) cout << i << " " << carstate[0] << " " << carstate[3] << endl;
       }
       predictions.insert(pair<int, vector<vector<double>>>(mycar.id, storevec));
     }  

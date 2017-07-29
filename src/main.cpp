@@ -341,17 +341,19 @@ int main() {
           cout << "***********************************************************" << endl;
           
           // output of path data  
-          cout << "==========================================================================" << endl;          
-          cout << "previous_path_x = " << previous_path_x << endl;  
-          cout << "previous_path_y = " << previous_path_y << endl;     
-          cout << "end_path_s = " << end_path_s << endl;  
-          cout << "end_path_d = " << end_path_d << endl; 
-          cout << "sensor_fusion = " << sensor_fusion << endl; 
-          //cout << "*** car x,y,s,d,yaw,speed = " << car_x << " " << car_y << " " << car_s << " " << car_d << " " << car_yaw << " " << car_speed << endl; 
-          cout << "*** car x,y = " << car_x << " " << car_y<< endl;         
-          cout << endl;
-          cout << "==========================================================================" << endl;          
-          cout << endl;                
+          if (pf.be_verbose) {
+            cout << "==========================================================================" << endl;          
+            cout << "previous_path_x = " << previous_path_x << endl;  
+            cout << "previous_path_y = " << previous_path_y << endl;     
+            cout << "end_path_s = " << end_path_s << endl;  
+            cout << "end_path_d = " << end_path_d << endl; 
+            cout << "sensor_fusion = " << sensor_fusion << endl; 
+            //cout << "*** car x,y,s,d,yaw,speed = " << car_x << " " << car_y << " " << car_s << " " << car_d << " " << car_yaw << " " << car_speed << endl; 
+            cout << "*** car x,y = " << car_x << " " << car_y<< endl;         
+            cout << endl;
+            cout << "==========================================================================" << endl;          
+            cout << endl; 
+          }                
             
           // ***************************************************************************
           // 1 update my cars data in PathFinder object
@@ -432,9 +434,11 @@ int main() {
             
           }    
           // show vehicles_inrange 
-          cout << "*** " << vehicles_inrange.size() << " vehicles in range 50m detected ***" << endl;
-          for (int ii=0; ii<vehicles_inrange.size(); ii++) {
-            vehicles_inrange[ii].display(vehicles_inrange[ii]);
+          if (pf.be_verbose) {
+            cout << "*** " << vehicles_inrange.size() << " vehicles in range 50m detected ***" << endl;
+            for (int ii=0; ii<vehicles_inrange.size(); ii++) {
+              vehicles_inrange[ii].display(vehicles_inrange[ii]);
+            }
           }
         
           // calculate predictions of vehicles_inrange over time horizon time steps
@@ -443,14 +447,16 @@ int main() {
           cout << "*** " << predictions.size() << " predictions generated ***" << endl;
        
           // output of map predictions
-          map<int, vector<vector<double>>>::iterator it= predictions.begin();
-          while(it != predictions.end())
-          {
-              int car_id = it->first;
-              vector<vector<double>> state_vector = it->second;
-              cout << "key: " << car_id << " " << endl;
-              pf.output_vector2(state_vector); 
-              it++;
+          if (pf.be_verbose) {
+            map<int, vector<vector<double>>>::iterator it= predictions.begin();
+            while(it != predictions.end())
+            {
+                int car_id = it->first;
+                vector<vector<double>> state_vector = it->second;
+                cout << "key: " << car_id << " " << endl;
+                pf.output_vector2(state_vector); 
+                it++;
+            } 
           }
           
             
@@ -460,15 +466,21 @@ int main() {
           // ***************************************************************************  
             
           //TODO: ...complete this... 
-          cout << "*** id of target car: " << id_front << " ***" << endl;
-          mytargetcar.display(mytargetcar);
+          if (pf.be_verbose) {
+            cout << "*** id of target car: " << id_front << " ***" << endl;
+            mytargetcar.display(mytargetcar);
+          }
                 
           // predict state of target vehicle at time T using offset delta
           double T = 5;
           vector<double> delta = {10,0,0,4,0,0};
           vector<double> target_state = pf.predictions0(mytargetcar, T, delta);
-          cout << "target_state" << endl;
-          pf.output_vector(target_state);
+          
+          // output of target state
+          if (pf.be_verbose) {
+            cout << "target_state" << endl;
+            pf.output_vector(target_state);
+          }
           
           
           // ***************************************************************************
@@ -537,7 +549,7 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
           for (int istate=0; istate < possible_successor_states.size(); istate++) {
             
             // output of current investigated state
-            cout << "investigating state: " << possible_successor_states[istate] << endl;;
+            if (pf.be_verbose) cout << "investigating state: " << possible_successor_states[istate] << endl;;
             
             // check for possible collision in the future and adjust costs
             lane my_lane = pf.in_lane(pf.d);
@@ -569,11 +581,13 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
             }
             
             // check for state
-            if (possible_successor_states[istate] == KL )  cout << "KL   possible" << endl;
-            if (possible_successor_states[istate] == PLCL) cout << "PLCL possible" << endl;
-            if (possible_successor_states[istate] == PLCR) cout << "PLCR possible" << endl;
-            if (possible_successor_states[istate] == LCL)  cout << "LCR  possible" << endl;
-            if (possible_successor_states[istate] == LCR)  cout << "LCR  possible" << endl;
+            if (pf.be_verbose) {
+              if (possible_successor_states[istate] == KL )  cout << "KL   possible" << endl;
+              if (possible_successor_states[istate] == PLCL) cout << "PLCL possible" << endl;
+              if (possible_successor_states[istate] == PLCR) cout << "PLCR possible" << endl;
+              if (possible_successor_states[istate] == LCL)  cout << "LCR  possible" << endl;
+              if (possible_successor_states[istate] == LCR)  cout << "LCR  possible" << endl;
+            }
             
             // generate path for current state
             // trajectory_for_state = generate_trajectory(state, current_pose, predictions)           
@@ -622,22 +636,18 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
           // ***************************************************************************
                   
           // variables for actual vehicle data
+
           double pos_x;
           double pos_y;
           double angle;
-          
-          // current size of path
           int path_size = previous_path_x.size();
-          cout << "path_size = " << path_size << endl;
 
-          // store previous path in new one for smooth transition 
           for(int i = 0; i < path_size; i++)
           {
               next_x_vals.push_back(previous_path_x[i]);
               next_y_vals.push_back(previous_path_y[i]);
           }
 
-          // treat case of initial path of length zero, one and two
           if(path_size == 0)
           {
               pos_x = car_x;
@@ -653,87 +663,17 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
               double pos_y2 = previous_path_y[path_size-2];
               angle = atan2(pos_y-pos_y2,pos_x-pos_x2);
           }
-          
-          next_x_vals.push_back(pos_x);
-          next_y_vals.push_back(pos_y);
-          // generate circle
-          /*
+
           double dist_inc = 0.5;
           for(int i = 0; i < 50-path_size; i++)
           {    
               next_x_vals.push_back(pos_x+(dist_inc)*cos(angle+(i+1)*(pi()/100)));
               next_y_vals.push_back(pos_y+(dist_inc)*sin(angle+(i+1)*(pi()/100)));
-              
               pos_x += (dist_inc)*cos(angle+(i+1)*(pi()/100));
               pos_y += (dist_inc)*sin(angle+(i+1)*(pi()/100));
-            
-          }
-          */
+          }         
           
-          // ########
-         
-          //double max_car_speed = 0.8 * 50.0 * 0.44704; // apply safety factor of 90%
-          double max_car_speed = 1.0 * pf.SPEED_LIMIT; // apply safety factor of 90%
-          
-          // position
-          double b = 0.8*10.0; //10.0; // m/s2
-          double c = 0.8*10.0; //50.0; // m/s3
-          double dt = 0.02;        // s          
-          double x0 = 0; //car_s;
-          double v0 = max_car_speed; // change to variable speed according to traffic conditions later
-          double xt = x0 + v0 * dt + b * dt*dt/2 + c * dt*dt*dt/6;
-          cout << "==========================================================================" << endl;
-          cout << "car_s, car_d, xt, v0 = " << car_s << " " << car_d << " " << xt << " " << v0 << endl;
-          cout << endl;
-          double x_smooth = waypointspline_x(car_s);
-          cout <<  "smooth x = " << x_smooth << endl;
-          cout << endl;
-          cout << endl;
-          cout << "==========================================================================" << endl;
-          
-          double ds = xt; //0.4; // increment along s for time interval dt  
-          double dd = 2.0; //car_s - 6.0; //0.0; // increment for changing lane  
-          cout << ">>> ds = " << ds << endl;
-          
-          // ########
-          
-          
-          // generate path in middle lane
-          double dist_inc = 0.5;
-          //for(int i = 0; i < 50-path_size; i++)
-          for(int i = path_size; i < 50; i++)              
-          //for(int i = 0; i < 50; i++)              
-          {  
-           
-            // new increments along s,d
-            double delta_s = car_s + i * ds;
-            double delta_d = car_d + i * dd;
-            //double delta_s = pf.s + i * ds;
-            //double delta_d = pf.d + i * dd;
-            
-            // use spline to get smooth new path points of road center
-            double new_x0 = waypointspline_x(delta_s);
-            double new_y0 = waypointspline_y(delta_s);
-            double new_dx0 = waypointspline_dx(delta_s);
-            double new_dy0 = waypointspline_dy(delta_s);
-                       
-            // adjust for lane
-            double new_x = new_x0 + new_dx0 * dd;
-            double new_y = new_y0 + new_dy0 * dd;
-            
-            // store the calculated path
-            next_x_vals.push_back(new_x); 
-            next_y_vals.push_back(new_y);   
-           
-           /* 
-            // straight line
-            double my_x = car_x+(dist_inc*i)*cos(deg2rad(car_yaw));
-            double my_y = car_y+(dist_inc*i)*sin(deg2rad(car_yaw));
-            
-            next_x_vals.push_back(my_x); 
-            next_y_vals.push_back(my_y);   
-            */
-          }
+
          
           
           // increment the counter
