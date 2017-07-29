@@ -231,6 +231,24 @@ int main() {
   waypointspline_dx.set_points(map_waypoints_s, map_waypoints_dx);
   waypointspline_dy.set_points(map_waypoints_s, map_waypoints_dy);
   
+  // upsample waypoints ref: https://discussions.udacity.com/t/latency-handling/322156
+  vector<double> map_waypoints_x_upsampled;
+  vector<double> map_waypoints_y_upsampled;
+  vector<double> map_waypoints_s_upsampled;
+  
+  spline spline_x, spline_y;
+  spline_x.set_points(map_waypoints_s, map_waypoints_x);
+  spline_y.set_points(map_waypoints_s, map_waypoints_y);
+
+  // refine path with spline.
+  int spline_samples = 12000;
+  for (size_t i = 0; i < spline_samples; ++i) {
+    map_waypoints_x_upsampled.push_back(spline_x(i));
+    map_waypoints_y_upsampled.push_back(spline_y(i));
+    map_waypoints_s_upsampled.push_back(i);
+  }
+  
+  
   // get new point at my_s with --> double y = waypointspline_x(my_s);
   //double x_smooth = waypointspline_x(100.0);
   //cout <<  x_smooth << endl;
@@ -253,7 +271,7 @@ int main() {
 //rbx
   //ur h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
       
-  h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy, &waypointspline_x, &waypointspline_y, &waypointspline_dx, &waypointspline_dy, &pf, &counter](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
+  h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy, &waypointspline_x, &waypointspline_y, &waypointspline_dx, &waypointspline_dy, &pf, &counter, &map_waypoints_x_upsampled, &map_waypoints_y_upsampled, &map_waypoints_s_upsampled](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                      uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -443,7 +461,7 @@ int main() {
           }
         
           // calculate predictions of vehicles_inrange over time horizon time steps
-          int horizon = 50;
+          int horizon = 250; //50;
           map<int, vector<vector<double>>> predictions = pf.CARpredictions(vehicles_inrange, horizon);      
           
           // output of map predictions
@@ -633,86 +651,61 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
             
            
           // ***************************************************************************
-          // XX generate path (test with circle)
+          // XX generate just a smooth path along middle lane
           // ***************************************************************************
                   
-          // variables for actual vehicle data
-
-          double pos_x;
-          double pos_y;
-          double pos_s;
-          double angle;
-          int path_size = previous_path_x.size();
-          cout << "path_size = " << path_size << endl;
-
-          for(int i = 0; i < path_size; i++)
-          {
-              next_x_vals.push_back(previous_path_x[i]);
-              next_y_vals.push_back(previous_path_y[i]);
-          }
-
-          if(path_size == 0)
-          {
-              pos_x = car_x;
-              pos_y = car_y;
-              angle = deg2rad(car_yaw);
-          }
-          else
-          {
-              pos_x = previous_path_x[path_size-1];
-              pos_y = previous_path_y[path_size-1];
-
-              double pos_x2 = previous_path_x[path_size-2];
-              double pos_y2 = previous_path_y[path_size-2];
-              angle = atan2(pos_y-pos_y2,pos_x-pos_x2);
-          }
-
-          double dist_inc = 0.3;
-          double ds = dist_inc;
-          double dd = 6.0;
-                        
-          // new increments along s based on last pos_x & pos_y
-          vector<double> cars_sd = getFrenet(pos_x, pos_y, angle, map_waypoints_x, map_waypoints_y);
-          //pos_s = cars_sd[0];
+          // define lane
+          double pos_d = 6.0;
           
-          for(int i = 0; i < 50-path_size; i++)
-          {      
-              // circle path
-              //double dx = (dist_inc)*cos(angle+(i+1)*(pi()/100));
-              //double dy = (dist_inc)*sin(angle+(i+1)*(pi()/100));
+          // define maximum car speed
+          double max_car_speed = 0.9 * pf.SPEED_LIMIT; // apply safety factor of 90%
+          
+          // increment along s in m
+          //double ds = 0.4; 
+          double b = 0.80*10.0; //10.0; // m/s2
+          double c = 0.80*50.0; //50.0; // m/s3
+          double dt = 0.02;        // s          
+          double x0 = 0; //car_s;
+          double v0 = max_car_speed; // change to variable speed according to traffic conditions later
+          double ds = x0 + v0 * dt + b * dt*dt/2 + c * dt*dt*dt/6;
+ 
+          // update every n_update cycles 
+          int n_update = 100; 
+          
+          // number of points to generate along smooth path
+          double n_hires = 100;
+          
+          // generate new points only if its time to update
+          if (previous_path_x.size() < horizon - n_update) {
+            
+            for(int i = 0; i < horizon; i++) {
+              // actual s coordinate increment 
+              double pos_s = car_s + ds * i;
               
-              // middle lane path
-              //update s
-              pos_s = cars_sd[0] + i * ds;
-              cout << "car_s = " << car_s <<" pos_s = "<<pos_s<< " delta s to car_a = " << pos_s-car_s << endl;
+              // get path x,y coordinate from actual pos_s & pos_d
+              vector<double> pos_xy = getXY(pos_s, pos_d, map_waypoints_s_upsampled, map_waypoints_x_upsampled, map_waypoints_y_upsampled);
               
-              // use spline to get smooth new path points of road center
-              double new_x0 = waypointspline_x(pos_s);
-              double new_y0 = waypointspline_y(pos_s);
-              double new_dx0 = waypointspline_dx(pos_s);
-              double new_dy0 = waypointspline_dy(pos_s);
+              // generate a smooth path
+              if ( (i < n_hires) && (previous_path_x.size() >= n_hires) ) {
+                  double fac = i / n_hires;
+                  pos_xy[0] = fac * pos_xy[0] + (1 - fac) * double(previous_path_x[i]);
+                  pos_xy[1] = fac * pos_xy[1] + (1 - fac) * double(previous_path_y[i]);
+              }
               
-              // adjust for lane
-              double new_x = new_x0 + new_dx0 * dd;
-              double new_y = new_y0 + new_dy0 * dd;   
-              
-              // calculate new increment tonext point
-              double dx = new_x0 - pos_x + new_dx0 * dd;
-              double dy = new_y0 - pos_y + new_dy0 * dd; 
-              
-              // store new path element
-              next_x_vals.push_back(pos_x +  dx);
-              next_y_vals.push_back(pos_y +  dy);
-              pos_x += dx;
-              pos_y += dy;
-              
-           /*   
-              next_x_vals.push_back(pos_x +  (dist_inc)*cos(angle+(i+1)*(pi()/100)));
-              next_y_vals.push_back(pos_y +  (dist_inc)*sin(angle+(i+1)*(pi()/100)));
-                                    pos_x += (dist_inc)*cos(angle+(i+1)*(pi()/100));
-                                    pos_y += (dist_inc)*sin(angle+(i+1)*(pi()/100));
-           */
-          }         
+              // store new path points
+              next_x_vals.push_back(pos_xy[0]);
+              next_y_vals.push_back(pos_xy[1]);
+            }
+            
+          // just pass the previous points   
+          } else {
+              for(int i = 0; i < previous_path_x.size(); i++) {
+                next_x_vals.push_back(previous_path_x[i]);
+                next_y_vals.push_back(previous_path_y[i]);
+              }
+          }
+          
+          // ***************************************************************************
           
 
          
