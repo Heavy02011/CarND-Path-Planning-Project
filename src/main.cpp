@@ -15,6 +15,7 @@
 #include <vector>
 
 #include "vehicle.h"
+//#include "matplotlibcpp.h"
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
@@ -235,7 +236,9 @@ int main() {
   vector<double> map_waypoints_x_upsampled;
   vector<double> map_waypoints_y_upsampled;
   vector<double> map_waypoints_s_upsampled;
-  
+  //vector<double> map_waypoints_dx_upsampled;
+  //vector<double> map_waypoints_dy_upsampled;
+    
   spline spline_x, spline_y;
   spline_x.set_points(map_waypoints_s, map_waypoints_x);
   spline_y.set_points(map_waypoints_s, map_waypoints_y);
@@ -358,7 +361,7 @@ int main() {
           cout << "*** time step: " << counter << endl;
           cout << "*** car s,d,yaw,speed = " << car_s << " " << car_d << " " << car_yaw << " " << car_speed << endl;   
           cout << "***********************************************************" << endl;
-          
+/*          
           // output of path data  
           if (pf.be_verbose) {
             cout << "==========================================================================" << endl;          
@@ -373,23 +376,20 @@ int main() {
             cout << "==========================================================================" << endl;          
             cout << endl; 
           }                
-            
+*/            
           // ***************************************************************************
           // 1 update my cars data in PathFinder object
           // ***************************************************************************
-          
-          // store actual car state & DELAY 1-2s ????????????????????  
-//car_s += 30; // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
           pf.s = car_s;
           pf.d = car_d;
           pf.x = car_x;
           pf.y = car_y;
           pf.v = car_speed*pf.MPH2MPS;
-          double my_dx = waypointspline_dx(car_s);
+          double my_dx = waypointspline_dx(car_s); //TODO: upsampling necessary???????????????
           double my_dy = waypointspline_dy(car_s);
 
-/*          
+         
           // place my car in a vector of cars as well to be able to use state prediction
           vector<Vehicle> mycars;
           Vehicle mycar(23, car_x, car_y, my_dx*car_speed*pf.MPH2MPS, my_dy*car_speed*pf.MPH2MPS, car_s, car_d, 0, 0, 0);
@@ -398,7 +398,7 @@ int main() {
           // predict the state of my car in the future (1s)
           vector<double> mystate = mycar.state_at(1);
           vector<double> car_xy = getXY(mystate[0], mystate[3], map_waypoints_s, map_waypoints_x, map_waypoints_y);
-          
+/*          
           // upddate car data to future state
           car_s = mystate[0];
           car_d = mystate[3];
@@ -412,7 +412,7 @@ int main() {
           // ***************************************************************************
           
           // keep vehicles in range in this vector      
-          vector<Vehicle> vehicles_inrange;
+          vector<Vehicle> cars_inrange;
           vector<Vehicle> all_cars;
           
           // select the car that has largest distance & velocity in front of us as target
@@ -447,22 +447,35 @@ int main() {
               
             // store vehicles in range
             if (distance < 50) {
-              vehicles_inrange.push_back(othercar);
+              cars_inrange.push_back(othercar);
             }
             all_cars.push_back(othercar);
             
           }    
-          // show vehicles_inrange 
+          // show cars_inrange 
+          cout << "*** " << cars_inrange.size() << " vehicles in range 50m detected ***" << endl;
+          for (int ii=0; ii<cars_inrange.size(); ii++) {
+              cout << "cars_inrange = \t" << cars_inrange[ii].id << "\t s = " << all_cars[cars_inrange[ii].id].s <<"\t d = " << all_cars[cars_inrange[ii].id].d <<endl;
+                      
+              cars_inrange[ii];
+          }           
+/*          
           if (pf.be_verbose) {
-            cout << "*** " << vehicles_inrange.size() << " vehicles in range 50m detected ***" << endl;
-            for (int ii=0; ii<vehicles_inrange.size(); ii++) {
-              vehicles_inrange[ii].display(vehicles_inrange[ii]);
+            cout << "*** " << cars_inrange.size() << " vehicles in range 50m detected ***" << endl;
+            for (int ii=0; ii<cars_inrange.size(); ii++) {
+              cars_inrange[ii].display(cars_inrange[ii]);
             }
           }
-        
-          // calculate predictions of vehicles_inrange over time horizon time steps
+*/          
+          
+          // ***************************************************************************
+          // 2a calculate predictions of cars_inrange over time horizon time steps
+          // ***************************************************************************  
+ 
+          // number of points on path to investigate into the future
           int horizon = 250; //50;
-          map<int, vector<vector<double>>> predictions = pf.CARpredictions(vehicles_inrange, horizon);      
+/*          
+          map<int, vector<vector<double>>> predictions = pf.CARpredictions(cars_inrange, horizon);      
           
           // output of map predictions
           if (pf.be_verbose) {
@@ -477,7 +490,7 @@ int main() {
                 it++;
             } 
           }
-          
+*/         
             
 
           // ***************************************************************************
@@ -485,6 +498,7 @@ int main() {
           // ***************************************************************************  
             
           //TODO: ...complete this... 
+/*
           if (pf.be_verbose) {
             cout << "*** id of target car: " << id_front << " ***" << endl;
             mytargetcar.display(mytargetcar);
@@ -500,7 +514,7 @@ int main() {
             cout << "target_state" << endl;
             pf.output_vector(target_state);
           }
-          
+*/          
           
           // ***************************************************************************
           // 4 run finite state machine & evaluate possible trajectories & costs
@@ -563,17 +577,31 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
       
                   return best_next_state
 */
+          // predict the state of my car in the future (1s)
+          mystate = mycar.state_at(horizon*0.02);
+          
+          
+          // check for possible collision in the future and adjust costs
+          //lane my_lane = pf.in_lane(mystate[3]); //pf.in_lane(pf.d);   // s, v, this->a, d, d_dot, this->d_double_dot
+double my_s = car_s; //mystate[0]; #######################
+double my_d = car_d; //mystate[3];
+          cout << "mystate: \t" << "\t s = " << my_s <<"\t d = " <<my_d<< endl;
+          
+          int closecar_id = pf.distance2car_inlane(all_cars, my_s, my_d); // TODO: limit to cars_inrange!!!!!!!
+          cout << "closecar = \t" << closecar_id << "\t s = " << all_cars[closecar_id].s <<"\t d = " << all_cars[closecar_id].d <<endl;
+          cout << endl;
+          
      
           // loop over possible succesor states
           for (int istate=0; istate < possible_successor_states.size(); istate++) {
             
             // output of current investigated state
-            if (pf.be_verbose) cout << "investigating state: " << possible_successor_states[istate] << endl;;
+            //if (pf.be_verbose) cout << "investigating state: " << possible_successor_states[istate] << endl;;
             
-            // check for possible collision in the future and adjust costs
-            lane my_lane = pf.in_lane(pf.d);
-            //TODO: create a Vehicle for myself and make a prediction as for all_cars
-            //....
+            
+ 
+ /*           
+            // initialize costs 
             double costs = 0;
             map<int, vector<vector<double>>>::iterator it= predictions.begin();
             while(it != predictions.end())
@@ -586,12 +614,15 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
                 lane othercar_lane = pf.in_lane(d); // lane of the othercar
                 
                 //TODO:  function(state_vector) --> find collision index for s
-                if ((othercar_lane == my_lane) and ((state_vector[49][0]-s)< 5)) {
+                //if ((othercar_lane == my_lane) and ((state_vector[49][0]-s)< 5)) {                
+                if ((othercar_lane == my_lane) and ((s - my_s)< 5)) {
                   cout << "/////////////////////////////////" << endl;
                   cout << "////// collision ahead //////////" << endl;
                   cout << "/////////////////////////////////" << endl; 
                   cout << "car_id: " << othercar_id << " s: " << s << " d: " << d <<endl;
                 }
+                
+                
                 
                 //cout << "key: " << car_id << " " << endl;
                 //pf.output_vector2(state_vector); 
@@ -607,7 +638,7 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
               if (possible_successor_states[istate] == LCL)  cout << "LCR  possible" << endl;
               if (possible_successor_states[istate] == LCR)  cout << "LCR  possible" << endl;
             }
-            
+*/            
             // generate path for current state
             // trajectory_for_state = generate_trajectory(state, current_pose, predictions)           
             vector<double> start = {car_s, 0, 0};

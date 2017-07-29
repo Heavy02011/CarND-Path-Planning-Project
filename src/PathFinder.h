@@ -54,7 +54,7 @@ class PathFinder
     virtual ~PathFinder();
 
     // test output
-    bool be_verbose = false;
+    bool be_verbose = true;
         
     // number of sample points on track
     const int N_SAMPLES = 50;
@@ -167,6 +167,9 @@ class PathFinder
      
     // calculate distance of othercar to my car 
     double distance2car(Vehicle othercar);
+    
+    // calculate distance of othercar to my car (in front)
+    int distance2car_inlane(vector<Vehicle> othercar, double my_s, double my_d);
     
     // determine the lane othercar is driving in
     lane in_lane(double d);

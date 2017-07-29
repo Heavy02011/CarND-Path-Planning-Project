@@ -300,6 +300,43 @@ double PathFinder::distance2car(Vehicle othercar) {
   return dist;
 }
 
+// determine index of closest othercar in lane (in front)
+int PathFinder::distance2car_inlane(vector<Vehicle> othercars, double my_s, double my_d) {
+  int othercar_id = -1;
+  
+  // smallest distance
+  double sd = 99999;
+  double coll_s  = -9999;
+  lane coll_lane;
+  
+  // get my lane
+  lane my_lane = in_lane(my_d);
+  
+  for (int i=0; i < othercars.size(); i++) {
+    
+    // get distance of car
+    double distance = distance2car(othercars[i]);
+    
+    // get lane of car
+    lane othercarlane = in_lane(othercars[i].d);
+    
+    // get s of car
+    double s = othercars[i].s;
+    
+    if ((othercarlane == my_lane) && (distance < sd) && (s > my_s)) {
+      othercar_id = othercars[i].id;
+      sd = distance;
+      coll_lane = othercarlane;
+      coll_s = s;
+    }
+    
+  }
+  cout << "dist2car:= \t" << othercar_id << "\t s = " << coll_s << "\t d = " << my_d <<"\t dist = "<< sd<< endl;
+        
+  // -1 if no car detected
+  return othercar_id;
+}
+
 // determine the lane othercar is driving in
 lane PathFinder::in_lane(double d) {
   if (d < 0.0) {
@@ -490,7 +527,7 @@ map<int, vector<vector<double>>> PathFinder::CARpredictions(vector<Vehicle> myca
     //assert( myMap.find( key )->second == value ); // post-condition
     // map.insert(std::pair<key_type, value_type>(key, value));
     
-    if (be_verbose) cout << "PathFinder::CARpredictions..." << endl;;
+    //if (be_verbose) cout << "PathFinder::CARpredictions..." << endl;;
       
     // store predictions here
     map<int, vector<vector<double>>>  predictions;
@@ -512,7 +549,7 @@ map<int, vector<vector<double>>> PathFinder::CARpredictions(vector<Vehicle> myca
         vector<double> store = {carstate[0], carstate[3]};
         storevec.push_back(store);
         //assert(predictions.find( mycar.id )->second == store ); // crashed während runtime
-        if (be_verbose) cout << i << " " << carstate[0] << " " << carstate[3] << endl;
+        //if (be_verbose) cout << i << " " << carstate[0] << " " << carstate[3] << endl;
       }
       predictions.insert(pair<int, vector<vector<double>>>(mycar.id, storevec));
     }  
