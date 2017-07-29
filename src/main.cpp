@@ -599,9 +599,22 @@ double my_d = car_d; //mystate[3];
                     
           cout << endl;
           
-          // test drive
+          // crude test drive
           double pos_d = car_d; //6;
-          if (closecar_dist < 20) pos_d += 4;
+          int closecar_id_right  = pf.distance2car_inlane(all_cars, my_s, 10);
+          int closecar_id_middle = pf.distance2car_inlane(all_cars, my_s, 6);
+          int closecar_id_left   = pf.distance2car_inlane(all_cars, my_s, 2);
+          double closecar_dist_right  = pf.distance2car(all_cars[closecar_id_right]);
+          double closecar_dist_middle = pf.distance2car(all_cars[closecar_id_middle]);
+          double closecar_dist_left   = pf.distance2car(all_cars[closecar_id_left]);
+          
+          if ((closecar_dist < 25) && (closecar_dist_right > 25)) {
+            pos_d = 10;
+          } else if ((closecar_dist < 25) && (closecar_dist_left > 25)) {
+            pos_d = 2;
+          } else {
+            pos_d = 6;
+          }
           
      
           // loop over possible succesor states
