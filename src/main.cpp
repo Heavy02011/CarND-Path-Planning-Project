@@ -608,12 +608,25 @@ double my_d = car_d; //mystate[3];
           double closecar_dist_middle = pf.distance2car(all_cars[closecar_id_middle]);
           double closecar_dist_left   = pf.distance2car(all_cars[closecar_id_left]);
           
-          if ((closecar_dist < 25) && (closecar_dist_right > 25)) {
-            pos_d = 10;
-          } else if ((closecar_dist < 25) && (closecar_dist_left > 25)) {
-            pos_d = 2;
+          if ((closecar_dist_left < 25) && (closecar_dist_middle < 25) && (closecar_dist_right < 25)) {
+            // slow down
+            //pf.SPEED_LIMIT *= 0.9;
+            cout << "<<< SLOW DOWN >>>" << endl;
           } else {
-            pos_d = 6;
+            // change lane
+            if ((closecar_dist < 25) && (closecar_dist_right > 25)) {
+            pos_d = 10;
+            } else if ((closecar_dist < 25) && (closecar_dist_left > 25)) {
+              pos_d = 2;
+            } else if ((closecar_dist < 25) && (closecar_dist_middle > 25)){
+              pos_d = 6;
+            } else {
+              // keep lane
+              lane my_lane = pf.in_lane(mystate[3]);
+              if (my_lane == LEFT_LANE) pos_d = 2; 
+              if (my_lane == MIDDLE_LANE) pos_d = 6; 
+              if (my_lane == RIGHT_LANE) pos_d = 10;           
+            }
           }
           
      
@@ -724,6 +737,7 @@ double my_d = car_d; //mystate[3];
           double x0 = 0; //car_s;
           double v0 = max_car_speed; // change to variable speed according to traffic conditions later
           //double ds = x0 + v0 * dt + b * dt*dt/2 + c * dt*dt*dt/6;
+          
           double vel_set;
           if (car_speed < max_car_speed) {
             vel_set = car_speed;
