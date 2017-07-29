@@ -678,7 +678,7 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
               
               // middle lane path
               // new increments along s based on last pos_x & pos_y
-              vector<double> cars_sd = getFrenet(pos_x, pos_y,0., map_waypoints_x, map_waypoints_y);
+              vector<double> cars_sd = getFrenet(pos_x, pos_y, angle, map_waypoints_x, map_waypoints_y);
               pos_s = cars_sd[0] + i * ds;
               
               // use spline to get smooth new path points of road center
