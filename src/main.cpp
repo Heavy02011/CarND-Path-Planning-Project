@@ -684,7 +684,7 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
               // middle lane path
               //update s
               pos_s = cars_sd[0] + i * ds;
-              cout << "car_s = " << car_s <<" pos_s = "<<pos_s<<endl;
+              cout << "car_s = " << car_s <<" pos_s = "<<pos_s<< " delta s to car_a = " << pos_s-car_s << endl;
               
               // use spline to get smooth new path points of road center
               double new_x0 = waypointspline_x(pos_s);
