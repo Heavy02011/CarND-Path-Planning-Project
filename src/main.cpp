@@ -208,7 +208,7 @@ int main() {
   }
   
 //rbx
-  
+/*  
   // output waypoints & size 
   cout << "waypoints.size: " << map_waypoints_x.size() << std::endl;
   for (int i=0; i<map_waypoints_x.size(); i++) {
@@ -218,7 +218,7 @@ int main() {
     cout << map_waypoints_dx[i] << " "; 
     cout << map_waypoints_dy[i] << endl;
   }
-  
+*/  
   // setup spline objects
   spline waypointspline_x;
   spline waypointspline_y;
@@ -667,9 +667,14 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
               angle = atan2(pos_y-pos_y2,pos_x-pos_x2);
           }
 
-          double dist_inc = 0.4;
+          double dist_inc = 0.3;
           double ds = dist_inc;
           double dd = 6.0;
+                        
+          // new increments along s based on last pos_x & pos_y
+          vector<double> cars_sd = getFrenet(pos_x, pos_y, angle, map_waypoints_x, map_waypoints_y);
+          //pos_s = cars_sd[0];
+          
           for(int i = 0; i < 50-path_size; i++)
           {      
               // circle path
@@ -677,9 +682,9 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
               //double dy = (dist_inc)*sin(angle+(i+1)*(pi()/100));
               
               // middle lane path
-              // new increments along s based on last pos_x & pos_y
-              vector<double> cars_sd = getFrenet(pos_x, pos_y, angle, map_waypoints_x, map_waypoints_y);
+              //update s
               pos_s = cars_sd[0] + i * ds;
+              cout << "car_s = " << car_s <<" pos_s = "<<pos_s<<endl;
               
               // use spline to get smooth new path points of road center
               double new_x0 = waypointspline_x(pos_s);
