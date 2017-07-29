@@ -662,13 +662,21 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
           
           // increment along s in m
           //double ds = 0.4; 
-          double b = 0.80*10.0; //10.0; // m/s2
-          double c = 0.80*50.0; //50.0; // m/s3
+          double b = 0.90*10.0; //10.0; // m/s2
+          double c = 0.90*10.0; //50.0; // m/s3
           double dt = 0.02;        // s          
           double x0 = 0; //car_s;
           double v0 = max_car_speed; // change to variable speed according to traffic conditions later
-          double ds = x0 + v0 * dt + b * dt*dt/2 + c * dt*dt*dt/6;
- 
+          //double ds = x0 + v0 * dt + b * dt*dt/2 + c * dt*dt*dt/6;
+          double vel_set;
+          if (car_speed < max_car_speed) {
+            vel_set = car_speed;
+          } else {
+            vel_set = max_car_speed;
+          }
+          
+          double ds = x0 + vel_set * dt + b * dt*dt/2 + c * dt*dt*dt/6;
+                   
           // update every n_update cycles 
           int n_update = 100; 
           
