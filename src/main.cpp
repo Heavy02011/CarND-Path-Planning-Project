@@ -616,7 +616,7 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
           
           //TODO: ...complet this...
             
-            
+           
           // ***************************************************************************
           // XX generate path (test with circle)
           // ***************************************************************************
@@ -671,7 +671,7 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
           */
           
           // ########
-          
+         
           //double max_car_speed = 0.8 * 50.0 * 0.44704; // apply safety factor of 90%
           double max_car_speed = 1.0 * pf.SPEED_LIMIT; // apply safety factor of 90%
           
@@ -734,7 +734,7 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
             next_y_vals.push_back(my_y);   
             */
           }
-          
+         
           
           // increment the counter
           counter += 1;
