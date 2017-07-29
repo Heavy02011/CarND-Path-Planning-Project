@@ -331,7 +331,7 @@ int PathFinder::distance2car_inlane(vector<Vehicle> othercars, double my_s, doub
     }
     
   }
-  cout << "dist2car:= \t" << othercar_id << "\t s = " << coll_s << "\t d = " << my_d <<"\t dist = "<< sd<< endl;
+  //cout << "dist2car:= \t" << othercar_id << "\t s = " << coll_s << "\t d = " << my_d <<"\t dist = "<< sd<< endl;
         
   // -1 if no car detected
   return othercar_id;

@@ -578,7 +578,9 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
                   return best_next_state
 */
           // predict the state of my car in the future (1s)
-          mystate = mycar.state_at(horizon*0.02);
+          //mystate = mycar.state_at(horizon*0.02);
+          mystate = mycar.state_at(1);
+                    
           
           
           // check for possible collision in the future and adjust costs
@@ -587,9 +589,19 @@ double my_s = car_s; //mystate[0]; #######################
 double my_d = car_d; //mystate[3];
           cout << "mystate: \t" << "\t s = " << my_s <<"\t d = " <<my_d<< endl;
           
+          //get id of closest in front car in my lane 
           int closecar_id = pf.distance2car_inlane(all_cars, my_s, my_d); // TODO: limit to cars_inrange!!!!!!!
-          cout << "closecar = \t" << closecar_id << "\t s = " << all_cars[closecar_id].s <<"\t d = " << all_cars[closecar_id].d <<endl;
+          
+          // get distance of that car
+          double closecar_dist = pf.distance2car(all_cars[closecar_id]);
+          cout << "closecar = \t" << closecar_id << "\t s = " << all_cars[closecar_id].s <<"\t d = " << all_cars[closecar_id].d << "\t dist = " << closecar_dist << endl;
+          cout << "myfutstate: \t" << "\t s = " << mystate[0] <<"\t d = " <<mystate[3]<< endl;
+                    
           cout << endl;
+          
+          // test drive
+          double pos_d = car_d; //6;
+          if (closecar_dist < 20) pos_d += 4;
           
      
           // loop over possible succesor states
@@ -686,7 +698,7 @@ double my_d = car_d; //mystate[3];
           // ***************************************************************************
                   
           // define lane
-          double pos_d = 6.0;
+          // double pos_d = 6.0;
           
           // define maximum car speed
           double max_car_speed = 0.9 * pf.SPEED_LIMIT; // apply safety factor of 90%
