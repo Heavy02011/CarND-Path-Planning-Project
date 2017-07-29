@@ -334,7 +334,8 @@ int main() {
 // =====================================================================================          
 // ==== start implementation ===========================================================
 // =====================================================================================
-          
+                      
+          cout << endl;             
           cout << "***********************************************************" << endl;
           cout << "*** time step: " << counter << endl;
           cout << "*** car s,d,yaw,speed = " << car_s << " " << car_d << " " << car_yaw << " " << car_speed << endl;   
@@ -444,10 +445,10 @@ int main() {
           // calculate predictions of vehicles_inrange over time horizon time steps
           int horizon = 50;
           map<int, vector<vector<double>>> predictions = pf.CARpredictions(vehicles_inrange, horizon);      
-          cout << "*** " << predictions.size() << " predictions generated ***" << endl;
-       
+          
           // output of map predictions
           if (pf.be_verbose) {
+            cout << "*** " << predictions.size() << " predictions generated ***" << endl;          
             map<int, vector<vector<double>>>::iterator it= predictions.begin();
             while(it != predictions.end())
             {
@@ -639,8 +640,10 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
 
           double pos_x;
           double pos_y;
+          double pos_s;
           double angle;
           int path_size = previous_path_x.size();
+          cout << "path_size = " << path_size << endl;
 
           for(int i = 0; i < path_size; i++)
           {
@@ -664,13 +667,46 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
               angle = atan2(pos_y-pos_y2,pos_x-pos_x2);
           }
 
-          double dist_inc = 0.5;
+          double dist_inc = 0.4;
+          double ds = dist_inc;
+          double dd = 6.0;
           for(int i = 0; i < 50-path_size; i++)
-          {    
-              next_x_vals.push_back(pos_x+(dist_inc)*cos(angle+(i+1)*(pi()/100)));
-              next_y_vals.push_back(pos_y+(dist_inc)*sin(angle+(i+1)*(pi()/100)));
-              pos_x += (dist_inc)*cos(angle+(i+1)*(pi()/100));
-              pos_y += (dist_inc)*sin(angle+(i+1)*(pi()/100));
+          {      
+              // circle path
+              //double dx = (dist_inc)*cos(angle+(i+1)*(pi()/100));
+              //double dy = (dist_inc)*sin(angle+(i+1)*(pi()/100));
+              
+              // middle lane path
+              // new increments along s based on last pos_x & pos_y
+              vector<double> cars_sd = getFrenet(pos_x, pos_y,0., map_waypoints_x, map_waypoints_y);
+              pos_s = cars_sd[0] + i * ds;
+              
+              // use spline to get smooth new path points of road center
+              double new_x0 = waypointspline_x(pos_s);
+              double new_y0 = waypointspline_y(pos_s);
+              double new_dx0 = waypointspline_dx(pos_s);
+              double new_dy0 = waypointspline_dy(pos_s);
+              
+              // adjust for lane
+              double new_x = new_x0 + new_dx0 * dd;
+              double new_y = new_y0 + new_dy0 * dd;   
+              
+              // calculate new increment tonext point
+              double dx = new_x0 - pos_x + new_dx0 * dd;
+              double dy = new_y0 - pos_y + new_dy0 * dd; 
+              
+              // store new path element
+              next_x_vals.push_back(pos_x +  dx);
+              next_y_vals.push_back(pos_y +  dy);
+              pos_x += dx;
+              pos_y += dy;
+              
+           /*   
+              next_x_vals.push_back(pos_x +  (dist_inc)*cos(angle+(i+1)*(pi()/100)));
+              next_y_vals.push_back(pos_y +  (dist_inc)*sin(angle+(i+1)*(pi()/100)));
+                                    pos_x += (dist_inc)*cos(angle+(i+1)*(pi()/100));
+                                    pos_y += (dist_inc)*sin(angle+(i+1)*(pi()/100));
+           */
           }         
           
 
