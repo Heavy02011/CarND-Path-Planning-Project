@@ -419,8 +419,155 @@ vector<vector<double>> PathFinder::perturb_goal0(vector<double> target_state, in
   return all_goals;
 }
 
-// PTG part 1: generate a bunch of salternative (pertubed) goals using gaussion noise based on target_states during T...T-4*dt
-vector<vector<double>> PathFinder::PTG_1_all_goals(Vehicle targetcar, double T, vector<double> delta, int n_goals, double dt) { 
+// PTG part 0: main function. that calls PTG 1-2 und gives back a new path
+vector<vector<double>> PathFinder::PTG_0_main(vector<Vehicle> othercars, double velocity, vector<double> start_state, double horizon) { 
+  
+  // vector that gives back the generated path
+  vector<vector<double>> mypath;
+  
+  // vector to keep the input to pertubate goals
+  vector<vector<double>> input_goals;
+  
+  // vector to keep all_goals which will be evaluated by their costs
+  vector<vector<double>> all_goals; // s, v, a d, d_dot, d_double_dot
+  
+  // vector to keep the_goal for state which will be added to all_goals
+  vector<double> the_goal; // s, v, a d, d_dot, d_double_dot
+  
+  // vector that keeps the delta between
+  vector<double> delta; // TODO: define          
+  
+  // determine s & d path increments
+  
+          // define maximum car speed
+          double max_car_speed = 0.9 * SPEED_LIMIT; // apply safety factor of 90%
+          
+          // increment along s in m
+          double b = 0.90*10.0; //10.0; // m/s2
+          double c = 0.90*10.0; //50.0; // m/s3
+          double dt = 0.02;        // s          
+          double x0 = 0; //car_s;
+          double v0 = max_car_speed; // change to variable speed according to traffic conditions later
+          
+          double vel_set;
+          if (velocity < max_car_speed) {
+            vel_set = velocity;
+          } else {
+            vel_set = max_car_speed;
+          }
+          
+          double ds = x0 + vel_set * dt + b * dt*dt/2 + c * dt*dt*dt/6;
+          
+  // determine possible succesor states based on actual state
+  vector<states> possible_successor_states = successor_states(state); 
+  
+  // loop over possible succesor states
+  for (int istate=0; istate < possible_successor_states.size(); istate++) {
+    
+    // output of current investigated state
+    if (be_verbose) cout << "investigating state: " << possible_successor_states[istate] << endl;;
+            
+    // check for state & add new_goals for investigated state to all_goals        
+    switch (possible_successor_states[istate]) {
+      case KL: 
+        cout << "KL   possible" << endl;    
+        // check whether a vehicles is close
+        // ....
+        
+        // case 1 "vehicle close": set the_goal and store in all_goals
+        
+        
+        // case 2 "no vehicle close": set the_goal and store in all_goals
+        the_goal = {start_state[0] + ds , velocity, 0, start_state[3], 0, 0};
+        input_goals.push_back(the_goal);
+        
+      case PLCL:
+        cout << "PLCL possible" << endl;
+        
+      case PLCR:
+        cout << "PLCR possible" << endl;
+        
+      case LCL:
+        cout << "LCR  possible" << endl;
+        // set the_goal and store in all_goals
+        the_goal = {start_state[0] + ds , velocity, 0, start_state[3]-4, 0, 0};
+        input_goals.push_back(the_goal);
+        
+      case LCR:
+        cout << "LCR  possible" << endl;
+        // set the_goal and store in all_goals
+        the_goal = {start_state[0] + ds , velocity, 0, start_state[3]+4, 0, 0};
+        input_goals.push_back(the_goal);
+        
+      default:
+        cerr << "PathFinder::PTG_0_main: state not defined -> " << possible_successor_states[istate] << endl;
+        break;
+    } 
+    
+    // PTG part 1b: perturbate input_goals into all_goals >> generate a bunch of salternative (pertubed) goals using gaussion noise based on target_states during T...T-4*dt
+    int n_samples = 20;
+    double T = 2; // predict at time T missing !!!!!
+    for (int i=0; i < input_goals.size(); i++) {
+      //vector<vector<double>> new_goals = perturb_goal0(input_goals[i], n_samples);
+      vector<vector<double>> new_goals = PTG_1b_all_goals(input_goals[i], T, n_samples, 0.5); 
+      all_goals.insert(all_goals.end(),new_goals.begin(),new_goals.end()); // all_goals.push_back(new_goals);
+    } 
+    
+    // trajectory_for_state = generate_trajectory(state, current_pose, predictions) --> all_goals
+    // PTG part 2: generate trajectories for all_goals
+    //vector<double> current_state = {pf.s,pf.v,pf.a,pf.d,0,0 }; // check this d_dot, d_double_dot!!!!
+    vector<vector<double>> trajectories = PTG_2_trajectories(all_goals, start_state); // coefficients of trajectories!!!
+    cout << "*** " << trajectories.size() << " new trajectories generated ***" << endl;
+    
+    // calculate the "cost" associated with that trajectory.
+    // TODO: implement!......
+    
+  }          
+  
+/*
+
+def transition_function(predictions, current_fsm_state, current_pose, cost_functions, weights):
+    # only consider states which can be reached from current FSM state.
+    possible_successor_states = successor_states(current_fsm_state)
+
+    # keep track of the total cost of each state.
+    costs = []
+    for state in possible_successor_states: 
+        # generate a rough idea of what trajectory we would
+        # follow IF we chose this state.
+        trajectory_for_state = generate_trajectory(state, current_pose, predictions)
+
+        # calculate the "cost" associated with that trajectory.
+        cost_for_state = 0
+        for i in range(len(cost_functions)) :
+            # apply each cost function to the generated trajectory
+            cost_function = cost_functions[i]
+            cost_for_cost_function = cost_function(trajectory_for_state, predictions)
+
+            # multiply the cost by the associated weight
+            weight = weights[i]
+            cost_for_state += weight * cost_for_cost_function
+        costs.append({'state' : state, 'cost' : cost_for_state})
+
+    # Find the minimum cost state.
+    best_next_state = None
+    min_cost = 9999999
+    for i in range(len(possible_successor_states)):
+        state = possible_successor_states[i]
+        cost  = costs[i]
+        if cost < min_cost:
+            min_cost = cost
+            best_next_state = state 
+
+            return best_next_state
+
+*/          
+  
+  return mypath;
+}
+
+// PTG part 1a: generate a bunch of salternative (pertubed) goals using gaussion noise based on target_states during T...T-4*dt
+vector<vector<double>> PathFinder::PTG_1a_all_goals(Vehicle targetcar, double T, vector<double> delta, int n_goals, double dt) { 
   
   // create vector for samples
   vector<vector<double>> all_goals;
@@ -466,6 +613,64 @@ vector<vector<double>> PathFinder::PTG_1_all_goals(Vehicle targetcar, double T, 
   
   return all_goals;
 }
+/*
+          // PTG part 1
+          // generate a bunch of alternative (pertubed) goals using gaussion noise based on target_states during T...T-4*dt
+          int n_goals = 50;
+          double timestep = 0.5;
+          vector<vector<double>> all_goals = pf.PTG_1_all_goals(mytargetcar, T, delta, n_goals, timestep);         
+          cout << "*** " << all_goals.size() << " new goals generated ***" << endl;
+          //vector<vector<double>> all_goals = pf.perturb_goal0(target_state, n_samples);
+*/
+    
+// PTG part 1b: generate a bunch of salternative (pertubed) goals using gaussion noise based on target_states during T...T-4*dt
+vector<vector<double>> PathFinder::PTG_1b_all_goals(vector<double> target_state, double T, int n_goals, double dt) { 
+  
+  // create vector for samples
+  vector<vector<double>> all_goals;
+  
+  // while t <= T + 4 * timestep:
+  double t = T - 4 * dt;
+  
+  // predict state at time T: s movement
+  double fut_s     = this->v * t + this->a * t * t / 2;
+  double fut_v     = this->a * t;
+  target_state[0] += fut_s;
+  target_state[1] += fut_v;
+  cout << "PathFinder::PTG_1b_all_goals: predicting s" << endl;
+      
+  while (t <= T + 4 * dt) {
+    
+    // generate gaussians
+    default_random_engine gen;
+    
+    // creates a normal (Gaussian) distribution for s, d
+    normal_distribution<double> dist_s1_init(target_state[0], SIGMA_S[0]);
+    normal_distribution<double> dist_s2_init(target_state[1], SIGMA_S[1]);
+    normal_distribution<double> dist_s3_init(target_state[2], SIGMA_S[2]);
+    normal_distribution<double> dist_d1_init(target_state[3], SIGMA_D[0]);
+    normal_distribution<double> dist_d2_init(target_state[4], SIGMA_D[1]);
+    normal_distribution<double> dist_d3_init(target_state[5], SIGMA_D[2]);  
+    
+    // generate goals
+    for (int i=0; i<n_goals; i++) {
+      // generate elements of new pertubed state
+      double s            = dist_s1_init(gen);
+      double s_dot        = dist_s2_init(gen);
+      double s_double_dot = dist_s2_init(gen);
+      double d            = dist_d1_init(gen);
+      double d_dot        = dist_d2_init(gen);
+      double d_double_dot = dist_d2_init(gen);
+      // store in new state vector
+      all_goals.push_back({s, s_dot, s_double_dot, d, d_dot, d_double_dot, t});    
+    }
+    
+    // increment time
+    t += dt;
+  }
+  
+  return all_goals;
+}      
 
 // PTG part 2: generate trajectories for all_goals
 vector<vector<double>> PathFinder::PTG_2_trajectories(vector<vector<double>> all_goals, vector<double> current_state) { 
@@ -510,13 +715,14 @@ vector<vector<double>> PathFinder::PTG_2_trajectories(vector<vector<double>> all
   
   return trajectories;
 }
-/*
-std::map<char, char> my_map = {
-    { 'A', '1' },
-    { 'B', '2' },
-    { 'C', '3' }
-    };
-*/
+/*          
+          // PTG part 2
+          // generate trajectories for all_goals
+          vector<double> current_state = {pf.s,pf.v,pf.a,pf.d,0,0 }; // check this d_dot, d_double_dot!!!!
+          vector<vector<double>> trajectories = pf.PTG_2_trajectories(all_goals, current_state);
+          cout << "*** " << trajectories.size() << " new trajectories generated ***" << endl;
+*/ 
+
 // generate predictions of given allcars over horizon
 //vector<vector<double>> PathFinder::CARpredictions(vector<Vehicle> mycars, int horizon = 10) {
 map<int, vector<vector<double>>> PathFinder::CARpredictions(vector<Vehicle> mycars, int horizon = 10) {

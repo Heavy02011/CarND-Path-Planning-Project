@@ -180,8 +180,14 @@ class PathFinder
     // generate a bunch of samples using gaussion noise
     vector<vector<double>> perturb_goal0(vector<double> target_state, int n_samples);
    
-    // PTG part 1: generate a bunch of salternative (pertubed) goals using gaussion noise based on target_states during T...T-4*dt
-    vector<vector<double>> PTG_1_all_goals(Vehicle targetcar, double T, vector<double> delta, int n_goals, double dt);
+    // PTG part 0: main function. that calls PTG 1-2 und gives back a new path
+    vector<vector<double>> PTG_0_main(vector<Vehicle> othercars, double velocity, vector<double> start_state, double horizon);
+    
+    // PTG part 1a: generate a bunch of salternative (pertubed) goals using gaussion noise based on target_states during T...T-4*dt
+    vector<vector<double>> PTG_1a_all_goals(Vehicle targetcar, double T, vector<double> delta, int n_goals, double dt);
+    
+    // PTG part 1b: generate a bunch of salternative (pertubed) goals using gaussion noise based on target_states during T...T-4*dt
+    vector<vector<double>> PTG_1b_all_goals(vector<double> target_state, double T, int n_goals, double dt);
     
     // PTG part 2: generate trajectories for all_goals
     vector<vector<double>> PTG_2_trajectories(vector<vector<double>> all_goals, vector<double> current_state);

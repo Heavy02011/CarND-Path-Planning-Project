@@ -585,8 +585,10 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
           
           // check for possible collision in the future and adjust costs
           //lane my_lane = pf.in_lane(mystate[3]); //pf.in_lane(pf.d);   // s, v, this->a, d, d_dot, this->d_double_dot
-double my_s = car_s; //mystate[0]; #######################
-double my_d = car_d; //mystate[3];
+//double my_s = car_s; //mystate[0]; #######################
+//double my_d = car_d; //mystate[3];
+double my_s = mystate[0]; 
+double my_d = mystate[3];
           cout << "mystate: \t" << "\t s = " << my_s <<"\t d = " <<my_d<< endl;
           
           //get id of closest in front car in my lane 
@@ -748,7 +750,7 @@ double my_d = car_d; //mystate[3];
           double ds = x0 + vel_set * dt + b * dt*dt/2 + c * dt*dt*dt/6;
                    
           // update every n_update cycles 
-          int n_update = 100; 
+          int n_update = 10; //100; 
           
           // number of points to generate along smooth path
           double n_hires = 100;
