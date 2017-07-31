@@ -796,16 +796,45 @@ double PathFinder::cost4s_total_acc(vector<double> traj_coeff, vector<double> ta
   vector<double> s_coeff = {traj_coeff[0], traj_coeff[1], traj_coeff[2]};
   vector<double> d_coeff = {traj_coeff[3], traj_coeff[4], traj_coeff[5]};
   
-  // differentiate polynomals
-  vector<double> s_traj_dot_coeff = differentiate(s_coeff);
-  vector<double> d_traj_dot_coeff = differentiate(d_coeff);
+  // differentiate polynomals twice
+  vector<double> s_dot_coeff = differentiate(s_coeff);
+  vector<double> d_dot_coeff = differentiate(d_coeff);
+  vector<double> s_dot2_coeff = differentiate(s_dot_coeff);
+  vector<double> d_dot2_coeff = differentiate(d_dot_coeff);
   
   // evaluate polynomals over horizon
   for (int i = 0; i < horizon; i++) {
     double t = float(i) * dt;
-    double s_traj_dot = evaluate_polynomal(s_traj_dot_coeff, t);
-    double d_traj_dot = evaluate_polynomal(d_traj_dot_coeff, t);
-    if ((s_traj_dot > MAX_ACCEL) || (d_traj_dot > MAX_ACCEL)) {
+    double s_dot2 = evaluate_polynomal(s_dot2_coeff, t);
+    double d_dot2 = evaluate_polynomal(d_dot2_coeff, t);
+    if ((s_dot2 > MAX_ACCEL) || (d_dot2 > MAX_ACCEL)) {
+      return 1;
+    } 
+  }
+  return 0;
+}
+
+// costs for total jerk
+double PathFinder::cost4s_total_jerk(vector<double> traj_coeff, vector<double> target_state, double dt, int horizon) {
+  
+  // split trajectory_coeff in s & d
+  vector<double> s_coeff = {traj_coeff[0], traj_coeff[1], traj_coeff[2]};
+  vector<double> d_coeff = {traj_coeff[3], traj_coeff[4], traj_coeff[5]};
+  
+  // differentiate polynomals 3x
+  vector<double> s_dot_coeff = differentiate(s_coeff);
+  vector<double> d_dot_coeff = differentiate(d_coeff);
+  vector<double> s_dot2_coeff = differentiate(s_dot_coeff);
+  vector<double> d_dot2_coeff = differentiate(d_dot_coeff);
+  vector<double> s_dot3_coeff = differentiate(s_dot2_coeff);
+  vector<double> d_dot3_coeff = differentiate(d_dot2_coeff);
+    
+  // evaluate polynomals over horizon
+  for (int i = 0; i < horizon; i++) {
+    double t = float(i) * dt;
+    double s_dot3 = evaluate_polynomal(s_dot3_coeff, t);
+    double d_dot3 = evaluate_polynomal(d_dot3_coeff, t);
+    if ((s_dot3 > MAX_JERK) || (d_dot3 > MAX_JERK)) {
       return 1;
     } 
   }
