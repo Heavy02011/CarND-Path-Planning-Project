@@ -790,7 +790,7 @@ double PathFinder::cost4duration(double t, double T) {
 }
 
 // costs for total acceleration
-double PathFinder::cost4s_total_acc(vector<double> traj_coeff, vector<double> target_state, double dt, int horizon) {
+double PathFinder::cost4total_acc(vector<double> traj_coeff, vector<double> target_state, double dt, int horizon) {
   
   // split trajectory_coeff in s & d
   vector<double> s_coeff = {traj_coeff[0], traj_coeff[1], traj_coeff[2]};
@@ -815,7 +815,7 @@ double PathFinder::cost4s_total_acc(vector<double> traj_coeff, vector<double> ta
 }
 
 // costs for total jerk
-double PathFinder::cost4s_total_jerk(vector<double> traj_coeff, vector<double> target_state, double dt, int horizon) {
+double PathFinder::cost4total_jerk(vector<double> traj_coeff, vector<double> target_state, double dt, int horizon) {
   
   // split trajectory_coeff in s & d
   vector<double> s_coeff = {traj_coeff[0], traj_coeff[1], traj_coeff[2]};
@@ -839,6 +839,23 @@ double PathFinder::cost4s_total_jerk(vector<double> traj_coeff, vector<double> t
     } 
   }
   return 0;
+}
+
+// costs for deviation from d
+double PathFinder::cost4d_diff(vector<double> traj_coeff, vector<double> target_state, double dt, int horizon) {
+  
+  // split trajectory_coeff in s & d
+  vector<double> s_coeff = {traj_coeff[0], traj_coeff[1], traj_coeff[2]};
+  vector<double> d_coeff = {traj_coeff[3], traj_coeff[4], traj_coeff[5]};
+    
+  // evaluate polynomals at end of horizon
+  double d_pred = evaluate_polynomal(d_coeff, dt*horizon);
+  
+  // evaluate target state
+  double d_target = target_state[3];
+  
+  // return cost    
+  return 1-logistic(d_target - d_pred);
 }
 
 /*

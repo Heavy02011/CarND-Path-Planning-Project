@@ -202,10 +202,13 @@ class PathFinder
     double cost4duration(double t, double T);
     
     // costs for total acceleration
-    double cost4s_total_acc(vector<double> traj_coeff, vector<double> target_state, double dt, int horizon);
+    double cost4total_acc(vector<double> traj_coeff, vector<double> target_state, double dt, int horizon);
     
     // costs for total jerk
-    double cost4s_total_jerk(vector<double> traj_coeff, vector<double> target_state, double dt, int horizon);
+    double cost4total_jerk(vector<double> traj_coeff, vector<double> target_state, double dt, int horizon);
+    
+    // costs for deviation from d
+    double cost4d_diff(vector<double> traj_coeff, vector<double> target_state, double dt, int horizon);
     
   private:
       
