@@ -462,6 +462,11 @@ vector<vector<double>> PathFinder::PTG_0_main(vector<Vehicle> othercars, double 
   // determine possible succesor states based on actual state
   vector<states> possible_successor_states = successor_states(state); 
   
+  // minimum cost tarjectories
+  double cost_min = 99999999;
+  vector<vector<double>> trajectories;
+  int id_min;
+  
   // loop over possible succesor states
   for (int istate=0; istate < possible_successor_states.size(); istate++) {
     
@@ -520,7 +525,7 @@ vector<vector<double>> PathFinder::PTG_0_main(vector<Vehicle> othercars, double 
     // trajectory_for_state = generate_trajectory(state, current_pose, predictions) --> all_goals
     // PTG part 2: generate trajectories for all_goals
     //vector<double> current_state = {pf.s,pf.v,pf.a,pf.d,0,0 }; // check this d_dot, d_double_dot!!!!
-    vector<vector<double>> trajectories = PTG_2_trajectories(all_goals, start_state); // coefficients of trajectories!!!
+    trajectories = PTG_2_trajectories(all_goals, start_state); // coefficients of trajectories!!!
     cout << "*** " << trajectories.size() << " new trajectories generated ***" << endl;
     
     // calculate the "cost" associated with that trajectory.
@@ -535,24 +540,46 @@ vector<vector<double>> PathFinder::PTG_0_main(vector<Vehicle> othercars, double 
     }
     
     // find trajectory with minimal costs
-    double cost_min = 99999999;
-    int id_min = 0;
+    id_min = 0;
     for (int i=0; i < cost_vec.size(); i++) {
       if (cost_vec[i] < cost_min) {
         cost_min = cost_vec[i];
         id_min = i;
       }
     }
-    // minimum cost trajectory coefficients & state
-    vector<double> coeff_min = trajectories[id_min];
-    vector<double> goal_min = all_goals[id_min];
-    states goal_state = goal_states[id_min];
-    cout << "choosen state = " << goal_state << " with cost = " << cost_min;
     
-    // set goal state into car data
-    // TODO: .....
     
-  }          
+  } 
+
+  // minimum cost trajectory coefficients & state
+  vector<double> coeff_min = trajectories[id_min];
+  vector<double> goal_min = all_goals[id_min];
+  states goal_state = goal_states[id_min];
+  cout << "choosen state = " << goal_state << " with cost = " << cost_min << endl;;
+  
+  // set goal state into car data
+  // TODO: .....
+  state = goal_state;  
+  
+  // generate minimum cost trajectory
+  
+  // split trajectory_coeff in s & d
+  vector<double> s_coeff = {coeff_min[0], coeff_min[1], coeff_min[2]};
+  vector<double> d_coeff = {coeff_min[3], coeff_min[4], coeff_min[5]};
+    
+  // evaluate polynomals over horizon
+  for (int i = 0; i < horizon; i++) {
+    double t = float(i) * dt;
+    
+    // generate path point
+    double path_s = evaluate_polynomal(s_coeff, t);
+    double path_d = evaluate_polynomal(d_coeff, t);
+    
+    // add to path
+    mypath.push_back({t,path_s, path_d}); // TODO: CHECK THIS !!!!!!!!!!!!!!!!!
+    
+  }
+  
   
 /*
 
