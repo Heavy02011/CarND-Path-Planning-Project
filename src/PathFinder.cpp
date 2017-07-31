@@ -762,8 +762,24 @@ map<int, vector<vector<double>>> PathFinder::CARpredictions(vector<Vehicle> myca
     }  
 
     return predictions;
-
 }
+/*          
+          map<int, vector<vector<double>>> predictions = pf.CARpredictions(cars_inrange, horizon);      
+          
+          // output of map predictions
+          if (pf.be_verbose) {
+            cout << "*** " << predictions.size() << " predictions generated ***" << endl;          
+            map<int, vector<vector<double>>>::iterator it= predictions.begin();
+            while(it != predictions.end())
+            {
+                int car_id = it->first;
+                vector<vector<double>> state_vector = it->second;
+                cout << "key: " << car_id << " " << endl;
+                pf.output_vector2(state_vector); 
+                it++;
+            } 
+          }
+*/ 
 
 // get id of car with car_id in vector of Vehicles
 int PathFinder::car_id(vector<Vehicle> cars, int car_id) {
@@ -881,6 +897,45 @@ double PathFinder::cost4v_diff(vector<double> traj_coeff, vector<double> target_
   } else {
     return 1-logistic(v_target - v_pred);
   }
+}
+
+// costs for driving not close to target velocity
+double PathFinder::cost4collision(vector<double> traj_coeff, vector<Vehicle> othercars, double dt, int horizon) {
+  
+  // define distance for collision detection
+  double eps = 5;
+  
+  // generate predictions for othercars
+  map<int, vector<vector<double>>> predictions = CARpredictions(othercars, horizon);
+  
+  // split trajectory_coeff in s & d
+  vector<double> s_coeff = {traj_coeff[0], traj_coeff[1], traj_coeff[2]};
+  vector<double> d_coeff = {traj_coeff[3], traj_coeff[4], traj_coeff[5]};
+  
+  // evaluate polynomals over horizon
+  for (int i = 0; i < horizon; i++) {
+    double t = float(i) * dt;
+    
+    // evaluate polynomals at time t
+    double s_pred = evaluate_polynomal(s_coeff, t);
+    double d_pred = evaluate_polynomal(d_coeff, t);
+    
+    // loop over all predictions for othercars
+    map<int, vector<vector<double>>>::iterator it= predictions.begin();
+    while(it != predictions.end())
+    {
+      int car_id = it->first;
+      vector<vector<double>> state_vector = it->second;
+      double othercar_s = state_vector[i][0];
+      double othercar_d = state_vector[i][1];
+      if ((othercar_s - s_pred < eps) && (othercar_d - d_pred < eps)) {
+        return 1;
+      }
+      it++;
+    } 
+    
+  }
+  return 0;  
 }
 
 /*

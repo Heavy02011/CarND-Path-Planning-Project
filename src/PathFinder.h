@@ -213,6 +213,9 @@ class PathFinder
     // costs for driving not close to target velocity
     double cost4v_diff(vector<double> traj_coeff, vector<double> target_state, double dt, int horizon);
     
+    // costs for driving not close to target velocity
+    double cost4collision(vector<double> traj_coeff, vector<Vehicle> othercars, double dt, int horizon);
+    
   private:
       
       
