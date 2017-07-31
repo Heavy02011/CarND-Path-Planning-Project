@@ -858,6 +858,31 @@ double PathFinder::cost4d_diff(vector<double> traj_coeff, vector<double> target_
   return 1-logistic(d_target - d_pred);
 }
 
+// costs for driving not close to target velocity
+double PathFinder::cost4v_diff(vector<double> traj_coeff, vector<double> target_state, double dt, int horizon) {
+  
+  // split trajectory_coeff in s & d
+  vector<double> s_coeff = {traj_coeff[0], traj_coeff[1], traj_coeff[2]};
+  //vector<double> d_coeff = {traj_coeff[3], traj_coeff[4], traj_coeff[5]};
+  
+  // differentiate polynomals twice
+  vector<double> s_dot_coeff = differentiate(s_coeff);
+  //vector<double> d_dot_coeff = differentiate(d_coeff);
+    
+  // evaluate polynomals at end of horizon
+  double v_pred = evaluate_polynomal(s_dot_coeff, dt*horizon);
+  
+  // evaluate target state
+  double v_target = target_state[1];
+  
+  // return cost  
+  if (v_pred > v_target) {
+    return 1;
+  } else {
+    return 1-logistic(v_target - v_pred);
+  }
+}
+
 /*
 // Penalizes trajectories whose s coordinate (and derivatives) differ from the goal.
 double PathFinder::cost4s_diff(vector<double> trajectory, vector<double> target_state, double t, double T) {
