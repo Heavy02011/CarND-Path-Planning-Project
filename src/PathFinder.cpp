@@ -521,6 +521,7 @@ vector<vector<double>> PathFinder::PTG_0_main(vector<Vehicle> othercars, double 
     
     // calculate the "cost" associated with that trajectory.
     // TODO: implement!......
+    // take coefficients of trajectories == trajectories AND target_states == all_goals as input for cost functions
     
   }          
   
@@ -775,82 +776,74 @@ int PathFinder::car_id(vector<Vehicle> cars, int car_id) {
   return -1; // not found
 }
 
-// identify a collision taking a set of predictions
-//TODO:....
-
-//#######################################################################
-        
-
 /*
-
-def transition_function(predictions, current_fsm_state, current_pose, cost_functions, weights):
-    # only consider states which can be reached from current FSM state.
-    possible_successor_states = successor_states(current_fsm_state)
-
-    # keep track of the total cost of each state.
-    costs = []
-    for state in possible_successor_states: 
-        # generate a rough idea of what trajectory we would
-        # follow IF we chose this state.
-        trajectory_for_state = generate_trajectory(state, current_pose, predictions)
-
-        # calculate the "cost" associated with that trajectory.
-        cost_for_state = 0
-        for i in range(len(cost_functions)) :
-            # apply each cost function to the generated trajectory
-            cost_function = cost_functions[i]
-            cost_for_cost_function = cost_function(trajectory_for_state, predictions)
-
-            # multiply the cost by the associated weight
-            weight = weights[i]
-            cost_for_state += weight * cost_for_cost_function
-        costs.append({'state' : state, 'cost' : cost_for_state})
-
-    # Find the minimum cost state.
-    best_next_state = None
-    min_cost = 9999999
-    for i in range(len(possible_successor_states)):
-        state = possible_successor_states[i]
-        cost  = costs[i]
-        if cost < min_cost:
-            min_cost = cost
-            best_next_state = state 
-
-            return best_next_state
-
-*/  
-            
-            
-/*
-vector<vector<double>> PathFinder::CARpredictions(vector<Vehicle> mycars, int horizon = 10) {
+// summarize all costs of individual cost functions
+double PathFinder::cost_summary(vector<double> &traj, vector<double> &goal) {
   
-    cout << "PathFinder::CARpredictions..." << endl;;
-      
-    // store predictions here
-    vector<vector<double>>  predictions;
-    
-    // time step
-    double dt = 0.2; 
+}
+*/
 
-    for (int j = 0; j < mycars.size(); j++) {
-      
-      // check for this car
-      Vehicle mycar = mycars[j];
-      cout << "car id: " << mycar.id << endl;;
-      
-      // loop over horizon
-      for( int i = 0; i < horizon; i++)
-      {
-        vector<double> carstate = mycar.state_at(i*dt); // {s, v, this->a, d, d_dot, this->d_double_dot}
-        predictions.push_back({carstate[0], carstate[3]}); // id, s, d
-        cout << i << " " << carstate[0] << " " << carstate[3] << endl;
-        //vector<double> check1 = state_at(i);
-        //vector<int> lane_s = {check1[0], check1[1]};
-        //predictions.push_back(lane_s);
-      }
-    }  
 
-    return predictions;
+// Penalizes trajectories that span a duration which is longer or shorter than the duration requested.
+double PathFinder::cost4duration(double t, double T) {
+  return logistic(float(abs(t-T)) / T);
+}
 
-    }
+// costs for total acceleration
+double PathFinder::cost4s_total_acc(vector<double> traj_coeff, vector<double> target_state, double dt, int horizon) {
+  
+  // split trajectory_coeff in s & d
+  vector<double> s_coeff = {traj_coeff[0], traj_coeff[1], traj_coeff[2]};
+  vector<double> d_coeff = {traj_coeff[3], traj_coeff[4], traj_coeff[5]};
+  
+  // differentiate polynomals
+  vector<double> s_traj_dot_coeff = differentiate(s_coeff);
+  vector<double> d_traj_dot_coeff = differentiate(d_coeff);
+  
+  // evaluate polynomals over horizon
+  for (int i = 0; i < horizon; i++) {
+    double t = float(i) * dt;
+    double s_traj_dot = evaluate_polynomal(s_traj_dot_coeff, t);
+    double d_traj_dot = evaluate_polynomal(d_traj_dot_coeff, t);
+    if ((s_traj_dot > MAX_ACCEL) || (d_traj_dot > MAX_ACCEL)) {
+      return 1;
+    } 
+  }
+  return 0;
+}
+
+/*
+// Penalizes trajectories whose s coordinate (and derivatives) differ from the goal.
+double PathFinder::cost4s_diff(vector<double> trajectory, vector<double> target_state, double t, double T) {
+  //vector<double> 
+  //eval: 
+  // evaluate a polynomal 5th order determined by coefficients at value x
+  // double PathFinder::evaluate_polynomal(vector<double> coeffcients, double x)
+  
+  // calculates the derivative of a polynomial and returns the corresponding coefficients. ref: helpers.py in lesson 5.30
+  // vector<double> PathFinder::differentiate(vector<double> coefficients)
+  
+  //double s = trajectory[0];
+  
+  return -1; //logistic(float(abs(t-T)) / T);
+}
+*/
+
+/*
+def s_diff_cost(traj, target_vehicle, delta, T, predictions):
+    """
+    Penalizes trajectories whose s coordinate (and derivatives) 
+    differ from the goal.
+    """
+    s, _, T = traj
+    target = predictions[target_vehicle].state_in(T)
+    target = list(np.array(target) + np.array(delta))
+    s_targ = target[:3]
+    S = [f(T) for f in get_f_and_N_derivatives(s, 2)]
+    cost = 0
+    for actual, expected, sigma in zip(S, s_targ, SIGMA_S):
+        diff = float(abs(actual-expected))
+        cost += logistic(diff/sigma)
+        return cost
+
 */

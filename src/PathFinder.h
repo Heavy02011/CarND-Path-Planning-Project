@@ -198,6 +198,12 @@ class PathFinder
     // get id of car with car_id in vector of Vehicles
     int car_id(vector<Vehicle> cars, int car_id);
     
+    // Penalizes trajectories that span a duration which is longer or shorter than the duration requested.
+    double cost4duration(double t, double T);
+    
+    // costs for total acceleration
+    double cost4s_total_acc(vector<double> traj_coeff, vector<double> target_state, double dt, int horizon);
+    
   private:
       
       
