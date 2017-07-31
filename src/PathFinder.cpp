@@ -520,8 +520,16 @@ vector<vector<double>> PathFinder::PTG_0_main(vector<Vehicle> othercars, double 
     cout << "*** " << trajectories.size() << " new trajectories generated ***" << endl;
     
     // calculate the "cost" associated with that trajectory.
-    // TODO: implement!......
     // take coefficients of trajectories == trajectories AND target_states == all_goals as input for cost functions
+    vector<double> cost_vec;
+    for (int i=0; i < trajectories.size(); i++) {
+      vector<double> traj_coeff = trajectories[i];
+      vector<double> target_state = all_goals[i];
+      double t = 0; // ?????????????????????????????????????????????????????????????????????????
+      double cost = cost_summary(traj_coeff, target_state, dt, horizon, t, T, othercars);
+      cost_vec.push_back(cost);
+    }
+    
     
   }          
   
