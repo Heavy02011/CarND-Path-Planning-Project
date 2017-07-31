@@ -792,13 +792,25 @@ int PathFinder::car_id(vector<Vehicle> cars, int car_id) {
   return -1; // not found
 }
 
-/*
-// summarize all costs of individual cost functions
-double PathFinder::cost_summary(vector<double> &traj, vector<double> &goal) {
-  
-}
-*/
 
+// summarize all costs of individual cost functions
+double PathFinder::cost_summary(vector<double> traj_coeff, vector<double> target_state, double dt, int horizon, double t, double T, vector<Vehicle> othercars) {
+  
+  double cost = 0;
+  
+  // calculate costs
+  double cost_duration   = cost4duration(t, T);
+  double cost_total_acc  = cost4total_acc(traj_coeff, target_state, dt, horizon);
+  double cost_total_jerk = cost4total_jerk(traj_coeff, target_state, dt, horizon);
+  double cost_d_diff     = cost4d_diff(traj_coeff, target_state, dt, horizon);
+  double cost_v_diff     = cost4v_diff(traj_coeff, target_state, dt, horizon);
+  double cost_collision  = cost4collision(traj_coeff, othercars, dt, horizon);
+  
+  // sum cost with weights
+  cost = 1 * cost_duration + 500 * cost_total_acc + 500 * cost_total_jerk + 10 * cost_d_diff + 10 * cost_v_diff + 500 * cost_collision;
+  
+  return cost;
+}
 
 // Penalizes trajectories that span a duration which is longer or shorter than the duration requested.
 double PathFinder::cost4duration(double t, double T) {
