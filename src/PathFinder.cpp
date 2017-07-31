@@ -430,6 +430,7 @@ vector<vector<double>> PathFinder::PTG_0_main(vector<Vehicle> othercars, double 
   
   // vector to keep all_goals which will be evaluated by their costs
   vector<vector<double>> all_goals; // s, v, a d, d_dot, d_double_dot
+  vector<states> goal_states;
   
   // vector to keep the_goal for state which will be added to all_goals
   vector<double> the_goal; // s, v, a d, d_dot, d_double_dot
@@ -480,6 +481,7 @@ vector<vector<double>> PathFinder::PTG_0_main(vector<Vehicle> othercars, double 
         // case 2 "no vehicle close": set the_goal and store in all_goals
         the_goal = {start_state[0] + ds , velocity, 0, start_state[3], 0, 0};
         input_goals.push_back(the_goal);
+        goal_states.push_back(possible_successor_states[istate]);
         
       case PLCL:
         cout << "PLCL possible" << endl;
@@ -492,12 +494,14 @@ vector<vector<double>> PathFinder::PTG_0_main(vector<Vehicle> othercars, double 
         // set the_goal and store in all_goals
         the_goal = {start_state[0] + ds , velocity, 0, start_state[3]-4, 0, 0};
         input_goals.push_back(the_goal);
+        goal_states.push_back(possible_successor_states[istate]);
         
       case LCR:
         cout << "LCR  possible" << endl;
         // set the_goal and store in all_goals
         the_goal = {start_state[0] + ds , velocity, 0, start_state[3]+4, 0, 0};
         input_goals.push_back(the_goal);
+        goal_states.push_back(possible_successor_states[istate]);
         
       default:
         cerr << "PathFinder::PTG_0_main: state not defined -> " << possible_successor_states[istate] << endl;
@@ -530,6 +534,23 @@ vector<vector<double>> PathFinder::PTG_0_main(vector<Vehicle> othercars, double 
       cost_vec.push_back(cost);
     }
     
+    // find trajectory with minimal costs
+    double cost_min = 99999999;
+    int id_min = 0;
+    for (int i=0; i < cost_vec.size(); i++) {
+      if (cost_vec[i] < cost_min) {
+        cost_min = cost_vec[i];
+        id_min = i;
+      }
+    }
+    // minimum cost trajectory coefficients & state
+    vector<double> coeff_min = trajectories[id_min];
+    vector<double> goal_min = all_goals[id_min];
+    states goal_state = goal_states[id_min];
+    cout << "choosen state = " << goal_state << " with cost = " << cost_min;
+    
+    // set goal state into car data
+    // TODO: .....
     
   }          
   
