@@ -473,7 +473,7 @@ int main() {
           // ***************************************************************************  
  
           // number of points on path to investigate into the future
-          int horizon = 250; //250; //50;
+          int horizon = 150; //250; //50;
 /*          
           map<int, vector<vector<double>>> predictions = pf.CARpredictions(cars_inrange, horizon);      
           
@@ -543,7 +543,7 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
 */
           
           // determine possible succesor states based on actual state
-          vector<states> possible_successor_states = pf.successor_states(pf.state); 
+          //vector<states> possible_successor_states = pf.successor_states(pf.state); 
 
 /*
           # keep track of the total cost of each state.
@@ -757,7 +757,7 @@ double my_d = mystate[3];
           // number of points to generate along smooth path
           double n_hires = 100;
           
-/*         
+/*        
           // ****************************************************************************************
           // generate new path
           double velocity = vel_set;
@@ -766,7 +766,7 @@ double my_d = mystate[3];
           vector<vector<double>> my_path_sd = pf.PTG_0_main(cars_inrange, velocity, mystate, horizon);
           // ****************************************************************************************
             // cars_inrange, all_cars
-*/           
+*/          
           
           // generate new points only if its time to update
           if (previous_path_x.size() < horizon - n_update) {
