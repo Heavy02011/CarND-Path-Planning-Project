@@ -514,7 +514,7 @@ vector<vector<double>> PathFinder::PTG_0_main(vector<Vehicle> othercars, double 
     } 
     
     // PTG part 1b: perturbate input_goals into all_goals >> generate a bunch of salternative (pertubed) goals using gaussion noise based on target_states during T...T-4*dt
-    int n_samples = 20;
+    int n_samples = 10;
     double T = 2; // predict at time T missing !!!!!
     for (int i=0; i < input_goals.size(); i++) {
       //vector<vector<double>> new_goals = perturb_goal0(input_goals[i], n_samples);
@@ -803,7 +803,7 @@ map<int, vector<vector<double>>> PathFinder::CARpredictions(vector<Vehicle> myca
       // check for this car
       Vehicle mycar = mycars[j];
       vector<vector<double>> storevec;
-      if (be_verbose) cout << "car id: " << mycar.id << endl;;
+      //if (be_verbose) cout << "car id: " << mycar.id << endl;;
       
       // loop over horizon
       for( int i = 0; i < horizon; i++)
@@ -1005,39 +1005,3 @@ double PathFinder::cost4collision(vector<double> traj_coeff, vector<Vehicle> oth
   }
   return 0;  
 }
-
-/*
-// Penalizes trajectories whose s coordinate (and derivatives) differ from the goal.
-double PathFinder::cost4s_diff(vector<double> trajectory, vector<double> target_state, double t, double T) {
-  //vector<double> 
-  //eval: 
-  // evaluate a polynomal 5th order determined by coefficients at value x
-  // double PathFinder::evaluate_polynomal(vector<double> coeffcients, double x)
-  
-  // calculates the derivative of a polynomial and returns the corresponding coefficients. ref: helpers.py in lesson 5.30
-  // vector<double> PathFinder::differentiate(vector<double> coefficients)
-  
-  //double s = trajectory[0];
-  
-  return -1; //logistic(float(abs(t-T)) / T);
-}
-*/
-
-/*
-def s_diff_cost(traj, target_vehicle, delta, T, predictions):
-    """
-    Penalizes trajectories whose s coordinate (and derivatives) 
-    differ from the goal.
-    """
-    s, _, T = traj
-    target = predictions[target_vehicle].state_in(T)
-    target = list(np.array(target) + np.array(delta))
-    s_targ = target[:3]
-    S = [f(T) for f in get_f_and_N_derivatives(s, 2)]
-    cost = 0
-    for actual, expected, sigma in zip(S, s_targ, SIGMA_S):
-        diff = float(abs(actual-expected))
-        cost += logistic(diff/sigma)
-        return cost
-
-*/

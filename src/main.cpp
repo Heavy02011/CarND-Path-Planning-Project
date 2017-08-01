@@ -473,7 +473,7 @@ int main() {
           // ***************************************************************************  
  
           // number of points on path to investigate into the future
-          int horizon = 250; //50;
+          int horizon = 250; //250; //50;
 /*          
           map<int, vector<vector<double>>> predictions = pf.CARpredictions(cars_inrange, horizon);      
           
@@ -633,7 +633,7 @@ double my_d = mystate[3];
           
      
           // loop over possible succesor states
-          for (int istate=0; istate < possible_successor_states.size(); istate++) {
+          //for (int istate=0; istate < possible_successor_states.size(); istate++) {
             
             // output of current investigated state
             //if (pf.be_verbose) cout << "investigating state: " << possible_successor_states[istate] << endl;;
@@ -678,7 +678,8 @@ double my_d = mystate[3];
               if (possible_successor_states[istate] == LCL)  cout << "LCR  possible" << endl;
               if (possible_successor_states[istate] == LCR)  cout << "LCR  possible" << endl;
             }
-*/            
+*/     
+/*            
             // generate path for current state
             // trajectory_for_state = generate_trajectory(state, current_pose, predictions)           
             vector<double> start = {car_s, 0, 0};
@@ -703,7 +704,7 @@ double my_d = mystate[3];
             vector<double> diff_coeff = pf.differentiate(coefficients);
             //cout << "diff_coefficients = " << endl;
             //pf.output_vector(diff_coeff);
-            
+*/            
             // determine costs according to lesson 4.16 behavioural planning for each successing possible state
             // #############################################################
             // ....
@@ -712,13 +713,14 @@ double my_d = mystate[3];
             
             
             
-          }          
+          //}          
             
           // ***************************************************************************
           // 5 generate path coordinates
           // ***************************************************************************
           
-          //TODO: ...complet this...
+          
+          
             
            
           // ***************************************************************************
@@ -754,6 +756,17 @@ double my_d = mystate[3];
           
           // number of points to generate along smooth path
           double n_hires = 100;
+          
+/*         
+          // ****************************************************************************************
+          // generate new path
+          double velocity = vel_set;
+          //mystate = mycar.state_at(0.2);
+          mystate = mycar.state();
+          vector<vector<double>> my_path_sd = pf.PTG_0_main(cars_inrange, velocity, mystate, horizon);
+          // ****************************************************************************************
+            // cars_inrange, all_cars
+*/           
           
           // generate new points only if its time to update
           if (previous_path_x.size() < horizon - n_update) {

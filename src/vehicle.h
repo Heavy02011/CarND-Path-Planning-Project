@@ -104,6 +104,12 @@ public:
     // vector<double> mystate = mycar.state_at(5);
     // pf.output_vector(mystate);
     
+    
+    // return current state of vehicle 
+    vector<double> state() {
+      return {this->s, this->v, this->a, this->d, this->d_dot, this->d_double_dot};
+    } 
+    
 };
 
 
