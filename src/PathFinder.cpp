@@ -462,7 +462,7 @@ vector<vector<double>> PathFinder::PTG_0_main(vector<Vehicle> othercars, double 
   // determine possible succesor states based on actual state
   vector<states> possible_successor_states = successor_states(state); 
   
-  // minimum cost tarjectories
+  // minimum cost trajectories
   double cost_min = 99999999;
   vector<vector<double>> trajectories;
   int id_min;
@@ -513,6 +513,12 @@ vector<vector<double>> PathFinder::PTG_0_main(vector<Vehicle> othercars, double 
         break;
     } 
     
+    // output all_goals
+    cout <<endl;
+    cout << "all_goals" << endl;
+    PathFinder::output_vector2(all_goals);
+    cout <<endl;
+    
     // PTG part 1b: perturbate input_goals into all_goals >> generate a bunch of salternative (pertubed) goals using gaussion noise based on target_states during T...T-4*dt
     int n_samples = 1; //10;
     double T = 2; // predict at time T missing !!!!!
@@ -549,7 +555,7 @@ vector<vector<double>> PathFinder::PTG_0_main(vector<Vehicle> othercars, double 
     }
     
     
-  } 
+  } // end states
 
   // minimum cost trajectory coefficients & state
   vector<double> coeff_min = trajectories[id_min];
@@ -558,7 +564,6 @@ vector<vector<double>> PathFinder::PTG_0_main(vector<Vehicle> othercars, double 
   cout << "choosen state = " << goal_state << " with cost = " << cost_min << endl;;
   
   // set goal state into car data
-  // TODO: .....
   state = goal_state;  
   
   // generate minimum cost trajectory
@@ -764,10 +769,8 @@ vector<vector<double>> PathFinder::PTG_2_trajectories(vector<vector<double>> all
     vector<double> s_coefficients = PathFinder::JMT(start_s, goal_s, t);
     vector<double> d_coefficients = PathFinder::JMT(start_d, goal_d, t);
       
-    //store reults
-    //trajectories.push_back({s_coefficients,d_coefficients,t}); 
+    //store reults 
   trajectories.push_back({s_coefficients[0],s_coefficients[1],s_coefficients[2],d_coefficients[0],d_coefficients[1],d_coefficients[2],t});
-    
   }  
   
   return trajectories;
