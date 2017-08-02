@@ -757,7 +757,7 @@ double my_d = mystate[3];
           // number of points to generate along smooth path
           double n_hires = 100;
           
-/*        
+        
           // ****************************************************************************************
           // generate new path
           double velocity = vel_set;
@@ -766,7 +766,7 @@ double my_d = mystate[3];
           vector<vector<double>> my_path_sd = pf.PTG_0_main(cars_inrange, velocity, mystate, horizon);
           // ****************************************************************************************
             // cars_inrange, all_cars
-*/          
+         
           
           // generate new points only if its time to update
           if (previous_path_x.size() < horizon - n_update) {

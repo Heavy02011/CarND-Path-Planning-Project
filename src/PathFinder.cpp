@@ -487,34 +487,34 @@ vector<vector<double>> PathFinder::PTG_0_main(vector<Vehicle> othercars, double 
         the_goal = {start_state[0] + ds , velocity, 0, start_state[3], 0, 0};
         input_goals.push_back(the_goal);
         goal_states.push_back(possible_successor_states[istate]);
-        
+        break;
       case PLCL:
         cout << "PLCL possible" << endl;
-        
+        break;        
       case PLCR:
         cout << "PLCR possible" << endl;
-        
+        break;
       case LCL:
         cout << "LCR  possible" << endl;
         // set the_goal and store in all_goals
         the_goal = {start_state[0] + ds , velocity, 0, start_state[3]-4, 0, 0};
         input_goals.push_back(the_goal);
         goal_states.push_back(possible_successor_states[istate]);
-        
+        break;
       case LCR:
         cout << "LCR  possible" << endl;
         // set the_goal and store in all_goals
         the_goal = {start_state[0] + ds , velocity, 0, start_state[3]+4, 0, 0};
         input_goals.push_back(the_goal);
         goal_states.push_back(possible_successor_states[istate]);
-        
+        break;
       default:
         cerr << "PathFinder::PTG_0_main: state not defined -> " << possible_successor_states[istate] << endl;
         break;
     } 
     
     // PTG part 1b: perturbate input_goals into all_goals >> generate a bunch of salternative (pertubed) goals using gaussion noise based on target_states during T...T-4*dt
-    int n_samples = 10;
+    int n_samples = 1; //10;
     double T = 2; // predict at time T missing !!!!!
     for (int i=0; i < input_goals.size(); i++) {
       //vector<vector<double>> new_goals = perturb_goal0(input_goals[i], n_samples);
