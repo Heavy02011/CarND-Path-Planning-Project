@@ -1005,3 +1005,26 @@ double PathFinder::cost4collision(vector<double> traj_coeff, vector<Vehicle> oth
   }
   return 0;  
 }
+
+// save mypath
+void PathFinder::savepath(string file_path, vector<vector<double>> mypath, int n_elements) {
+
+  ofstream out_file(file_path.c_str(), ofstream::out);
+
+  if (!out_file.is_open()) {
+    cerr << "PathFinder::savepath() - Cannot open output file: " << file_path << endl;
+  }
+
+  for (int i = 0; i < n_elements; i++) {
+    
+    out_file << i << "; ";
+    out_file << mypath[i][0] << "; ";
+    out_file << mypath[i][1] << "; ";
+    out_file << mypath[i][2] << " ";
+    out_file << endl;
+  }
+
+  if (out_file.is_open()) {
+    out_file.close();
+  }
+}

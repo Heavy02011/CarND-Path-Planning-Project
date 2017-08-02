@@ -10,6 +10,7 @@
 #include "json.hpp"
 #include "spline.h" // rbx
 #include "PathFinder.h"
+#include <string> 
 
 #include <cmath>
 #include <vector>
@@ -766,6 +767,11 @@ double my_d = mystate[3];
           vector<vector<double>> my_path_sd = pf.PTG_0_main(cars_inrange, velocity, mystate, horizon);
           // ****************************************************************************************
             // cars_inrange, all_cars
+          
+          // save path of current time step to file
+          string s_counter = to_string(counter);
+          string file_path = s_counter + ".csv";
+          pf.savepath(file_path, my_path_sd, my_path_sd.size());
          
           
           // generate new points only if its time to update
@@ -773,13 +779,14 @@ double my_d = mystate[3];
             
             for(int i = 0; i < horizon; i++) {
               // actual s coordinate increment 
-              double pos_s = car_s + ds * i;
-              //double pos_snew = my_path_sd[i][0]; // implement pf.PTG_0_main
-              //double pos_dnew = my_path_sd[i][1]; // implement pf.PTG_0_main
+              //double pos_s = car_s + ds * i;
+              //double pos_time = my_path_sd[i][0]; // t - implement pf.PTG_0_main
+              double pos_snew = my_path_sd[i][1]; // s - implement pf.PTG_0_main
+              double pos_dnew = my_path_sd[i][2]; // d - implement pf.PTG_0_main
               
               // get path x,y coordinate from actual pos_s & pos_d
-              vector<double> pos_xy = getXY(pos_s, pos_d, map_waypoints_s_upsampled, map_waypoints_x_upsampled, map_waypoints_y_upsampled);
-              //vector<double> pos_xy = getXY(pos_snew, pos_dnew, map_waypoints_s_upsampled, map_waypoints_x_upsampled, map_waypoints_y_upsampled); // implement pf.PTG_0_main
+              //vector<double> pos_xy = getXY(pos_s, pos_d, map_waypoints_s_upsampled, map_waypoints_x_upsampled, map_waypoints_y_upsampled);
+              vector<double> pos_xy = getXY(pos_snew, pos_dnew, map_waypoints_s_upsampled, map_waypoints_x_upsampled, map_waypoints_y_upsampled); // implement pf.PTG_0_main
               
               // generate a smooth path
               if ( (i < n_hires) && (previous_path_x.size() >= n_hires) ) {
@@ -864,55 +871,3 @@ double my_d = mystate[3];
   }
   h.run();
 }
-
-
-//########
-/*
-int NextWaypoint(double x, double y, double theta, 
-                 vector<double> &maps_x, vector<double> &maps_y,
-                 vector<double> &maps_dx, vector<double> &maps_dy)
-{
-
-	int closestWaypoint = ClosestWaypoint(x,y,maps_x,maps_y);
-
-	double map_x = maps_x[closestWaypoint];
-	double map_y = maps_y[closestWaypoint];
-
-//	double heading = atan2( (map_y-y),(map_x-x) );
-	
-    //heading vector
-    double hx = map_x-x;
-    double hy = map_y-y;
-    
-    //Normal vector:
-    double nx = maps_dx[closestWaypoint];
-    double ny = maps_dy[closestWaypoint];
-    
-    //Vector into the direction of the road (perpendicular to the normal vector)
-    double vx = -ny;
-    double vy = nx;
-    
-    //Here we assume that the vehicle goes in the right directions
-    //(If this is not the case, we have to examine theta and we might need to decrease closestWaypoint!)
-    
-    //If the inner product of v and h is positive then we are behind the waypoint so we do not need to
-    //increment closestWaypoint, otherwise we are beyond the waypoint and we need to increment closestWaypoint.
-
-    double inner = hx*vx+hy*vy;
-    if (inner<0.0) {
-        closestWaypoint++;
-    }
-    
-//    double heading = atan2( vy,vx );
-
-//	double angle = abs(theta-heading);
-
-//	if(angle > pi()/4)
-//	{
-//		closestWaypoint++;
-//	}
-    
-
-    return closestWaypoint;
-}
-*/

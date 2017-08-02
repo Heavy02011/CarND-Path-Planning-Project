@@ -219,6 +219,9 @@ class PathFinder
     // costs for driving not close to target velocity
     double cost4collision(vector<double> traj_coeff, vector<Vehicle> othercars, double dt, int horizon);
     
+    // save mypath
+    void savepath(string file_path, vector<vector<double>> mypath, int n_elements);
+    
   private:
       
       
