@@ -631,98 +631,7 @@ double my_d = mystate[3];
               if (my_lane == RIGHT_LANE) pos_d = 10;           
             }
           }
-          
-     
-          // loop over possible succesor states
-          //for (int istate=0; istate < possible_successor_states.size(); istate++) {
-            
-            // output of current investigated state
-            //if (pf.be_verbose) cout << "investigating state: " << possible_successor_states[istate] << endl;;
-            
-            
- 
- /*           
-            // initialize costs 
-            double costs = 0;
-            map<int, vector<vector<double>>>::iterator it= predictions.begin();
-            while(it != predictions.end())
-            {
-                int car_id = it->first;
-                vector<vector<double>> state_vector = it->second; // vectors of s, d over horizon
-                int othercar_id = pf.car_id(all_cars, car_id); // get index in all_cars for car_id
-                double d = all_cars[othercar_id].d; // othercar with car_id
-                double s = all_cars[othercar_id].s; // othercar s with car_id
-                lane othercar_lane = pf.in_lane(d); // lane of the othercar
-                
-                //TODO:  function(state_vector) --> find collision index for s
-                //if ((othercar_lane == my_lane) and ((state_vector[49][0]-s)< 5)) {                
-                if ((othercar_lane == my_lane) and ((s - my_s)< 5)) {
-                  cout << "/////////////////////////////////" << endl;
-                  cout << "////// collision ahead //////////" << endl;
-                  cout << "/////////////////////////////////" << endl; 
-                  cout << "car_id: " << othercar_id << " s: " << s << " d: " << d <<endl;
-                }
-                
-                
-                
-                //cout << "key: " << car_id << " " << endl;
-                //pf.output_vector2(state_vector); 
-                
-                it++;
-            }
-            
-            // check for state
-            if (pf.be_verbose) {
-              if (possible_successor_states[istate] == KL )  cout << "KL   possible" << endl;
-              if (possible_successor_states[istate] == PLCL) cout << "PLCL possible" << endl;
-              if (possible_successor_states[istate] == PLCR) cout << "PLCR possible" << endl;
-              if (possible_successor_states[istate] == LCL)  cout << "LCR  possible" << endl;
-              if (possible_successor_states[istate] == LCR)  cout << "LCR  possible" << endl;
-            }
-*/     
-/*            
-            // generate path for current state
-            // trajectory_for_state = generate_trajectory(state, current_pose, predictions)           
-            vector<double> start = {car_s, 0, 0};
-            vector<double> end   = {car_s, 0, 0};
-            double T = 1;
-
-            // setup input for JMT & output results
-            start = {pf.s, pf.v, pf.a}; // actual state of my car
-            end   = {pf.s+10, pf.SPEED_LIMIT, pf.MAX_ACCEL};
-            T     = 20;
-            //cout << "start/end/T = " << endl;
-            //pf.output_vector(start);
-            //pf.output_vector(end);
-            //cout << T << endl;;
-                        
-            // call JMT & output results
-            vector<double> coefficients = pf.JMT(start, end, T);
-            //cout << "coefficients = " << endl;
-            //pf.output_vector(coefficients);
-            
-            // test differentiate & output results
-            vector<double> diff_coeff = pf.differentiate(coefficients);
-            //cout << "diff_coefficients = " << endl;
-            //pf.output_vector(diff_coeff);
-*/            
-            // determine costs according to lesson 4.16 behavioural planning for each successing possible state
-            // #############################################################
-            // ....
-            
-            
-            
-            
-            
-          //}          
-            
-          // ***************************************************************************
-          // 5 generate path coordinates
-          // ***************************************************************************
-          
-          
-          
-            
+                    
            
           // ***************************************************************************
           // XX generate just a smooth path along middle lane
@@ -750,7 +659,7 @@ double my_d = mystate[3];
             vel_set = max_car_speed;
           }
           
-          double ds = x0 + vel_set * dt + b * dt*dt/2 + c * dt*dt*dt/6;
+          double ds = (x0 + vel_set * dt + b * dt*dt/2 + c * dt*dt*dt/6) * 0.9;
                    
           // update every n_update cycles 
           int n_update = 10; //100; 
@@ -758,9 +667,30 @@ double my_d = mystate[3];
           // number of points to generate along smooth path
           double n_hires = 100;
           
+          
+          
+          // ***************************************************************************
+          // 5 generate path coordinates
+          // ***************************************************************************
+          
+          
         
           // ****************************************************************************************
-          // generate new path
+/*          
+          // Option 1: quick & dirty: generate JMT here based on car_s and pos_d
+          vector<double> start_state = {pf.s,pf.v,pf.a,pf.d,0,0 }; // check this d_dot, d_double_dot!!!!
+          mystate = mycar.state_at(2);
+          vector<double> the_goal = {mystate[0], vel_set, 0, pos_d, 0, 0};
+          vector<vector<double>> all_goals;
+          all_goals.push_back(the_goal);        
+          vector<vector<double>> my_path_sd = pf.PTG_2_trajectories(all_goals, start_state); // coefficients of trajectories!!!
+          
+          // save path of current time step to file
+          string file_path = "crudepath.csv";
+          pf.savepath(file_path, my_path_sd, my_path_sd.size());   
+*/          
+          
+          // Option 2: generate new path using full path planning
           double velocity = vel_set;
           //mystate = mycar.state_at(0.2);
           mystate = mycar.state();
@@ -779,14 +709,14 @@ double my_d = mystate[3];
             
             for(int i = 0; i < horizon; i++) {
               // actual s coordinate increment 
-              //double pos_s = car_s + ds * i;
+              double pos_s = car_s + ds * i;
               //double pos_time = my_path_sd[i][0]; // t - implement pf.PTG_0_main
               double pos_snew = my_path_sd[i][1]; // s - implement pf.PTG_0_main
               double pos_dnew = my_path_sd[i][2]; // d - implement pf.PTG_0_main
               
               // get path x,y coordinate from actual pos_s & pos_d
-              //vector<double> pos_xy = getXY(pos_s, pos_d, map_waypoints_s_upsampled, map_waypoints_x_upsampled, map_waypoints_y_upsampled);
-              vector<double> pos_xy = getXY(pos_snew, pos_dnew, map_waypoints_s_upsampled, map_waypoints_x_upsampled, map_waypoints_y_upsampled); // implement pf.PTG_0_main
+              vector<double> pos_xy = getXY(pos_s, pos_d, map_waypoints_s_upsampled, map_waypoints_x_upsampled, map_waypoints_y_upsampled);
+              //vector<double> pos_xy = getXY(pos_snew, pos_dnew, map_waypoints_s_upsampled, map_waypoints_x_upsampled, map_waypoints_y_upsampled); // implement pf.PTG_0_main
               
               // generate a smooth path
               if ( (i < n_hires) && (previous_path_x.size() >= n_hires) ) {
