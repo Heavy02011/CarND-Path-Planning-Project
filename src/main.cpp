@@ -774,9 +774,12 @@ double my_d = mystate[3];
             for(int i = 0; i < horizon; i++) {
               // actual s coordinate increment 
               double pos_s = car_s + ds * i;
+              //double pos_snew = my_path_sd[i][0]; // implement pf.PTG_0_main
+              //double pos_dnew = my_path_sd[i][1]; // implement pf.PTG_0_main
               
               // get path x,y coordinate from actual pos_s & pos_d
               vector<double> pos_xy = getXY(pos_s, pos_d, map_waypoints_s_upsampled, map_waypoints_x_upsampled, map_waypoints_y_upsampled);
+              //vector<double> pos_xy = getXY(pos_snew, pos_dnew, map_waypoints_s_upsampled, map_waypoints_x_upsampled, map_waypoints_y_upsampled); // implement pf.PTG_0_main
               
               // generate a smooth path
               if ( (i < n_hires) && (previous_path_x.size() >= n_hires) ) {
