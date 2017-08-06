@@ -1031,3 +1031,10 @@ void PathFinder::savepath(string file_path, vector<vector<double>> mypath, int n
     out_file.close();
   }
 }
+
+// just a test function
+vector<vector<double>> PathFinder::newpath(vector<vector<double>> myprevious_path_x, vector<vector<double>> myprevious_path_y, vector<vector<double>> mysensor_fusion) {
+  vector<vector<double>> mypath;
+
+  return mypath;
+}

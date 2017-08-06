@@ -64,6 +64,9 @@ public:
 
     // car's d acceleration in m/s/s
     double d_double_dot;
+
+    // car's yaw angle in radian
+    double yaw;
     
     void display(Vehicle &car) { 
       cout << "=== car =================" << endl;

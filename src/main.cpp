@@ -305,7 +305,9 @@ int main() {
           	// Previous path data given to the Planner
           	auto previous_path_x = j[1]["previous_path_x"];
           	auto previous_path_y = j[1]["previous_path_y"];
-            
+            //vector<vector<double>> myprevious_path_x = j[1]["previous_path_x"]; 
+            //vector<vector<double>> myprevious_path_y = j[1]["previous_path_y"];
+
           	// Previous path's end s and d values 
           	double end_path_s = j[1]["end_path_s"];
           	double end_path_d = j[1]["end_path_d"];
@@ -314,6 +316,7 @@ int main() {
             // ["sensor_fusion"] A 2d vector of cars and then that car's 
             // [car's unique ID, car's x position in map coordinates, car's y position in map coordinates, car's x velocity in m/s, car's y velocity in m/s, car's s position in frenet coordinates, car's d position in frenet coordinates.
           	auto sensor_fusion = j[1]["sensor_fusion"];
+            //vector<vector<double>> mysensor_fusion = j[1]["sensor_fusion"];
 
           	json msgJson;
 
@@ -387,6 +390,7 @@ int main() {
           pf.x = car_x;
           pf.y = car_y;
           pf.v = car_speed*pf.MPH2MPS;
+          pf.yaw = car_yaw;
           double my_dx = waypointspline_dx(car_s); //TODO: upsampling necessary???????????????
           double my_dy = waypointspline_dy(car_s);
 
@@ -407,6 +411,9 @@ int main() {
           car_y = car_xy[1];
 */          
           // {s, v, this->a, d, d_dot, this->d_double_dot};
+
+          // save all relevant input data
+          // vector<vector<double>> mynewpath = pf.newpath(myprevious_path_x, myprevious_path_y, mysensor_fusion);
 
           // ***************************************************************************
           // 2 limit investigation of traffic to a smaller range out of sensor_fusion

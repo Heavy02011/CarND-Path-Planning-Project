@@ -222,6 +222,7 @@ class PathFinder
     // save mypath
     void savepath(string file_path, vector<vector<double>> mypath, int n_elements);
     
+    vector<vector<double>> newpath(vector<vector<double>> myprevious_path_x, vector<vector<double>> myprevious_path_y, vector<vector<double>> mysensor_fusion);
   private:
       
       
