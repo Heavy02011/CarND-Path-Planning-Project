@@ -456,7 +456,7 @@ int main() {
           // show cars_inrange 
           cout << "*** " << cars_inrange.size() << " vehicles in range 50m detected ***" << endl;
           for (int ii=0; ii<cars_inrange.size(); ii++) {
-              cout << "cars_inrange = \t" << cars_inrange[ii].id << "\t s = " << all_cars[cars_inrange[ii].id].s <<"\t d = " << all_cars[cars_inrange[ii].id].d <<endl;
+              cout << "cars_inrange = \t" << cars_inrange[ii].id << "\t s = " << all_cars[cars_inrange[ii].id].s <<"\t d = " << all_cars[cars_inrange[ii].id].d << "\t dist = " << pf.distance2car(all_cars[cars_inrange[ii].id]) << endl;
                       
               cars_inrange[ii];
           }           
@@ -474,7 +474,7 @@ int main() {
           // ***************************************************************************  
  
           // number of points on path to investigate into the future
-          int horizon = 150; //250; //50;
+          int horizon = 175; //250; //50;
 /*          
           map<int, vector<vector<double>>> predictions = pf.CARpredictions(cars_inrange, horizon);      
           
@@ -580,7 +580,7 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
 */
           // predict the state of my car in the future (1s)
           //mystate = mycar.state_at(horizon*0.02);
-          mystate = mycar.state_at(1);
+          mystate = mycar.state_at(2);
                     
           
           
@@ -590,7 +590,7 @@ def transition_function(predictions, current_fsm_state, current_pose, cost_funct
 //double my_d = car_d; //mystate[3];
 double my_s = mystate[0]; 
 double my_d = mystate[3];
-          cout << "mystate: \t" << "\t s = " << my_s <<"\t d = " <<my_d<< endl;
+          cout << "mystate: \t" << "\t s = " << car_s <<"\t d = " <<car_d<< endl;
           
           //get id of closest in front car in my lane 
           int closecar_id = pf.distance2car_inlane(all_cars, my_s, my_d); // TODO: limit to cars_inrange!!!!!!!
@@ -660,12 +660,12 @@ double my_d = mystate[3];
           }
           
           double ds = (x0 + vel_set * dt + b * dt*dt/2 + c * dt*dt*dt/6) * 0.9;
-                   
+          
           // update every n_update cycles 
-          int n_update = 10; //100; 
+          int n_update = 40; //100; 
           
           // number of points to generate along smooth path
-          double n_hires = 100;
+          double n_hires = 50; //100;
           
           
           
@@ -673,7 +673,9 @@ double my_d = mystate[3];
           // 5 generate path coordinates
           // ***************************************************************************
           
-          
+          // what is our current number of lagging waypoints
+          int n_lag = horizon - previous_path_x.size() - n_update;
+          cout << "n_lag = " << n_lag << endl;
         
           // ****************************************************************************************
 /*          
@@ -701,7 +703,7 @@ double my_d = mystate[3];
           // save path of current time step to file
           string s_counter = to_string(counter);
           string file_path = s_counter + ".csv";
-          pf.savepath(file_path, my_path_sd, my_path_sd.size());
+          //pf.savepath(file_path, my_path_sd, my_path_sd.size());
          
           
           // generate new points only if its time to update
