@@ -406,6 +406,12 @@ int main() {
               if ((check_car_s > car_s) && ((check_car_s - car_s) < 30)) {
                 //vel_set = 29.5*pf.MPH2MPS;
                 othercars_too_close = true;
+
+                // just change lane left
+                //if (my_lane > 0) {
+                //  my_lane = 0;
+                //}
+
               }
 
             }
