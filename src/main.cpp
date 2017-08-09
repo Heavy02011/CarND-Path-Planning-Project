@@ -268,7 +268,7 @@ int main() {
   int counter = 0;
 
   // initialize velocity          
-  double vel_set = 49.5 * pf.MPH2MPS;
+  double vel_set = 0; //49.5 * pf.MPH2MPS;
 
   // set my lane
   int my_lane = 1;
@@ -401,12 +401,21 @@ int main() {
               double check_speed = sqrt(vx*vx+vy*vy);
               double check_car_s = sensor_fusion[i][5];
 
+              // predict cars future state
               check_car_s += previous_path_size*0.02*check_speed;
               if ((check_car_s > car_s) && ((check_car_s - car_s) < 30)) {
-                vel_set = 29.5*pf.MPH2MPS;
+                //vel_set = 29.5*pf.MPH2MPS;
+                othercars_too_close = true;
               }
 
             }
+          }
+
+          // adjust velocity
+          if (othercars_too_close) {
+            vel_set -= 0.224*pf.MPH2MPS;
+          } else if (vel_set < 49.5*pf.MPH2MPS) {
+            vel_set += 0.224*pf.MPH2MPS;
           }
 
 
