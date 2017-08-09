@@ -271,7 +271,7 @@ int main() {
   double vel_set = 0; //49.5 * pf.MPH2MPS;
 
   // set my lane
-  int my_lane = 1;
+  int lane = 1;
 
 
   
@@ -283,7 +283,7 @@ int main() {
 //rbx
   //ur h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
       
-  h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy, &waypointspline_x, &waypointspline_y, &waypointspline_dx, &waypointspline_dy, &pf, &counter, &map_waypoints_x_upsampled, &map_waypoints_y_upsampled, &map_waypoints_s_upsampled, &vel_set, &my_lane](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
+  h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy, &waypointspline_x, &waypointspline_y, &waypointspline_dx, &waypointspline_dy, &pf, &counter, &map_waypoints_x_upsampled, &map_waypoints_y_upsampled, &map_waypoints_s_upsampled, &vel_set, &lane](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                      uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -375,54 +375,6 @@ int main() {
           cout << "*** car_x, y = " << car_x << " " << car_y << endl;   
           cout << "***********************************************************" << endl;
           
-          // ***************************************************************************
-          // 0 new implementation of path
-          // ***************************************************************************
-
-          // get size of previous path
-          int previous_path_size = previous_path_x.size();
-
-          // make smooth transition
-         
-          if (previous_path_size > 0) {
-            car_s = end_path_s;
-          }
-
-          // are other cars too close
-          bool othercars_too_close = false;
-
-          // determine speed to drive
-          for (int i=0; i<sensor_fusion.size(); i++) {
-            // car in my lane
-            float d = sensor_fusion[i][6];
-            if(d < (2+4*my_lane+2) && d > (2+4*my_lane-2)) {
-              double vx = sensor_fusion[i][3];
-              double vy = sensor_fusion[i][4];
-              double check_speed = sqrt(vx*vx+vy*vy);
-              double check_car_s = sensor_fusion[i][5];
-
-              // predict cars future state
-              check_car_s += previous_path_size*0.02*check_speed;
-              if ((check_car_s > car_s) && ((check_car_s - car_s) < 30)) {
-                //vel_set = 29.5*pf.MPH2MPS;
-                othercars_too_close = true;
-
-                // just change lane left
-                if (my_lane > 0) {
-                  my_lane = 0;
-                }
-
-              }
-
-            }
-          }
-
-          // adjust velocity
-          if (othercars_too_close) {
-            vel_set -= 0.224*pf.MPH2MPS;
-          } else if (vel_set < 49.5*pf.MPH2MPS) {
-            vel_set += 0.224*pf.MPH2MPS;
-          }
 
 
           // ***************************************************************************
@@ -511,37 +463,9 @@ int main() {
                       
               cars_inrange[ii];
           }           
-/*          
-          if (pf.be_verbose) {
-            cout << "*** " << cars_inrange.size() << " vehicles in range 50m detected ***" << endl;
-            for (int ii=0; ii<cars_inrange.size(); ii++) {
-              cars_inrange[ii].display(cars_inrange[ii]);
-            }
-          }
-*/                      
+                     
 
-          // ***************************************************************************
-          // 3 select a real or virtual vehicle to follow & set target state
-          // ***************************************************************************  
-            
-          //TODO: ...complete this... 
-/*
-          if (pf.be_verbose) {
-            cout << "*** id of target car: " << id_front << " ***" << endl;
-            mytargetcar.display(mytargetcar);
-          }
-                
-          // predict state of target vehicle at time T using offset delta
-          double T = 5;
-          vector<double> delta = {10,0,0,4,0,0};
-          vector<double> target_state = pf.predictions0(mytargetcar, T, delta);
           
-          // output of target state
-          if (pf.be_verbose) {
-            cout << "target_state" << endl;
-            pf.output_vector(target_state);
-          }
-*/          
           
           // ***************************************************************************
           // 4 run finite state machine & evaluate possible trajectories & costs
@@ -584,9 +508,9 @@ double my_d = mystate[3];
                     
           cout << endl;
 
-/*          
+          
           // crude test drive
-          double pos_d = car_d; //6;
+          //double pos_d = car_d; //6;
           int closecar_id_right  = pf.distance2car_inlane(all_cars, my_s, 10);
           int closecar_id_middle = pf.distance2car_inlane(all_cars, my_s, 6);
           int closecar_id_left   = pf.distance2car_inlane(all_cars, my_s, 2);
@@ -601,21 +525,74 @@ double my_d = mystate[3];
           } else {
             // change lane
             if ((closecar_dist < 25) && (closecar_dist_right > 25)) {
-            pos_d = 10;
+              //pos_d = 10;
+              lane = 2;
             } else if ((closecar_dist < 25) && (closecar_dist_left > 25)) {
-              pos_d = 2;
+              //pos_d = 2;
+              lane = 0;
             } else if ((closecar_dist < 25) && (closecar_dist_middle > 25)){
-              pos_d = 6;
+              //pos_d = 6;
+              lane = 1;
             } else {
               // keep lane
+              /*
               lane my_lane = pf.in_lane(mystate[3]);
               if (my_lane == LEFT_LANE) pos_d = 2; 
               if (my_lane == MIDDLE_LANE) pos_d = 6; 
-              if (my_lane == RIGHT_LANE) pos_d = 10;           
+              if (my_lane == RIGHT_LANE) pos_d = 10;  
+              */         
             }
           }
                     
- */
+ 
+          // ***************************************************************************
+          // 0 new implementation of path
+          // ***************************************************************************
+
+          // get size of previous path
+          int previous_path_size = previous_path_x.size();
+
+          // make smooth transition
+         
+          if (previous_path_size > 0) {
+            car_s = end_path_s;
+          }
+
+          // are other cars too close
+          bool othercars_too_close = false;
+
+          // determine speed to drive
+          for (int i=0; i<sensor_fusion.size(); i++) {
+            // car in my lane
+            float d = sensor_fusion[i][6];
+            if(d < (2+4*lane+2) && d > (2+4*lane-2)) {
+              double vx = sensor_fusion[i][3];
+              double vy = sensor_fusion[i][4];
+              double check_speed = sqrt(vx*vx+vy*vy);
+              double check_car_s = sensor_fusion[i][5];
+
+              // predict cars future state
+              check_car_s += previous_path_size*0.02*check_speed;
+              if ((check_car_s > car_s) && ((check_car_s - car_s) < 30)) {
+                //vel_set = 29.5*pf.MPH2MPS;
+                othercars_too_close = true;
+
+                // just change lane left
+                //if (lane > 0) {
+                //  lane = 0;
+                //}
+
+              }
+
+            }
+          }
+
+          // adjust velocity
+          if (othercars_too_close) {
+            vel_set -= 0.224*pf.MPH2MPS;
+          } else if (vel_set < 49.5*pf.MPH2MPS) {
+            vel_set += 0.224*pf.MPH2MPS;
+          }
 
 
           // ***************************************************************************
@@ -666,13 +643,13 @@ double my_d = mystate[3];
 
           // get my lane (its in int my_lane)
           //lane my_lane = pf.in_lane(mystate[3]);
-          cout << "my_lane = " << my_lane << endl;
+          cout << "lane = " << lane << endl;
           //int my_lane = 1;
 
           // generate the wide spaced ANCHOR points to generate a spline for the path
-          vector<double> next_wp0 = getXY(car_s+30,(2+4*my_lane), map_waypoints_s, map_waypoints_x, map_waypoints_y);
-          vector<double> next_wp1 = getXY(car_s+60,(2+4*my_lane), map_waypoints_s, map_waypoints_x, map_waypoints_y);
-          vector<double> next_wp2 = getXY(car_s+90,(2+4*my_lane), map_waypoints_s, map_waypoints_x, map_waypoints_y);
+          vector<double> next_wp0 = getXY(car_s+30,(2+4*lane), map_waypoints_s, map_waypoints_x, map_waypoints_y);
+          vector<double> next_wp1 = getXY(car_s+60,(2+4*lane), map_waypoints_s, map_waypoints_x, map_waypoints_y);
+          vector<double> next_wp2 = getXY(car_s+90,(2+4*lane), map_waypoints_s, map_waypoints_x, map_waypoints_y);
 
           // add ANCHOR points to vector
           ptsx.push_back(next_wp0[0]);
@@ -690,7 +667,7 @@ double my_d = mystate[3];
 
             ptsx[i] = shift_x * cos(0-ref_yaw) - shift_y * sin(0-ref_yaw);
             ptsy[i] = shift_x * sin(0-ref_yaw) + shift_y * cos(0-ref_yaw);
-            cout << i << " " << ptsx[i] << " " << ptsy[i] << endl;
+            //cout << i << " " << ptsx[i] << " " << ptsy[i] << endl;
           }
 
           // construct spline
