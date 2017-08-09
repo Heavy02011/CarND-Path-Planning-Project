@@ -266,6 +266,10 @@ int main() {
   
   // setup a counter for every time step
   int counter = 0;
+
+  // initialize velocity          
+  double vel_set = 49.5 * pf.MPH2MPS;
+
   
   /*
     h.onMessage([&count,&pp, &map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy,&WP_spline_x,&WP_spline_y,&WP_spline_dx,&WP_spline_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
@@ -275,7 +279,7 @@ int main() {
 //rbx
   //ur h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
       
-  h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy, &waypointspline_x, &waypointspline_y, &waypointspline_dx, &waypointspline_dy, &pf, &counter, &map_waypoints_x_upsampled, &map_waypoints_y_upsampled, &map_waypoints_s_upsampled](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
+  h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy, &waypointspline_x, &waypointspline_y, &waypointspline_dx, &waypointspline_dy, &pf, &counter, &map_waypoints_x_upsampled, &map_waypoints_y_upsampled, &map_waypoints_s_upsampled, &vel_set](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                      uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -320,8 +324,8 @@ int main() {
 
           	json msgJson;
 
-          	vector<double> next_x_vals;
-          	vector<double> next_y_vals;
+          	//vector<double> next_x_vals;
+          	//vector<double> next_y_vals;
 
 
           	// TODO: define a path made up of (x,y) points that the car will visit sequentially every .02 seconds
@@ -364,6 +368,7 @@ int main() {
           cout << "***********************************************************" << endl;
           cout << "*** time step: " << counter << endl;
           cout << "*** car s,d,yaw,speed = " << car_s << " " << car_d << " " << car_yaw << " " << car_speed << endl;   
+          cout << "*** car_x, y = " << car_x << " " << car_y << endl;   
           cout << "***********************************************************" << endl;
 /*          
           // output of path data  
@@ -380,7 +385,24 @@ int main() {
             cout << "==========================================================================" << endl;          
             cout << endl; 
           }                
-*/            
+*/           
+          // ***************************************************************************
+          // 0 new implementation of path
+          // ***************************************************************************
+
+          // get size of previous path
+          int previous_path_size = previous_path_x.size();
+
+          // make smooth transition
+/*          
+          if (previous_path_size > 0) {
+            car_s = end_path_s;
+          }
+*/
+          // are other cars too close
+          bool othercars_too_close = false;
+
+
           // ***************************************************************************
           // 1 update my cars data in PathFinder object
           // ***************************************************************************
@@ -644,107 +666,164 @@ double my_d = mystate[3];
           // XX generate just a smooth path along middle lane
           // ***************************************************************************
                   
-          // define lane
-          // double pos_d = 6.0;
           
           // define maximum car speed
-          double max_car_speed = 0.9 * pf.SPEED_LIMIT; // apply safety factor of 90%
+          //double max_car_speed = 0.9 * pf.SPEED_LIMIT; // apply safety factor of 90%
           
-          // increment along s in m
-          //double ds = 0.4; 
-          double b = 0.90*10.0; //10.0; // m/s2
-          double c = 0.90*10.0; //50.0; // m/s3
-          double dt = 0.02;        // s          
-          double x0 = 0; //car_s;
-          double v0 = max_car_speed; // change to variable speed according to traffic conditions later
-          //double ds = x0 + v0 * dt + b * dt*dt/2 + c * dt*dt*dt/6;
-          
-          double vel_set;
-          if (car_speed < max_car_speed) {
-            vel_set = car_speed;
-          } else {
-            vel_set = max_car_speed;
+          // Option 3: generate new path using walkthrough video approach
+          //double velocity = vel_set;
+          //mystate = mycar.state_at(0.2);
+          //mystate = mycar.state();
+
+
+          // create widely spaced path points to construct the final path
+          vector<double> ptsx;
+          vector<double> ptsy;
+
+          // define the cars reference state: starting point or previous path end point
+          double ref_x = car_x;
+          double ref_y = car_y;
+          double ref_yaw = deg2rad(car_yaw);
+
+          // if previous path size is only 1 point or smaller use car as starting reference
+          cout << "previous_path_size = " << previous_path_size << endl;
+          if (previous_path_size < 2) {
+            // use two points to align car path with yaw
+            double prev_car_x = car_x - cos(ref_yaw); //???????????????
+            double prev_car_y = car_y - sin(ref_yaw); // ref_yaw???????
+            ptsx.push_back(prev_car_x);
+            ptsx.push_back(car_x);
+            ptsy.push_back(prev_car_y);
+            ptsy.push_back(car_y);
+
+          } else
+          // use last previous point as starting reference 
+          {
+            // set last point of previous path as reference state
+            ref_x = previous_path_x[previous_path_size-1];
+            ref_y = previous_path_y[previous_path_size-1];
+
+            double ref_x_prev = previous_path_x[previous_path_size-2];
+            double ref_y_prev = previous_path_y[previous_path_size-2];
+            ref_yaw = atan2(ref_y - ref_y_prev, ref_x - ref_x_prev);
+
+            // save the two points
+            ptsx.push_back(ref_x_prev);
+            ptsx.push_back(ref_x);
+            ptsy.push_back(ref_y_prev);
+            ptsy.push_back(ref_y);
+
           }
-          
-          double ds = (x0 + vel_set * dt + b * dt*dt/2 + c * dt*dt*dt/6) * 0.9;
-          
-          // update every n_update cycles 
-          int n_update = 40; //100; 
-          
-          // number of points to generate along smooth path
-          double n_hires = 50; //100;
+
+          // get my lane
+          //lane my_lane = pf.in_lane(mystate[3]);
+          int my_lane = 1;
+
+          // generate the wide spaced ANCHOR points to generate a spline for the path
+          vector<double> next_wp0 = getXY(car_s+30,(2+4*my_lane), map_waypoints_s, map_waypoints_x, map_waypoints_y);
+          vector<double> next_wp1 = getXY(car_s+60,(2+4*my_lane), map_waypoints_s, map_waypoints_x, map_waypoints_y);
+          vector<double> next_wp2 = getXY(car_s+90,(2+4*my_lane), map_waypoints_s, map_waypoints_x, map_waypoints_y);
+
+          // add ANCHOR points to vector
+          ptsx.push_back(next_wp0[0]);
+          ptsx.push_back(next_wp1[0]);
+          ptsx.push_back(next_wp2[0]);
+          ptsy.push_back(next_wp0[1]);
+          ptsy.push_back(next_wp1[1]);
+          ptsy.push_back(next_wp2[1]);
+
+          // convert ANCHOR points for spline to local car coordinate system
+          for (int i=0; i<ptsx.size(); i++) {
+            // convert to local car coordinates and rotate yaw to zero degrees
+            double shift_x = ptsx[i] - ref_x;
+            double shift_y = ptsy[i] - ref_y;
+
+            ptsx[i] = shift_x * cos(0-ref_yaw) - shift_y * sin(0-ref_yaw);
+            ptsy[i] = shift_x * sin(0-ref_yaw) + shift_y * cos(0-ref_yaw);
+            cout << i << " " << ptsx[i] << " " << ptsy[i] << endl;
+          }
+
+          // construct spline
+          tk::spline s;
+          s.set_points(ptsx, ptsy);
+
+          // define the actual path points
+          vector<double> next_x_vals;
+          vector<double> next_y_vals;
+
+          // part 1: add previous path points
+          for (int i = 0; i < previous_path_size; i++)
+          {
+            next_x_vals.push_back(previous_path_x[i]);
+            next_y_vals.push_back(previous_path_y[i]);
+          }
+
+          // break ANCHOR spline into segments. distance = N * 0.02 * velocity
+          double target_x = 30.0; // set target 30m ahead
+          double target_y = s(target_x);
+          double target_dist = sqrt(target_x*target_x + target_y*target_y);
+
+          // spline constructor x for getting y in local car coordinate system
+          double x_add_on = 0;
+          double N = target_dist / (0.02*vel_set);  // check for units!!!!!!!!!!!
+          double dx = target_x/N;
+
+          // part 2: add the new points by using the spline
+          for (int i = 1; i < 50-previous_path_size; ++i)
+          {
+            // generate points in local coordinate system
+            double x_point = x_add_on + dx;
+            double y_point = s(x_point);
+
+            // set new x
+            x_add_on = x_point;
+
+            // transfrom points back to global coordinate system
+            double x_delta = x_point;
+            double y_delta = y_point;
+            x_point = ref_x + x_delta * cos(ref_yaw) - y_delta * sin(ref_yaw);
+            y_point = ref_y + x_delta * sin(ref_yaw) + y_delta * cos(ref_yaw);
+
+            // store points in vector
+            next_x_vals.push_back(x_point);
+            next_y_vals.push_back(y_point);
+
+          }
+
+
+/*
+          double dist_inc = 0.3;
+          for(int i = 0; i < 50-previous_path_size; i++)
+          {    
+              double next_s = car_s + (i+1)*dist_inc;
+              double next_d = 6;
+              vector<double> pos_xy = getXY(next_s, next_d, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+
+              next_x_vals.push_back(pos_xy[0]);
+              next_y_vals.push_back(pos_xy[1]);
+
+          }
+ */         
+
           
           
           
           // ***************************************************************************
           // 5 generate path coordinates
-          // ***************************************************************************
+          // ***************************************************************************         
           
-          // what is our current number of lagging waypoints
-          int n_lag = horizon - previous_path_x.size() - n_update;
-          cout << "n_lag = " << n_lag << endl;
-        
-          // ****************************************************************************************
-/*          
-          // Option 1: quick & dirty: generate JMT here based on car_s and pos_d
-          vector<double> start_state = {pf.s,pf.v,pf.a,pf.d,0,0 }; // check this d_dot, d_double_dot!!!!
-          mystate = mycar.state_at(2);
-          vector<double> the_goal = {mystate[0], vel_set, 0, pos_d, 0, 0};
-          vector<vector<double>> all_goals;
-          all_goals.push_back(the_goal);        
-          vector<vector<double>> my_path_sd = pf.PTG_2_trajectories(all_goals, start_state); // coefficients of trajectories!!!
-          
-          // save path of current time step to file
-          string file_path = "crudepath.csv";
-          pf.savepath(file_path, my_path_sd, my_path_sd.size());   
-*/          
-          
-          // Option 2: generate new path using full path planning
-          double velocity = vel_set;
-          //mystate = mycar.state_at(0.2);
-          mystate = mycar.state();
-          vector<vector<double>> my_path_sd = pf.PTG_0_main(cars_inrange, velocity, mystate, horizon);
-          // ****************************************************************************************
-            // cars_inrange, all_cars
-          
-          // save path of current time step to file
-          string s_counter = to_string(counter);
-          string file_path = "my_path_sd_"+s_counter + ".csv";
-          pf.savepath(file_path, "my_path_sd", my_path_sd, my_path_sd.size());
 
-          // save path of current time step to file
-          //string s_counter = to_string(counter);
-          file_path = "previous_path_"+s_counter + ".csv";
-          vector<vector<double>> writepath;
-          for (int i = 0; i < previous_path_x.size(); ++i)
-          {
-            double dt = i*0.02;
-            vector<double> pathpoint = {dt, previous_path_x[i], previous_path_y[i]};
-            writepath.push_back(pathpoint);
-          }
-          pf.savepath(file_path, "previous_path", writepath, writepath.size());
 
-          
+ /*         
           // generate new points only if its time to update
           if (previous_path_x.size() < horizon - n_update) {
             
             for(int i = 0; i < horizon; i++) {
               // actual s coordinate increment 
               double pos_s = car_s + ds * i;
-              //double pos_time = my_path_sd[i][0]; // t - implement pf.PTG_0_main
-              double pos_snew = my_path_sd[i][1]; // s - implement pf.PTG_0_main
-              double pos_dnew = my_path_sd[i][2]; // d - implement pf.PTG_0_main
               
               // get path x,y coordinate from actual pos_s & pos_d
-              vector<double> pos_xy = getXY(pos_s, pos_d, map_waypoints_s_upsampled, map_waypoints_x_upsampled, map_waypoints_y_upsampled);
-              //vector<double> pos_xy = getXY(pos_snew, pos_dnew, map_waypoints_s_upsampled, map_waypoints_x_upsampled, map_waypoints_y_upsampled); // implement pf.PTG_0_main
-              
-              // generate a smooth path
-              if ( (i < n_hires) && (previous_path_x.size() >= n_hires) ) {
-                  double fac = i / n_hires;
-                  pos_xy[0] = fac * pos_xy[0] + (1 - fac) * double(previous_path_x[i]);
-                  pos_xy[1] = fac * pos_xy[1] + (1 - fac) * double(previous_path_y[i]);
-              }
+              vector<double> pos_xy = getXY(pos_s, pos_d, map_waypoints_s_upsampled, map_waypoints_x_upsampled, map_waypoints_y_upsampled);              
               
               // store new path points
               next_x_vals.push_back(pos_xy[0]);
@@ -758,19 +837,8 @@ double my_d = mystate[3];
                 next_y_vals.push_back(previous_path_y[i]);
               }
           }
-
-          // save path of current time step to file
-          //string s_counter = to_string(counter);
-          file_path = "next_xy_vals"+s_counter + ".csv";
-          vector<vector<double>> writepath2;
-          for (int i = 0; i < next_x_vals.size(); ++i)
-          {
-            double dt = i*0.02;
-            vector<double> pathpoint = {dt, next_x_vals[i], next_y_vals[i]};
-            writepath2.push_back(pathpoint);
-          }
-          pf.savepath(file_path, "next_xy_vals", writepath2, writepath2.size());
-          
+*/
+         
           // ***************************************************************************
           
 
