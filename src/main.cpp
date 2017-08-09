@@ -488,7 +488,7 @@ int main() {
   
           // predict the state of my car in the future (1s)
           //mystate = mycar.state_at(horizon*0.02);
-          mystate = mycar.state_at(2);
+          mystate = mycar.state_at(0);
                     
           // check for possible collision in the future and adjust costs
           //lane my_lane = pf.in_lane(mystate[3]); //pf.in_lane(pf.d);   // s, v, this->a, d, d_dot, this->d_double_dot
