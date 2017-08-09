@@ -395,7 +395,7 @@ int main() {
           for (int i=0; i<sensor_fusion.size(); i++) {
             // car in my lane
             float d = sensor_fusion[i][6];
-            if(d < (2+4*my_lane+2) && (2+4*my_lane-2)) {
+            if(d < (2+4*my_lane+2) && d > (2+4*my_lane-2)) {
               double vx = sensor_fusion[i][3];
               double vy = sensor_fusion[i][4];
               double check_speed = sqrt(vx*vx+vy*vy);
@@ -408,9 +408,9 @@ int main() {
                 othercars_too_close = true;
 
                 // just change lane left
-                //if (my_lane > 0) {
-                //  my_lane = 0;
-                //}
+                if (my_lane > 0) {
+                  my_lane = 0;
+                }
 
               }
 
