@@ -1010,7 +1010,7 @@ double PathFinder::cost4collision(vector<double> traj_coeff, vector<Vehicle> oth
 }
 
 // save mypath
-void PathFinder::savepath(string file_path, vector<vector<double>> mypath, int n_elements) {
+void PathFinder::savepath(string file_path, string vname, vector<vector<double>> mypath, int n_elements) {
 
   ofstream out_file(file_path.c_str(), ofstream::out);
 
@@ -1018,6 +1018,8 @@ void PathFinder::savepath(string file_path, vector<vector<double>> mypath, int n
     cerr << "PathFinder::savepath() - Cannot open output file: " << file_path << endl;
   }
 
+  out_file << vname << endl;
+  out_file << n_elements << endl;
   for (int i = 0; i < n_elements; i++) {
     
     out_file << i << "; ";

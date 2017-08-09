@@ -709,9 +709,21 @@ double my_d = mystate[3];
           
           // save path of current time step to file
           string s_counter = to_string(counter);
-          string file_path = s_counter + ".csv";
-          //pf.savepath(file_path, my_path_sd, my_path_sd.size());
-         
+          string file_path = "my_path_sd_"+s_counter + ".csv";
+          pf.savepath(file_path, "my_path_sd", my_path_sd, my_path_sd.size());
+
+          // save path of current time step to file
+          //string s_counter = to_string(counter);
+          file_path = "previous_path_"+s_counter + ".csv";
+          vector<vector<double>> writepath;
+          for (int i = 0; i < previous_path_x.size(); ++i)
+          {
+            double dt = i*0.02;
+            vector<double> pathpoint = {dt, previous_path_x[i], previous_path_y[i]};
+            writepath.push_back(pathpoint);
+          }
+          pf.savepath(file_path, "previous_path", writepath, writepath.size());
+
           
           // generate new points only if its time to update
           if (previous_path_x.size() < horizon - n_update) {
@@ -746,6 +758,18 @@ double my_d = mystate[3];
                 next_y_vals.push_back(previous_path_y[i]);
               }
           }
+
+          // save path of current time step to file
+          //string s_counter = to_string(counter);
+          file_path = "next_xy_vals"+s_counter + ".csv";
+          vector<vector<double>> writepath2;
+          for (int i = 0; i < next_x_vals.size(); ++i)
+          {
+            double dt = i*0.02;
+            vector<double> pathpoint = {dt, next_x_vals[i], next_y_vals[i]};
+            writepath2.push_back(pathpoint);
+          }
+          pf.savepath(file_path, "next_xy_vals", writepath2, writepath2.size());
           
           // ***************************************************************************
           

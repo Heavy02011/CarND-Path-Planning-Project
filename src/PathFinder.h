@@ -220,7 +220,7 @@ class PathFinder
     double cost4collision(vector<double> traj_coeff, vector<Vehicle> othercars, double dt, int horizon);
     
     // save mypath
-    void savepath(string file_path, vector<vector<double>> mypath, int n_elements);
+    void savepath(string file_path, string vname, vector<vector<double>> mypath, int n_elements);
     
     vector<vector<double>> newpath(vector<vector<double>> myprevious_path_x, vector<vector<double>> myprevious_path_y, vector<vector<double>> mysensor_fusion);
   private:
