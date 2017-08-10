@@ -457,8 +457,8 @@ int main() {
             }
             all_cars.push_back(othercar);
 
-            // set a switch if a car is closer than 25 m
-            if ((safe_lanechange_possible) && (distance < 25))
+            // set a switch if a car is closer than 20 m // 25 m worked
+            if ((safe_lanechange_possible) && (distance < 10))
             {
               safe_lanechange_possible = false;
             }
@@ -572,33 +572,7 @@ double my_d = mystate[3];
           double closecar_dist_left2   = pf.distance2car(all_cars[closecar_id_left2]);
 */
 
-          //double safechangedist = 15;
-          double safedist = 35;
 
-          // only change lane if no car is closer than 15 m
-          if (safe_lanechange_possible) {
-            // left lane
-            if (lane == 0) {
-              if ((closecar_dist_left < safedist) && (closecar_dist_middle > safedist)) {
-                lane += 1; // change right
-              }
-            } 
-            // middle lane
-            else if (lane == 1)
-            {
-              if ((closecar_dist_middle < safedist) && (closecar_dist_right > safedist)) {
-                lane += 1; // change right
-              } else if ((closecar_dist_middle < safedist) && (closecar_dist_left > safedist)) {
-                lane -= 1; // change left              
-              }
-            } 
-            // right lane
-            else if (lane == 2) {
-              if ((closecar_dist_right < safedist) && (closecar_dist_middle > safedist)) {
-                lane -= 1; // change left                            
-              }
-            }
-          }
 
  
           // ***************************************************************************
@@ -639,6 +613,34 @@ double my_d = mystate[3];
 
               }
 
+            }
+          }
+
+          //double safechangedist = 15;
+          double safedist = 40; // 35
+
+          // only change lane if no car is closer than 15 m
+          if (safe_lanechange_possible) {
+            // left lane
+            if (lane == 0) {
+              if ((closecar_dist_left < safedist) && (closecar_dist_middle > safedist)) {
+                lane += 1; // change right
+              }
+            } 
+            // middle lane
+            else if (lane == 1)
+            {
+              if ((closecar_dist_middle < safedist) && (closecar_dist_right > safedist)) {
+                lane += 1; // change right
+              } else if ((closecar_dist_middle < safedist) && (closecar_dist_left > safedist)) {
+                lane -= 1; // change left              
+              }
+            } 
+            // right lane
+            else if (lane == 2) {
+              if ((closecar_dist_right < safedist) && (closecar_dist_middle > safedist)) {
+                lane -= 1; // change left                            
+              }
             }
           }
 
