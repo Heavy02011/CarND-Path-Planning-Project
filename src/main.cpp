@@ -418,6 +418,8 @@ int main() {
           // keep vehicles in range in this vector      
           vector<Vehicle> cars_inrange;
           vector<Vehicle> all_cars;
+
+          bool safe_lanechange_possible = true;
           
           // select the car that has largest distance & velocity in front of us as target
           
@@ -454,6 +456,12 @@ int main() {
               cars_inrange.push_back(othercar);
             }
             all_cars.push_back(othercar);
+
+            // set a switch if a car is closer than 25 m
+            if ((safe_lanechange_possible) && (distance < 25))
+            {
+              safe_lanechange_possible = false;
+            }
             
           }    
           // show cars_inrange 
@@ -464,7 +472,7 @@ int main() {
               cars_inrange[ii];
           }           
                      
-
+          cout << "safe lane change possible = " << safe_lanechange_possible << endl;
           
           
           // ***************************************************************************
@@ -486,6 +494,10 @@ int main() {
           cout << "*** " << trajectories.size() << " new trajectories generated ***" << endl;
 */          
   
+
+          // get size of previous path
+          int previous_path_size = previous_path_x.size();
+
           // predict the state of my car in the future (1s)
           //mystate = mycar.state_at(horizon*0.02);
           mystate = mycar.state_at(0);
@@ -508,6 +520,9 @@ double my_d = mystate[3];
                     
           cout << endl;
 
+
+
+
           
           // crude test drive
           //double pos_d = car_d; //6;
@@ -517,40 +532,80 @@ double my_d = mystate[3];
           double closecar_dist_right  = pf.distance2car(all_cars[closecar_id_right]);
           double closecar_dist_middle = pf.distance2car(all_cars[closecar_id_middle]);
           double closecar_dist_left   = pf.distance2car(all_cars[closecar_id_left]);
-          
-          if ((closecar_dist_left < 25) && (closecar_dist_middle < 25) && (closecar_dist_right < 25)) {
+/*          
+          if ((closecar_dist_left < safedist) && (closecar_dist_middle < safedist) && (closecar_dist_right < safedist)) {
             // slow down
             //pf.SPEED_LIMIT *= 0.9;
             cout << "<<< SLOW DOWN >>>" << endl;
           } else {
             // change lane
-            if ((closecar_dist < 25) && (closecar_dist_right > 25)) {
+            if ((closecar_dist < safedist) && (closecar_dist_right > safedist)) {
               //pos_d = 10;
               lane = 2;
-            } else if ((closecar_dist < 25) && (closecar_dist_left > 25)) {
+            } else if ((closecar_dist < safedist) && (closecar_dist_left > safedist)) {
               //pos_d = 2;
               lane = 0;
-            } else if ((closecar_dist < 25) && (closecar_dist_middle > 25)){
+            } else if ((closecar_dist < safedist) && (closecar_dist_middle > safedist)){
               //pos_d = 6;
               lane = 1;
             } else {
               // keep lane
-              /*
+              
               lane my_lane = pf.in_lane(mystate[3]);
               if (my_lane == LEFT_LANE) pos_d = 2; 
               if (my_lane == MIDDLE_LANE) pos_d = 6; 
               if (my_lane == RIGHT_LANE) pos_d = 10;  
-              */         
+                      
             }
           }
-                    
+  */
+          /*
+          // predict the state of my car in the future (1s)
+          mystate = mycar.state_at(previous_path_size*0.02);                
+          my_s = mystate[0]; 
+          my_d = mystate[3];
+          int closecar_id_right2  = pf.distance2car_inlane(all_cars, my_s, 10);
+          int closecar_id_middle2 = pf.distance2car_inlane(all_cars, my_s, 6);
+          int closecar_id_left2   = pf.distance2car_inlane(all_cars, my_s, 2);
+          double closecar_dist_right2  = pf.distance2car(all_cars[closecar_id_right2]);
+          double closecar_dist_middle2 = pf.distance2car(all_cars[closecar_id_middle2]);
+          double closecar_dist_left2   = pf.distance2car(all_cars[closecar_id_left2]);
+*/
+
+          //double safechangedist = 15;
+          double safedist = 35;
+
+          // only change lane if no car is closer than 15 m
+          if (safe_lanechange_possible) {
+            // left lane
+            if (lane == 0) {
+              if ((closecar_dist_left < safedist) && (closecar_dist_middle > safedist)) {
+                lane += 1; // change right
+              }
+            } 
+            // middle lane
+            else if (lane == 1)
+            {
+              if ((closecar_dist_middle < safedist) && (closecar_dist_right > safedist)) {
+                lane += 1; // change right
+              } else if ((closecar_dist_middle < safedist) && (closecar_dist_left > safedist)) {
+                lane -= 1; // change left              
+              }
+            } 
+            // right lane
+            else if (lane == 2) {
+              if ((closecar_dist_right < safedist) && (closecar_dist_middle > safedist)) {
+                lane -= 1; // change left                            
+              }
+            }
+          }
+
  
           // ***************************************************************************
           // 0 new implementation of path
           // ***************************************************************************
 
-          // get size of previous path
-          int previous_path_size = previous_path_x.size();
+
 
           // make smooth transition
          
