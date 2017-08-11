@@ -1,14 +1,35 @@
 # CarND-Path-Planning-Project
 Self-Driving Car Engineer Nanodegree Program
    
-Rubic Points
+##Rubic Points
 
-1 The car is able to drive at least 4.32 miles without incident.
+###1 The car is able to drive at least 4.32 miles without incident.
 ![<Display Name>](https://github.com/Heavy02011/P1-CarND-term3-Path-Planning-Project/blob/master/png/onelap.png)
 
-2 There is a reflection on how to generate paths.
+###2 There is a reflection on how to generate paths.
+  
+The following step are taken to generate the path:
 
---
+#####1. update my cars data in PathFinder object
+
+An object PathFinder is created to hold all relevant data of the car, the sensor fusion data and helping functions like predicting the future state of cars, getting distances between our car and traffic etc.
+
+#####2. limit investigation of traffic to a smaller range out of sensor_fusion
+
+To save computational time and keep the path planner responsive the investigations are limited to traffic within a range of 50m.
+
+#####3 get id's and distance of close cars
+This part of the path planner takes the latency of the simulator into account. Our cars state is predicted at a future state that is calculated as follows:
+
+    double timelag = (50-previous_path_size)*0.02;
+    
+Dfdf
+
+
+###3 Final Remark
+
+
+----
 ### Simulator. You can download the Term3 Simulator BETA which contains the Path Planning Project from the [releases tab](https://github.com/udacity/self-driving-car-sim/releases).
 
 In this project your goal is to safely navigate around a virtual highway with other traffic that is driving +-10 MPH of the 50 MPH speed limit. You will be provided the car's localization and sensor fusion data, there is also a sparse map list of waypoints around the highway. The car should try to go as close as possible to the 50 MPH speed limit, which means passing slower traffic when possible, note that other cars will try to change lanes too. The car should avoid hitting other cars at all cost as well as driving inside of the marked road lanes at all times, unless going from one lane to another. The car should be able to make one complete loop around the 6946m highway. Since the car is trying to go 50 MPH, it should take a little over 5 minutes to complete 1 loop. Also the car should not experience total acceleration over 10 m/s^2 and jerk that is greater than 50 m/s^3.
