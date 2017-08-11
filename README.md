@@ -1,33 +1,66 @@
 # CarND-Path-Planning-Project
 Self-Driving Car Engineer Nanodegree Program
    
-##Rubic Points
+## Rubic Points
 
-###1 The car is able to drive at least 4.32 miles without incident.
+### A The car is able to drive at least 4.32 miles without incident.
 ![<Display Name>](https://github.com/Heavy02011/P1-CarND-term3-Path-Planning-Project/blob/master/png/onelap.png)
 
-###2 There is a reflection on how to generate paths.
+### B There is a reflection on how to generate paths.
   
-The following step are taken to generate the path:
+The following steps are taken to generate the path:
 
-#####1. update my cars data in PathFinder object
+##### 1 update my cars data in PathFinder object
 
 An object PathFinder is created to hold all relevant data of the car, the sensor fusion data and helping functions like predicting the future state of cars, getting distances between our car and traffic etc.
 
-#####2. limit investigation of traffic to a smaller range out of sensor_fusion
+##### 2 limit investigation of traffic to a smaller range out of sensor_fusion
 
 To save computational time and keep the path planner responsive the investigations are limited to traffic within a range of 50m.
 
-#####3 get id's and distance of close cars
+##### 3 get id's and distance of close cars
 This part of the path planner takes the latency of the simulator into account. Our cars state is predicted at a future state that is calculated as follows:
 
     double timelag = (50-previous_path_size)*0.02;
     
-Dfdf
+50 points are generated in total for the path. Every cycle only some points are 'consumed' by the simulator giving back a number of previous_path_size points from the previous cycle. The difference times the time increment of 0.02s gives the lagging time. The state of our car is then predicted at lagging time in the future.
+
+The id's and distance of the cars around us are calculated for every lane like
+
+    // cars with their id and distance around us
+    int closecar_id_right  = pf.distance2car_inlane(all_cars, my_s, 10);
+    int closecar_id_middle = pf.distance2car_inlane(all_cars, my_s, 6);
+    int closecar_id_left   = pf.distance2car_inlane(all_cars, my_s, 2);
+    double closecar_dist_right  = pf.distance2car(all_cars[closecar_id_right]);
+    double closecar_dist_middle = pf.distance2car(all_cars[closecar_id_middle]);
+    double closecar_dist_left   = pf.distance2car(all_cars[closecar_id_left]);
+
+##### 4 run finite state machine & evaluate possible trajectories (simple model)
+This part mainly follows the approach of the [Udacity Q&A walkthrough] (https://classroom.udacity.com/nanodegrees/nd013/parts/6047fe34-d93c-4f50-8336-b70ef10cb4b2/modules/27800789-bc8e-4adc-afe0-ec781e82ceae/lessons/23add5c6-7004-47ad-b169-49a5d7b1c1cb/concepts/3bdfeb8c-8dd6-49a7-9d08-beff6703792d): "Man, that was a monster!" This was the most difficult part of the project because the behavior of the simulator was not that clear.
+
+The basic idea is to generate the path in a local coordinate system (x pointing along the s and y perpendicular to the right) and just use a few ANCHOR points to generate a spline with them. The starting points are taken from the previous path points preserving the heading of the car and at stations of 30, 60 and 90 m ahead.
+
+The state machine uses the following states & decisions:
+* set a bool othercars_too_close to true if cars are closer than 30m at the future state,
+* a save lane change is regarded as possible if the distance to other cars is not smaller than 10m and there is enough distance (40m) on the neighbor lanes,
+* an escape condition is set if we are stuck in heavy traffic,
+* in all instances of heavy traffic around us the reduction of speed has priority,
+* reduction of speed is limited to a minimum value of 30 mph.
+
+A full JMT and PTG with cost functions was implemented in the PathFinder but currently not used here.
+
+An alternative approach would have been a much simpler set of cost functions ranking the 'best' lane like described in this [article](https://medium.com/@mohankarthik/path-planning-in-highways-for-an-autonomous-vehicle-242b91e6387d).
+
+However, after spending so much time on the project I preferred to stay with this simpler approach that just worked.
+
+##### 5 generate path coordinates
+Well, this follows exactly the approach as showed in [Udacity Q&A walkthrough] (https://classroom.udacity.com/nanodegrees/nd013/parts/6047fe34-d93c-4f50-8336-b70ef10cb4b2/modules/27800789-bc8e-4adc-afe0-ec781e82ceae/lessons/23add5c6-7004-47ad-b169-49a5d7b1c1cb/concepts/3bdfeb8c-8dd6-49a7-9d08-beff6703792d).
+
+The basic idea is to generate the new points in a local car coordinate system and add them to the list of previous points. The total number of points is aimed at a total number of 50. After transforming them back to global map coordinates they are handed over to the simulator.
 
 
-###3 Final Remark
-
+### C Final Remark
+This was by far the most time consuming project of all terms, but could have been done in much less time as the walkthrough showed us. However, implementing a full PTG with JMT was a good practice. A test may follow after the submission.
 
 ----
 ### Simulator. You can download the Term3 Simulator BETA which contains the Path Planning Project from the [releases tab](https://github.com/udacity/self-driving-car-sim/releases).

@@ -209,18 +209,7 @@ int main() {
   	map_waypoints_dy.push_back(d_y);
   }
   
-//rbx
-/*  
-  // output waypoints & size 
-  cout << "waypoints.size: " << map_waypoints_x.size() << std::endl;
-  for (int i=0; i<map_waypoints_x.size(); i++) {
-    cout << i <<  " map_waypoints_x,y,s,dx,dy = " << map_waypoints_x[i] << " ";  
-    cout << map_waypoints_y[i] << " ";     
-    cout << map_waypoints_s[i] << " ";  
-    cout << map_waypoints_dx[i] << " "; 
-    cout << map_waypoints_dy[i] << endl;
-  }
-*/  
+//rbx 
   // setup spline objects
   spline waypointspline_x;
   spline waypointspline_y;
@@ -250,16 +239,9 @@ int main() {
     map_waypoints_x_upsampled.push_back(spline_x(i));
     map_waypoints_y_upsampled.push_back(spline_y(i));
     map_waypoints_s_upsampled.push_back(i);
-  }
-  
-  
-  // get new point at my_s with --> double y = waypointspline_x(my_s);
-  //double x_smooth = waypointspline_x(100.0);
-  //cout <<  x_smooth << endl;
-            
+  }  
 
   // generate PathFinder class & initial states
-  //PathFinder pf;
   PathFinder pf(0, 0, 0, 0, 0, 0, 0); // double x, double y, double d, double s, double v, double a, double yaw
   
   pf.state = KL;
@@ -317,8 +299,6 @@ int main() {
           	// Previous path data given to the Planner
           	auto previous_path_x = j[1]["previous_path_x"];
           	auto previous_path_y = j[1]["previous_path_y"];
-            //vector<vector<double>> myprevious_path_x = j[1]["previous_path_x"]; 
-            //vector<vector<double>> myprevious_path_y = j[1]["previous_path_y"];
 
           	// Previous path's end s and d values 
           	double end_path_s = j[1]["end_path_s"];
@@ -328,8 +308,7 @@ int main() {
             // ["sensor_fusion"] A 2d vector of cars and then that car's 
             // [car's unique ID, car's x position in map coordinates, car's y position in map coordinates, car's x velocity in m/s, car's y velocity in m/s, car's s position in frenet coordinates, car's d position in frenet coordinates.
           	auto sensor_fusion = j[1]["sensor_fusion"];
-            //vector<vector<double>> mysensor_fusion = j[1]["sensor_fusion"];
-
+            
           	json msgJson;
 
           	//vector<double> next_x_vals;
@@ -337,37 +316,7 @@ int main() {
 
 
           	// TODO: define a path made up of (x,y) points that the car will visit sequentially every .02 seconds
-            
-          /*                ["sensor_fusion"] A 2d vector of cars and then that car's 
-          
-                            car's unique ID, 
-                            car's x position in map coordinates, 
-                            car's y position in map coordinates, 
-                            car's x velocity in m/s, 
-                            car's y velocity in m/s, 
-                            car's s position in frenet coordinates, 
-                            car's d position in frenet coordinates.
-                                                  
-          sensor_fusion = [ [0 ,1022.598,1147.169,14.19477 ,10.3549   ,237.563  , 8.870655],
-                            [1 ,1044.688,1155.066,15.69208 ,6.39629   ,261.0865 , 9.971673],
-                            [2 ,1133.548,1187.77 ,14.78464 ,1.11656   ,357.6642 , 1.827328],
-                            [3 ,904.5436,1124.697, 2.529505,2.679815  ,119.9534 ,10.10191 ],
-                            [4 ,949.4061,1134.024,15.38097 ,1.409398  ,164.616  , 2.596563],
-                            [5 ,1156.399,1189.374,15.09513 ,1.014567  ,380.5711 , 1.956437],
-                            [6 ,1166.188,1181.94 ,16.5754  ,0.8770281 ,390.0564 , 9.954964],
-                            [7 ,901.1926,1124.588, 2.646314,0.4060514 ,124.8682 ,10.17496 ],
-                            [8 ,892.0728,1130.129,18.83123 ,1.271136  ,107.481  , 4.67399 ],
-                            [9 ,1096.84 ,1174.888,17.36887 ,4.232598  ,332.6492 ,10.20708 ],
-                            [10,1071.899,1174.909,16.43713 ,6.889896  ,293.7626 , 2.037921],
-                            [11,836.1995,1132.793,20.70742 ,0.03320942, 51.60747, 2.123863] ]  
-                      
-          car x,y,s,d,yaw,speed = 909.48 1128.67 124.834 6.16483 0 0
-                    
-          */    
-            
-          
-          
-            
+              
 // =====================================================================================          
 // ==== start implementation ===========================================================
 // =====================================================================================
@@ -377,11 +326,18 @@ int main() {
           cout << "*** time step: " << counter << endl;
           cout << "*** car s,d,yaw,speed = " << car_s << " " << car_d << " " << car_yaw << " " << car_speed << endl;   
           cout << "*** car_x, y = " << car_x << " " << car_y << endl;  
-          cout << "de/increase speed = " << decrease_speed << " | " << increase_speed << endl; 
+          cout << "*** lane, de/increase speed = " <<lane << " | " << decrease_speed << " | " << increase_speed << endl; 
           cout << "***********************************************************" << endl;
+ 
+          // ***************************************************************************
+          // 0 setup lane data
+          // ***************************************************************************
           
+          // middle of left lane
+          double midleftlane = 2.2;
+          double lanewidth = 4.0;
 
-
+          
           // ***************************************************************************
           // 1 update my cars data in PathFinder object
           // ***************************************************************************
@@ -404,17 +360,7 @@ int main() {
           // predict the state of my car in the future (1s)
           vector<double> mystate = mycar.state_at(1);
           vector<double> car_xy = getXY(mystate[0], mystate[3], map_waypoints_s, map_waypoints_x, map_waypoints_y);
-/*          
-          // upddate car data to future state
-          car_s = mystate[0];
-          car_d = mystate[3];
-          car_x = car_xy[0];
-          car_y = car_xy[1];
-*/          
-          // {s, v, this->a, d, d_dot, this->d_double_dot};
-
-          // save all relevant input data
-          // vector<vector<double>> mynewpath = pf.newpath(myprevious_path_x, myprevious_path_y, mysensor_fusion);
+          
 
           // ***************************************************************************
           // 2 limit investigation of traffic to a smaller range out of sensor_fusion
@@ -428,17 +374,17 @@ int main() {
           
           // select the car that has largest distance & velocity in front of us as target
           
-              // create instance for mytargetcar
-              Vehicle mytargetcar(99,0,0,0,0,0,0,0,0,0);
-              
-              // largest distance in front
-              double ld_front = -999999;
-              
-              // largest velocity in front
-              double lv_front = -999999;
-              
-              // id of potential target car
-              int id_front;
+          // create instance for mytargetcar
+          Vehicle mytargetcar(99,0,0,0,0,0,0,0,0,0);
+          
+          // largest distance in front
+          double ld_front = -999999;
+          
+          // largest velocity in front
+          double lv_front = -999999;
+          
+          // id of potential target car
+          int id_front;
           
           // loop over all vehicles
           for (int k=0; k<sensor_fusion.size(); k++) {
@@ -476,41 +422,21 @@ int main() {
               cout << "cars_inrange = \t" << cars_inrange[ii].id << "\t s = " << all_cars[cars_inrange[ii].id].s <<"\t d = " << all_cars[cars_inrange[ii].id].d << "\t dist = " << pf.distance2car(all_cars[cars_inrange[ii].id]) << endl;
                       
               cars_inrange[ii];
-          }           
-                     
+          }                            
           cout << "safe lane change possible = " << safe_lanechange_possible << endl;
           
-          
+                   
           // ***************************************************************************
-          // 4 run finite state machine & evaluate possible trajectories & costs
+          // 3 get id's and distance of close cars
           // ***************************************************************************
-/*
-          // PTG part 1
-          // generate a bunch of alternative (pertubed) goals using gaussion noise based on target_states during T...T-4*dt
-          int n_goals = 50;
-          double timestep = 0.5;
-          vector<vector<double>> all_goals = pf.PTG_1_all_goals(mytargetcar, T, delta, n_goals, timestep);         
-          cout << "*** " << all_goals.size() << " new goals generated ***" << endl;
-          //vector<vector<double>> all_goals = pf.perturb_goal0(target_state, n_samples);
-          
-          // PTG part 2
-          // generate trajectories for all_goals
-          vector<double> current_state = {pf.s,pf.v,pf.a,pf.d,0,0 }; // check this d_dot, d_double_dot!!!!
-          vector<vector<double>> trajectories = pf.PTG_2_trajectories(all_goals, current_state);
-          cout << "*** " << trajectories.size() << " new trajectories generated ***" << endl;
-*/          
-  
 
           // get size of previous path
           int previous_path_size = previous_path_x.size();
 
-          // predict the state of my car in the future (1s) //TODO: !!!!!!!!!!!!!!!adjust 2-3 steps for latency!!!!!!!!!
-          //mystate = mycar.state_at(horizon*0.02);
-          //mystate = mycar.state_at(0); // working
+          // predict the state of my car in the future 
           double timelag = (50-previous_path_size)*0.02;
           cout << "time lag = " << timelag<< endl;
-          mystate = mycar.state_at(timelag);
-                    
+          mystate = mycar.state_at(timelag);           
                     
           // check for possible collision in the future and adjust costs
           double my_s = mystate[0]; 
@@ -534,23 +460,11 @@ int main() {
           double closecar_dist_middle = pf.distance2car(all_cars[closecar_id_middle]);
           double closecar_dist_left   = pf.distance2car(all_cars[closecar_id_left]);
           
-/*
-          // predict the state of my car in the future (1s)
-          mystate = mycar.state_at(previous_path_size*0.02);                
-          my_s = mystate[0]; 
-          my_d = mystate[3];
-          int closecar_id_right2  = pf.distance2car_inlane(all_cars, my_s, 10);
-          int closecar_id_middle2 = pf.distance2car_inlane(all_cars, my_s, 6);
-          int closecar_id_left2   = pf.distance2car_inlane(all_cars, my_s, 2);
-          double closecar_dist_right2  = pf.distance2car(all_cars[closecar_id_right2]);
-          double closecar_dist_middle2 = pf.distance2car(all_cars[closecar_id_middle2]);
-          double closecar_dist_left2   = pf.distance2car(all_cars[closecar_id_left2]);
-*/
  
           // ***************************************************************************
-          // 0 new implementation of path
+          // 4 run finite state machine & evaluate possible trajectories (simple model)
           // ***************************************************************************
-
+          
           // make smooth transition
           if (previous_path_size > 0) {
             car_s = end_path_s;
@@ -563,7 +477,7 @@ int main() {
           for (int i=0; i<sensor_fusion.size(); i++) {
             // car in my lane
             float d = sensor_fusion[i][6];
-            if(d < (2+4*lane+2) && d > (2+4*lane-2)) {
+            if(d < (midleftlane+lanewidth*lane+2) && d > (midleftlane+lanewidth*lane-2)) {
               double vx = sensor_fusion[i][3];
               double vy = sensor_fusion[i][4];
               double check_speed = sqrt(vx*vx+vy*vy);
@@ -652,7 +566,7 @@ int main() {
           cout << "car_infront_lastdist = " << car_infront_lastdist << endl;             
           // adjust velocity
           //if (othercars_too_close && decrease_speed) {
-          if (othercars_too_close && decrease_speed && vel_set > 35*pf.MPH2MPS) {
+          if (othercars_too_close && decrease_speed && vel_set > 30*pf.MPH2MPS) {
             vel_set -= 0.224*pf.MPH2MPS;
           } else if (vel_set < 49.5*pf.MPH2MPS && increase_speed) {
             vel_set += 0.224*pf.MPH2MPS;
@@ -666,13 +580,10 @@ int main() {
 
 
           // ***************************************************************************
-          // 5 generate path coordinates
+          // 5 generate path coordinates (Option 3: generate new path using walkthrough video approach)
           // ***************************************************************************         
-                  
-                    
-          // Option 3: generate new path using walkthrough video approach
 
-          // create widely spaced path points to construct the final path
+          // create widely spaced path points (ANCHOR points) to construct the final path
           vector<double> ptsx;
           vector<double> ptsy;
 
@@ -685,8 +596,8 @@ int main() {
           cout << "previous_path_size = " << previous_path_size << endl;
           if (previous_path_size < 2) {
             // use two points to align car path with yaw
-            double prev_car_x = car_x - cos(ref_yaw); //???????????????
-            double prev_car_y = car_y - sin(ref_yaw); // ref_yaw???????
+            double prev_car_x = car_x - cos(ref_yaw); 
+            double prev_car_y = car_y - sin(ref_yaw);
             ptsx.push_back(prev_car_x);
             ptsx.push_back(car_x);
             ptsy.push_back(prev_car_y);
@@ -710,16 +621,11 @@ int main() {
             ptsy.push_back(ref_y);
 
           }
-
-          // get my lane (its in int my_lane)
-          //lane my_lane = pf.in_lane(mystate[3]);
-          cout << "lane = " << lane << endl;
-          //int my_lane = 1;
-
+          
           // generate the wide spaced ANCHOR points to generate a spline for the path
-          vector<double> next_wp0 = getXY(car_s+30,(2+4*lane), map_waypoints_s, map_waypoints_x, map_waypoints_y);
-          vector<double> next_wp1 = getXY(car_s+60,(2+4*lane), map_waypoints_s, map_waypoints_x, map_waypoints_y);
-          vector<double> next_wp2 = getXY(car_s+90,(2+4*lane), map_waypoints_s, map_waypoints_x, map_waypoints_y);
+          vector<double> next_wp0 = getXY(car_s+30,(midleftlane+lanewidth*lane), map_waypoints_s, map_waypoints_x, map_waypoints_y);
+          vector<double> next_wp1 = getXY(car_s+60,(midleftlane+lanewidth*lane), map_waypoints_s, map_waypoints_x, map_waypoints_y);
+          vector<double> next_wp2 = getXY(car_s+90,(midleftlane+lanewidth*lane), map_waypoints_s, map_waypoints_x, map_waypoints_y);
 
           // add ANCHOR points to vector
           ptsx.push_back(next_wp0[0]);
@@ -787,12 +693,11 @@ int main() {
 
           }        
          
+          
+          // ***************************************************************************
+          // 6 increment the counter
           // ***************************************************************************
           
-
-         
-          
-          // increment the counter
           counter += 1;
           
           
