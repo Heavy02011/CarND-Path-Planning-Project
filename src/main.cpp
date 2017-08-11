@@ -272,7 +272,11 @@ int main() {
 
   // set my lane
   int lane = 1;
-
+  
+  //distance to car in front of us
+  double car_infront_lastdist = 0;
+  bool increase_speed = true;    
+  bool decrease_speed = true;  
 
   
   /*
@@ -283,7 +287,7 @@ int main() {
 //rbx
   //ur h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
       
-  h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy, &waypointspline_x, &waypointspline_y, &waypointspline_dx, &waypointspline_dy, &pf, &counter, &map_waypoints_x_upsampled, &map_waypoints_y_upsampled, &map_waypoints_s_upsampled, &vel_set, &lane](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
+  h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy, &waypointspline_x, &waypointspline_y, &waypointspline_dx, &waypointspline_dy, &pf, &counter, &map_waypoints_x_upsampled, &map_waypoints_y_upsampled, &map_waypoints_s_upsampled, &vel_set, &lane, &car_infront_lastdist, &increase_speed, &decrease_speed](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                      uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -372,7 +376,8 @@ int main() {
           cout << "***********************************************************" << endl;
           cout << "*** time step: " << counter << endl;
           cout << "*** car s,d,yaw,speed = " << car_s << " " << car_d << " " << car_yaw << " " << car_speed << endl;   
-          cout << "*** car_x, y = " << car_x << " " << car_y << endl;   
+          cout << "*** car_x, y = " << car_x << " " << car_y << endl;  
+          cout << "de/increase speed = " << decrease_speed << " | " << increase_speed << endl; 
           cout << "***********************************************************" << endl;
           
 
@@ -461,6 +466,7 @@ int main() {
             if ((safe_lanechange_possible) && (distance < 10))
             {
               safe_lanechange_possible = false;
+              decrease_speed = true;
             }
             
           }    
@@ -540,16 +546,12 @@ int main() {
           double closecar_dist_middle2 = pf.distance2car(all_cars[closecar_id_middle2]);
           double closecar_dist_left2   = pf.distance2car(all_cars[closecar_id_left2]);
 */
-
  
           // ***************************************************************************
           // 0 new implementation of path
           // ***************************************************************************
 
-
-
           // make smooth transition
-         
           if (previous_path_size > 0) {
             car_s = end_path_s;
           }
@@ -570,16 +572,9 @@ int main() {
               // predict cars future state
               check_car_s += previous_path_size*0.02*check_speed;
               if ((check_car_s > car_s) && ((check_car_s - car_s) < 30)) {
-                //vel_set = 29.5*pf.MPH2MPS;
                 othercars_too_close = true;
-
-                // just change lane left
-                //if (lane > 0) {
-                //  lane = 0;
-                //}
-
               }
-
+              
             }
           }
 
@@ -588,6 +583,7 @@ int main() {
 
           // only change lane if no car is closer than 15 m
           if (safe_lanechange_possible) {
+            cout << "*** safe lane change possible ***" << endl;
             // left lane
             if (lane == 0) {
               if ((closecar_dist_left < safedist) && (closecar_dist_middle > safedist)) {
@@ -611,17 +607,21 @@ int main() {
             }
           }
           // exception: we are stuck in heavy traffic and we are not TOO slow
-          else if (vel_set > 40*pf.MPH2MPS) {
+          else if (vel_set > 40*pf.MPH2MPS) 
+          {
+            cout << "*** watch out: could get stuck in heavy traffic ***" << endl;            
             if (lane == 0) {
               if ((closecar_dist_left < safedist-20) && (closecar_dist_middle > safedist)) {
                 lane += 1; // change right
               }
-            } else if (lane == 1) {
+            } 
+            else if (lane == 1) {
               if ((closecar_dist_middle < safedist-20) && (closecar_dist_right > safedist)) {
                 lane += 1; // change right
               } else if ((closecar_dist_middle < safedist-20) && (closecar_dist_left > safedist)) {
                 lane -= 1; // change left              
-              } else if (lane == 2) {
+            } 
+            else if (lane == 2) {
                 if ((closecar_dist_right < safedist-20) && (closecar_dist_middle > safedist)) {
                   lane -= 1; // change left                            
                 }
@@ -629,12 +629,40 @@ int main() {
             }
           }
 
+/*         
+          // stop breaking / reducing speed if distance to car in front is > 20m and already increasing again
+          if (decrease_speed) {
+            cout << "*** be prepared to stop breaking ***" << endl;            
+            if (car_infront_lastdist > 20) {
+              if (lane == 0) {
+                if (closecar_dist_left > car_infront_lastdist-5) decrease_speed = false;
+              } else if (lane == 1) {
+                if (closecar_dist_middle > car_infront_lastdist-5) decrease_speed = false;
+              } else if (lane == 2) {
+                if (closecar_dist_right > car_infront_lastdist-5) decrease_speed = false;
+              } else {
+                decrease_speed = true;
+              }
+            } else {
+              decrease_speed = true;
+            }
+          }      
+          if (!decrease_speed) cout << "*** stop breaking ***" << endl;                
+*/          
+          cout << "car_infront_lastdist = " << car_infront_lastdist << endl;             
           // adjust velocity
-          if (othercars_too_close) {
+          //if (othercars_too_close && decrease_speed) {
+          if (othercars_too_close && decrease_speed && vel_set > 35*pf.MPH2MPS) {
             vel_set -= 0.224*pf.MPH2MPS;
-          } else if (vel_set < 49.5*pf.MPH2MPS) {
+          } else if (vel_set < 49.5*pf.MPH2MPS && increase_speed) {
             vel_set += 0.224*pf.MPH2MPS;
           }
+          if (!safe_lanechange_possible) decrease_speed = true;
+          
+          // store distance to car in front of us to check whether distance is increasing or decreasing over time
+          if (lane == 0) car_infront_lastdist = closecar_dist_left;
+          if (lane == 1) car_infront_lastdist = closecar_dist_middle;
+          if (lane == 2) car_infront_lastdist = closecar_dist_right;
 
 
           // ***************************************************************************
