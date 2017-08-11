@@ -498,16 +498,17 @@ int main() {
           // get size of previous path
           int previous_path_size = previous_path_x.size();
 
-          // predict the state of my car in the future (1s)
+          // predict the state of my car in the future (1s) //TODO: !!!!!!!!!!!!!!!adjust 2-3 steps for latency!!!!!!!!!
           //mystate = mycar.state_at(horizon*0.02);
-          mystate = mycar.state_at(0);
+          //mystate = mycar.state_at(0); // working
+          double timelag = (50-previous_path_size)*0.02;
+          cout << "time lag = " << timelag<< endl;
+          mystate = mycar.state_at(timelag);
+                    
                     
           // check for possible collision in the future and adjust costs
-          //lane my_lane = pf.in_lane(mystate[3]); //pf.in_lane(pf.d);   // s, v, this->a, d, d_dot, this->d_double_dot
-//double my_s = car_s; //mystate[0]; #######################
-//double my_d = car_d; //mystate[3];
-double my_s = mystate[0]; 
-double my_d = mystate[3];
+          double my_s = mystate[0]; 
+          double my_d = mystate[3];
           cout << "mystate: \t" << "\t s = " << car_s <<"\t d = " <<car_d<< endl;
           
           //get id of closest in front car in my lane 
@@ -516,50 +517,18 @@ double my_d = mystate[3];
           // get distance of that car
           double closecar_dist = pf.distance2car(all_cars[closecar_id]);
           cout << "closecar = \t" << closecar_id << "\t s = " << all_cars[closecar_id].s <<"\t d = " << all_cars[closecar_id].d << "\t dist = " << closecar_dist << endl;
-          cout << "myfutstate: \t" << "\t s = " << mystate[0] <<"\t d = " <<mystate[3]<< endl;
-                    
+          cout << "myfutstate: \t" << "\t s = " << mystate[0] <<"\t d = " <<mystate[3]<< endl;         
           cout << endl;
-
-
-
-
           
-          // crude test drive
-          //double pos_d = car_d; //6;
+          // cars with their id and distance around us
           int closecar_id_right  = pf.distance2car_inlane(all_cars, my_s, 10);
           int closecar_id_middle = pf.distance2car_inlane(all_cars, my_s, 6);
           int closecar_id_left   = pf.distance2car_inlane(all_cars, my_s, 2);
           double closecar_dist_right  = pf.distance2car(all_cars[closecar_id_right]);
           double closecar_dist_middle = pf.distance2car(all_cars[closecar_id_middle]);
           double closecar_dist_left   = pf.distance2car(all_cars[closecar_id_left]);
-/*          
-          if ((closecar_dist_left < safedist) && (closecar_dist_middle < safedist) && (closecar_dist_right < safedist)) {
-            // slow down
-            //pf.SPEED_LIMIT *= 0.9;
-            cout << "<<< SLOW DOWN >>>" << endl;
-          } else {
-            // change lane
-            if ((closecar_dist < safedist) && (closecar_dist_right > safedist)) {
-              //pos_d = 10;
-              lane = 2;
-            } else if ((closecar_dist < safedist) && (closecar_dist_left > safedist)) {
-              //pos_d = 2;
-              lane = 0;
-            } else if ((closecar_dist < safedist) && (closecar_dist_middle > safedist)){
-              //pos_d = 6;
-              lane = 1;
-            } else {
-              // keep lane
-              
-              lane my_lane = pf.in_lane(mystate[3]);
-              if (my_lane == LEFT_LANE) pos_d = 2; 
-              if (my_lane == MIDDLE_LANE) pos_d = 6; 
-              if (my_lane == RIGHT_LANE) pos_d = 10;  
-                      
-            }
-          }
-  */
-          /*
+          
+/*
           // predict the state of my car in the future (1s)
           mystate = mycar.state_at(previous_path_size*0.02);                
           my_s = mystate[0]; 
@@ -571,8 +540,6 @@ double my_d = mystate[3];
           double closecar_dist_middle2 = pf.distance2car(all_cars[closecar_id_middle2]);
           double closecar_dist_left2   = pf.distance2car(all_cars[closecar_id_left2]);
 */
-
-
 
  
           // ***************************************************************************
@@ -640,6 +607,24 @@ double my_d = mystate[3];
             else if (lane == 2) {
               if ((closecar_dist_right < safedist) && (closecar_dist_middle > safedist)) {
                 lane -= 1; // change left                            
+              }
+            }
+          }
+          // exception: we are stuck in heavy traffic and we are not TOO slow
+          else if (vel_set > 40*pf.MPH2MPS) {
+            if (lane == 0) {
+              if ((closecar_dist_left < safedist-20) && (closecar_dist_middle > safedist)) {
+                lane += 1; // change right
+              }
+            } else if (lane == 1) {
+              if ((closecar_dist_middle < safedist-20) && (closecar_dist_right > safedist)) {
+                lane += 1; // change right
+              } else if ((closecar_dist_middle < safedist-20) && (closecar_dist_left > safedist)) {
+                lane -= 1; // change left              
+              } else if (lane == 2) {
+                if ((closecar_dist_right < safedist-20) && (closecar_dist_middle > safedist)) {
+                  lane -= 1; // change left                            
+                }
               }
             }
           }
