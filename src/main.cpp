@@ -183,10 +183,12 @@ int main() {
   vector<double> map_waypoints_dy;
 
   // Waypoint map to read from
-  string map_file_ = "../data/highway_map.csv";
+  //string map_file_ = "../data/highway_map.csv";
+  string map_file_ = "../data/highway_map_bosch1.csv";
   // The max s value before wrapping around the track back to 0
-  double max_s = 6945.554;
-
+  //double max_s = 6945.554;
+  double max_s = 4935.511;
+    
   ifstream in_map_(map_file_.c_str(), ifstream::in);
 
   string line;
@@ -210,36 +212,6 @@ int main() {
   }
   
 //rbx 
-  // setup spline objects
-  spline waypointspline_x;
-  spline waypointspline_y;
-  spline waypointspline_dx;
-  spline waypointspline_dy;
-      
-  // generate splines
-  waypointspline_x.set_points( map_waypoints_s, map_waypoints_x );
-  waypointspline_y.set_points( map_waypoints_s, map_waypoints_y );
-  waypointspline_dx.set_points(map_waypoints_s, map_waypoints_dx);
-  waypointspline_dy.set_points(map_waypoints_s, map_waypoints_dy);
-  
-  // upsample waypoints ref: https://discussions.udacity.com/t/latency-handling/322156
-  vector<double> map_waypoints_x_upsampled;
-  vector<double> map_waypoints_y_upsampled;
-  vector<double> map_waypoints_s_upsampled;
-  //vector<double> map_waypoints_dx_upsampled;
-  //vector<double> map_waypoints_dy_upsampled;
-    
-  spline spline_x, spline_y;
-  spline_x.set_points(map_waypoints_s, map_waypoints_x);
-  spline_y.set_points(map_waypoints_s, map_waypoints_y);
-
-  // refine path with spline.
-  int spline_samples = 12000;
-  for (size_t i = 0; i < spline_samples; ++i) {
-    map_waypoints_x_upsampled.push_back(spline_x(i));
-    map_waypoints_y_upsampled.push_back(spline_y(i));
-    map_waypoints_s_upsampled.push_back(i);
-  }  
 
   // generate PathFinder class & initial states
   PathFinder pf(0, 0, 0, 0, 0, 0, 0); // double x, double y, double d, double s, double v, double a, double yaw
@@ -269,7 +241,7 @@ int main() {
 //rbx
   //ur h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
       
-  h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy, &waypointspline_x, &waypointspline_y, &waypointspline_dx, &waypointspline_dy, &pf, &counter, &map_waypoints_x_upsampled, &map_waypoints_y_upsampled, &map_waypoints_s_upsampled, &vel_set, &lane, &car_infront_lastdist, &increase_speed, &decrease_speed](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
+  h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy, &pf, &counter, &vel_set, &lane, &car_infront_lastdist, &increase_speed, &decrease_speed](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                      uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -348,8 +320,8 @@ int main() {
           pf.y = car_y;
           pf.v = car_speed*pf.MPH2MPS;
           pf.yaw = car_yaw;
-          double my_dx = waypointspline_dx(car_s); //TODO: upsampling necessary???????????????
-          double my_dy = waypointspline_dy(car_s);
+          double my_dx = 1; //waypointspline_dx(car_s); //TODO: upsampling necessary???????????????
+          double my_dy = 0; //waypointspline_dy(car_s);
 
          
           // place my car in a vector of cars as well to be able to use state prediction
@@ -568,7 +540,7 @@ int main() {
           //if (othercars_too_close && decrease_speed) {
           if (othercars_too_close && decrease_speed && vel_set > 30*pf.MPH2MPS) {
             vel_set -= 0.224*pf.MPH2MPS;
-          } else if (vel_set < 49.5*pf.MPH2MPS && increase_speed) {
+          } else if (vel_set < 49.7*pf.MPH2MPS && increase_speed) {
             vel_set += 0.224*pf.MPH2MPS;
           }
           if (!safe_lanechange_possible) decrease_speed = true;
@@ -598,11 +570,19 @@ int main() {
             // use two points to align car path with yaw
             double prev_car_x = car_x - cos(ref_yaw); 
             double prev_car_y = car_y - sin(ref_yaw);
+            
             ptsx.push_back(prev_car_x);
             ptsx.push_back(car_x);
             ptsy.push_back(prev_car_y);
             ptsy.push_back(car_y);
-
+            
+/*            
+            //-654.479 -640.717
+            ptsx.push_back(-654.479-2);
+            ptsx.push_back(-654.479-1);
+            ptsy.push_back(-640.717);
+            ptsy.push_back(-640.717);
+*/            
           } else
           // use last previous point as starting reference 
           {
